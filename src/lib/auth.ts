@@ -2,6 +2,8 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { prisma } from "./prisma";
 
+// Added this to solve some issues I have personally ran into
+// on a separate project. /Sabrina
 const development = process.env.NODE_ENV == "development";
 
 export const auth = betterAuth({
