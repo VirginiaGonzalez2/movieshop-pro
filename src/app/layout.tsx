@@ -1,11 +1,7 @@
-"use server";
-
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AcceptCookies from "./_components/accept-cookies";
-import { cookies } from "next/headers";
-import { useCallback, useState } from "react";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -27,8 +23,6 @@ export default async function RootLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const cookieStore = await cookies();
-
     return (
         <html lang="en">
             <body
