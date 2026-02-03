@@ -1,64 +1,88 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
 }
 
-model account {
-  id                    String    @id
-  accountId             String
-  providerId            String
-  userId                String
-  accessToken           String?
-  refreshToken          String?
-  idToken               String?
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
-  scope                 String?
-  password              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime
-  user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Movie {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  price       Decimal
+  releaseDate DateTime
+  runtime     Int
+  imageUrl    String?
+  stock       Int
 
-  @@index([userId])
+  genres      MovieGenre[]
+  people      MoviePerson[]
+  orderItems  OrderItem[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
-model session {
-  id        String   @id
-  expiresAt DateTime
-  token     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Genre {
+  id          Int     @id @default(autoincrement())
+  name        String @unique
+  description String?
 
-  @@index([userId])
+  movies      MovieGenre[]
 }
 
-model user {
-  id            String    @id
-  name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime
-  account       account[]
-  session       session[]
+model Person {
+  id     Int     @id @default(autoincrement())
+  name   String
+  bio    String?
+
+  movies MoviePerson[]
 }
 
-model verification {
-  id         String   @id
-  identifier String
-  value      String
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime
+model MovieGenre {
+  movieId Int
+  genreId Int
 
-  @@index([identifier])
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  genre Genre @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, genreId])
+}
+
+model MoviePerson {
+  movieId  Int
+  personId Int
+  role     Role
+
+  movie  Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  person Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  @@id([movieId, personId, role])
+}
+
+enum Role {
+  ACTOR
+  DIRECTOR
+}
+
+model Order {
+  id          Int      @id @default(autoincrement())
+  userId      String
+  totalAmount Decimal
+  status      String
+  orderDate   DateTime @default(now())
+
+  items       OrderItem[]
+}
+
+model OrderItem {
+  id              Int      @id @default(autoincrement())
+  orderId         Int
+  movieId         Int
+  quantity        Int
+  priceAtPurchase Decimal
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
 }
