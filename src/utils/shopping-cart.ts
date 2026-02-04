@@ -1,43 +1,49 @@
-import { getLocalCookieStore } from "./cookie-store";
+import { cookies } from "next/dist/server/request/cookies";
 
 type ShoppingCartItem = {
     id: number;
     quantity: number;
 };
 
+type ShoppingCart = ShoppingCartItem[];
+
 const shoppingCartCookie = "shopping-cart";
+const shoppingCartLifetime = 604800000; // One week.
 
-function saveShoppingCart(shoppingCart: ShoppingCartItem[] | null): boolean {
-    const storage = getLocalCookieStore();
-    if (!storage) {
-        return false;
-    }
+async function getShoppingCart(): Promise<ShoppingCart | undefined> {
+    const cookieStore = await cookies();
 
-    if (shoppingCart) {
-        storage.setItem(shoppingCartCookie, JSON.stringify(shoppingCart));
-    } else {
-        storage.removeItem(shoppingCartCookie);
-    }
-
-    return true;
-}
-
-function getShoppingCart(): ShoppingCartItem[] | undefined {
-    const storage = getLocalCookieStore();
-    if (!storage) {
+    const cookie = cookieStore.get(shoppingCartCookie);
+    if (!cookie || !cookie.value) {
         return undefined;
     }
 
-    const cookie = storage.getItem(shoppingCartCookie);
-    if (!cookie) {
-        return [];
+    const parsed = JSON.parse(cookie.value);
+
+    if (!(parsed instanceof Array)) {
+        clearShoppingCart();
+        return undefined;
     }
 
-    return JSON.parse(cookie.toString());
+    // TODO: Check for and remove invalid items.
+
+    return parsed;
+}
+
+async function saveShoppingCart(shoppingCart: ShoppingCart | null) {
+    if (shoppingCart) {
+        cookieStore.set({
+            name: shoppingCartCookie,
+            value: JSON.stringify(shoppingCart),
+            expires: Date.now() + shoppingCartLifetime,
+        });
+    } else {
+        cookieStore.delete(shoppingCartCookie);
+    }
 }
 
 function findShoppingCartItem(
-    shoppingCart: ShoppingCartItem[],
+    shoppingCart: ShoppingCart,
     id: number,
 ): ShoppingCartItem | null {
     for (const item of shoppingCart) {
@@ -45,78 +51,57 @@ function findShoppingCartItem(
             return item;
         }
     }
+
     return null;
 }
 
-function addShoppingCartItem(
-    item: ShoppingCartItem,
-): ShoppingCartItem[] | undefined {
-    const shoppingCart = getShoppingCart();
-    if (!shoppingCart) {
-        return undefined;
-    }
+function addShoppingCartItem(item: ShoppingCartItem) {
+    getShoppingCart().then((shoppingCart) => {
+        let existing = undefined;
 
-    const existing = findShoppingCartItem(shoppingCart, item.id);
-
-    if (existing) {
-        // If it already exists add to quantity.
-        existing.quantity += item.quantity;
-    } else {
-        shoppingCart.push(item);
-    }
-
-    saveShoppingCart(shoppingCart);
-
-    return shoppingCart;
-}
-
-function removeShoppingCartItem(id: number): ShoppingCartItem[] | undefined {
-    const shoppingCart = getShoppingCart();
-    if (!shoppingCart) {
-        return undefined;
-    }
-
-    for (let i = 0; i < shoppingCart.length; i++) {
-        const item = shoppingCart[i];
-        if (item.id === id) {
-            shoppingCart.copyWithin(i - 1, i);
-            shoppingCart.pop();
-            saveShoppingCart(shoppingCart);
-            break;
+        if (shoppingCart) {
+            existing = findShoppingCartItem(shoppingCart, item.id);
+        } else {
+            shoppingCart = [];
         }
-    }
 
-    return shoppingCart;
-}
-
-function updateShoppingCartItem(
-    id: number,
-    quantity: number,
-): ShoppingCartItem[] | undefined {
-    const shoppingCart = getShoppingCart();
-    if (!shoppingCart) {
-        return undefined;
-    }
-
-    for (const item of shoppingCart) {
-        if (item.id === id) {
-            item.quantity = quantity;
-            saveShoppingCart(shoppingCart);
-            break;
+        if (existing) {
+            // If it already exists add to quantity.
+            existing.quantity += item.quantity;
+        } else {
+            shoppingCart.push(item);
         }
-    }
 
-    return shoppingCart;
+        saveShoppingCart(shoppingCart);
+    });
 }
 
-function clearShoppingCart(): boolean {
-    return saveShoppingCart(null);
+function removeShoppingCartItem(id: number): void {
+    getShoppingCart().then((shoppingCart) => {
+        if (!shoppingCart) {
+            return;
+        }
+
+        for (let i = 0; i < shoppingCart.length; i++) {
+            const item = shoppingCart[i];
+            if (item.id === id) {
+                shoppingCart.copyWithin(i - 1, i);
+                shoppingCart.pop();
+                saveShoppingCart(shoppingCart);
+                break;
+            }
+        }
+    });
+}
+
+function clearShoppingCart() {
+    saveShoppingCart(null);
 }
 
 export {
     getShoppingCart,
     addShoppingCartItem,
     removeShoppingCartItem,
-    updateShoppingCartItem,
     clearShoppingCart,
+    type ShoppingCart,
 };
