@@ -4,7 +4,6 @@ import {
     NavigationMenuLink,
     NavigationMenuList,
 } from "@/components/ui/navigation-menu";
-import Link from "next/link";
 
 type Props = Omit<React.ComponentProps<typeof NavigationMenu>, "className"> & {
     className?: string;
