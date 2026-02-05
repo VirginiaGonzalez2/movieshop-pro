@@ -20,37 +20,37 @@ export default function GlobalNavigationHeader({ className }: Props) {
                 <NavigationMenuList>
                     <NavigationMenuItem>
                         <NavigationMenuLink
-                            asChild
+                            href="/"
                             className="navigationMenuTriggerStyle()">
-                            <Link href="/">Home</Link>
+                            Home
                         </NavigationMenuLink>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                         <NavigationMenuLink
-                            asChild
+                            href="/movies"
                             className="navigationMenuTriggerStyle()">
-                            <Link href="/movies">Movies</Link>
+                            Movies
                         </NavigationMenuLink>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                         <NavigationMenuLink
-                            asChild
+                            href="/orders"
                             className="navigationMenuTriggerStyle()">
-                            <Link href="/orders">Orders</Link>
+                            Orders
                         </NavigationMenuLink>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                         <NavigationMenuLink
-                            asChild
+                            href="/cart"
                             className="navigationMenuTriggerStyle()">
-                            <Link href="/cart">Cart</Link>
+                            Cart
                         </NavigationMenuLink>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                         <NavigationMenuLink
-                            asChild
+                            href="/about"
                             className="navigationMenuTriggerStyle()">
-                            <Link href="/about">About</Link>
+                            About
                         </NavigationMenuLink>
                     </NavigationMenuItem>
                 </NavigationMenuList>
