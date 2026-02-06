@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import GlobalNavigationHeader from "./_components/global-navigation-header";
+import GlobalHeader from "./_components/global-header";
 import GlobalFooter from "./_components/global-footer";
 
 const geistSans = Geist({
@@ -29,12 +29,12 @@ export default function RootLayout({
         <html lang="en" className="h-full">
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased h-full gap-4 flex flex-col justify-between`}>
-                <GlobalNavigationHeader className="p-2 pb-0 flex-0" />
+                <GlobalHeader className="p-1 flex-0" />
                 <div className="p-2 flex-1 text-center overflow-y-auto">
                     {children}
                     <Toaster richColors />
                 </div>
-                <GlobalFooter className="p-2 pt-0 flex-0" />
+                <GlobalFooter className="p-1 flex-0" />
             </body>
         </html>
     );
