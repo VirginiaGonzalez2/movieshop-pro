@@ -37,6 +37,11 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-hover: var(--primary-hover); /* */
+  --color-secondary-hover: var(--secondary-hover); /* */
+  --color-disabled: var(--disabled); /* */
+  --color-error: var(--error); /* */
+  --color-success: var(--success);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -48,21 +53,26 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  --background:oklch(0.9842 0.0034 247.86);
+  --foreground: black;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
+  --primary: oklch(0.5461 0.2152 262.88);
+  --primary-foreground: oklch(0.9842 0.0034 247.86);
+  --primary-hover: oklch(0.4244 0.1809 265.64);
+  --secondary: oklch(85.566% 0.00716 248.222 / 0.815);
+  --secondary-foreground: oklch(0.5544 0.0407 257.42);
+  --secondary-hover: oklch(0.7938 0.00716 248.222);
   --muted: oklch(0.968 0.007 247.896);
   --muted-foreground: oklch(0.554 0.046 257.417);
   --accent: oklch(0.968 0.007 247.896);
   --accent-foreground: oklch(0.208 0.042 265.755);
   --destructive: oklch(0.577 0.245 27.325);
+  --disabled: oklch(0.869 0.0198 252.89);
+  --error: oklch(0.5771 0.2152 27.33);
+  --success: oklch(0.6271 0.1699 149.21);
   --border: oklch(0.929 0.013 255.508);
   --input: oklch(0.929 0.013 255.508);
   --ring: oklch(0.704 0.04 256.788);

@@ -1,0 +1,2 @@
+- Colour tokens goes in 'globals.css'
+- 'colour-tokens.css' example of how content can look within global.css, not the chosen colours as is
