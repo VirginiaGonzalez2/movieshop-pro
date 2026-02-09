@@ -1,3 +1,11 @@
+/**
+ *  Author: Sabrina Bjurman
+ *  Create Time: 2026-02-04
+ *  Modified by: Sabrina Bjurman
+ *  Modified time: 2026-02-09 14:51:30
+ *  Description: Header
+ */
+
 import MovieShopLogo from "@/components/ui-brand/movieshop-logo";
 import {
     NavigationMenu,
@@ -11,14 +19,15 @@ import { twMerge } from "tailwind-merge";
 
 type Props = React.ComponentProps<"header">;
 
-export default function GlobalHeader({ className, ...headerProps }: Props) {
+export function AppHeader({ className, ...headerProps }: Props) {
     return (
         <header
             className={twMerge(
                 "p-1 w-full flex-0 flex flex-row justify-between",
-                className,
+                className
             )}
-            {...headerProps}>
+            {...headerProps}
+        >
             <MovieShopLogo variant="header" className="flex-0" />
             <NavigationMenu className="flex-0">
                 <NavigationMenuList className="w-full flex-1 justify-end">

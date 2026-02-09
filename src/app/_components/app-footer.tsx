@@ -1,3 +1,11 @@
+/**
+ *  Author: Sabrina Bjurman
+ *  Create Time: 2026-02-04
+ *  Modified by: Sabrina Bjurman
+ *  Modified time: 2026-02-09 14:51:22
+ *  Description: Footer
+ */
+
 import MovieShopLogo from "@/components/ui-brand/movieshop-logo";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -9,14 +17,15 @@ import { twMerge } from "tailwind-merge";
 
 type Props = React.ComponentProps<"footer">;
 
-export default function GlobalFooter({ className, ...rest }: Props) {
+export function AppFooter({ className, ...rest }: Props) {
     return (
         <footer
             className={twMerge(
                 "p-1 flex-0 flex justify-between items-center bg-foreground text-nowrap",
-                className,
+                className
             )}
-            {...rest}>
+            {...rest}
+        >
             <div className="flex-1">
                 <MovieShopLogo variant="footer" />
             </div>
@@ -64,9 +73,10 @@ const Menu = ({ className, children, ...rest }: React.ComponentProps<"ul">) => (
     <ul
         className={twMerge(
             "flex flex-nowrap items-center justify-start",
-            className,
+            className
         )}
-        {...rest}>
+        {...rest}
+    >
         {children}
     </ul>
 );

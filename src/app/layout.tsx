@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
-import GlobalHeader from "./_components/global-header";
-import GlobalFooter from "./_components/global-footer";
+import { AppHeader } from "./_components/app-header";
+import { AppFooter } from "./_components/app-footer";
 import { twMerge } from "tailwind-merge";
 
 const geistSans = Geist({
@@ -32,14 +32,15 @@ export default function RootLayout({
                 className={twMerge(
                     geistSans.variable,
                     geistMono.variable,
-                    "antialiased h-full flex flex-col items-stretch bg-background text-foreground",
-                )}>
-                <GlobalHeader />
+                    "antialiased h-full flex flex-col items-stretch bg-background text-foreground"
+                )}
+            >
+                <AppHeader />
                 <div className="flex-1 overflow-y-auto">
                     {children}
                     <Toaster richColors />
                 </div>
-                <GlobalFooter />
+                <AppFooter />
             </body>
         </html>
     );
