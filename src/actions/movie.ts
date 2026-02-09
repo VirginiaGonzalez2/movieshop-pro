@@ -4,12 +4,16 @@ import { prisma } from "@/lib/prisma";
 import { movieSchema } from "@/lib/validations/movie";
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
-export async function createMovie(formData: FormData) {
+//  CREATE
+export async function createMovie(formData: FormData): Promise<void> {
   const raw = Object.fromEntries(formData);
-
   const parsed = movieSchema.safeParse(raw);
-  if (!parsed.success) return { error: parsed.error.flatten() };
+
+  if (!parsed.success) {
+    throw new Error(parsed.error.issues.map((i) => i.message).join(", "));
+  }
 
   await prisma.movie.create({
     data: {
@@ -20,14 +24,20 @@ export async function createMovie(formData: FormData) {
 
   revalidatePath("/admin/movies");
   revalidatePath("/movies");
-  return { success: true };
+  redirect("/admin/movies"); 
 }
 
-export async function updateMovie(id: number, formData: FormData) {
+//  UPDATE
+export async function updateMovie(
+  id: number,
+  formData: FormData,
+): Promise<void> {
   const raw = Object.fromEntries(formData);
-
   const parsed = movieSchema.safeParse(raw);
-  if (!parsed.success) return { error: parsed.error.flatten() };
+
+  if (!parsed.success) {
+    throw new Error(parsed.error.issues.map((i) => i.message).join(", "));
+  }
 
   await prisma.movie.update({
     where: { id },
@@ -39,10 +49,11 @@ export async function updateMovie(id: number, formData: FormData) {
 
   revalidatePath("/admin/movies");
   revalidatePath("/movies");
-  return { success: true };
+  redirect("/admin/movies");
 }
 
-export async function deleteMovie(id: number) {
+//  DELETE
+export async function deleteMovie(id: number): Promise<void> {
   await prisma.movie.delete({ where: { id } });
 
   revalidatePath("/admin/movies");

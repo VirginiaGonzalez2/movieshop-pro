@@ -4,15 +4,34 @@ import { updateMovie } from "@/actions/movie";
 export default async function AdminEditMoviePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }> | { id: string };
 }) {
-  const id = Number(params.id);
+  const resolvedParams = await Promise.resolve(params);
+
+  const id = Number(resolvedParams.id);
+
+  if (!Number.isInteger(id) || id <= 0) {
+    return (
+      <div className="p-8">
+        <h1 className="text-xl font-semibold">Invalid movie id</h1>
+        <p className="text-muted-foreground">
+          URL must look like: <code>/admin/movies/1/edit</code>
+        </p>
+      </div>
+    );
+  }
 
   const movie = await prisma.movie.findUnique({
     where: { id },
   });
 
-  if (!movie) return <div className="p-8">Movie not found</div>;
+  if (!movie) {
+    return (
+      <div className="p-8">
+        Movie not found for id <code>{id}</code>
+      </div>
+    );
+  }
 
   const updateWithId = updateMovie.bind(null, movie.id);
 
@@ -26,11 +45,13 @@ export default async function AdminEditMoviePage({
           defaultValue={movie.title}
           className="w-full border p-2"
         />
+
         <textarea
           name="description"
           defaultValue={movie.description}
           className="w-full border p-2"
         />
+
         <input
           name="price"
           type="number"
@@ -38,23 +59,27 @@ export default async function AdminEditMoviePage({
           defaultValue={movie.price.toString()}
           className="w-full border p-2"
         />
+
         <input
           name="releaseDate"
           type="date"
           defaultValue={movie.releaseDate.toISOString().split("T")[0]}
           className="w-full border p-2"
         />
+
         <input
           name="runtime"
           type="number"
           defaultValue={movie.runtime}
           className="w-full border p-2"
         />
+
         <input
           name="imageUrl"
           defaultValue={movie.imageUrl ?? ""}
           className="w-full border p-2"
         />
+
         <input
           name="stock"
           type="number"
