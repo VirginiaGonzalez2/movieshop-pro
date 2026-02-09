@@ -1,6 +1,6 @@
 import { createMovie } from "@/actions/movie";
 
-export default function NewMoviePage() {
+export default function AdminNewMoviePage() {
   return (
     <div className="p-8 max-w-xl">
       <h1 className="text-2xl font-bold mb-6">Add Movie</h1>
@@ -28,7 +28,7 @@ export default function NewMoviePage() {
         />
         <input
           name="imageUrl"
-          placeholder="Image URL"
+          placeholder="Image URL (optional)"
           className="w-full border p-2"
         />
         <input

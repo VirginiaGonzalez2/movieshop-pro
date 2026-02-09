@@ -1,16 +1,17 @@
-import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { prisma } from "@/lib/prisma";
 import { deleteMovie } from "@/actions/movie";
 
-export default async function MoviesAdminPage() {
+export default async function AdminMoviesPage() {
   const movies = await prisma.movie.findMany({
     orderBy: { createdAt: "desc" },
   });
 
   return (
     <div className="p-8">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Movies</h1>
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-2xl font-bold">Admin: Movies</h1>
+
         <Link
           href="/admin/movies/new"
           className="bg-black text-white px-4 py-2 rounded"
@@ -19,32 +20,39 @@ export default async function MoviesAdminPage() {
         </Link>
       </div>
 
-      <div className="space-y-4">
-        {movies.map((movie) => (
-          <div
-            key={movie.id}
-            className="border p-4 rounded flex justify-between"
-          >
-            <div>
-              <h2 className="font-semibold">{movie.title}</h2>
-              <p className="text-sm text-gray-500">${movie.price.toString()}</p>
-            </div>
+      {movies.length === 0 ? (
+        <p className="text-muted-foreground">No movies yet.</p>
+      ) : (
+        <div className="space-y-4">
+          {movies.map((movie) => (
+            <div
+              key={movie.id}
+              className="border p-4 rounded flex items-start justify-between"
+            >
+              <div>
+                <div className="font-semibold">{movie.title}</div>
+                <div className="text-sm text-muted-foreground">
+                  ${movie.price.toString()} • Stock: {movie.stock} • Runtime:{" "}
+                  {movie.runtime} min
+                </div>
+              </div>
 
-            <div className="flex gap-4 items-center">
-              <Link
-                href={`/admin/movies/${movie.id}/edit`}
-                className="text-blue-600"
-              >
-                Edit
-              </Link>
+              <div className="flex gap-4">
+                <Link
+                  className="text-blue-600"
+                  href={`/admin/movies/${movie.id}/edit`}
+                >
+                  Edit
+                </Link>
 
-              <form action={async () => deleteMovie(movie.id)}>
-                <button className="text-red-600">Delete</button>
-              </form>
+                <form action={deleteMovie.bind(null, movie.id)}>
+                  <button className="text-red-600">Delete</button>
+                </form>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

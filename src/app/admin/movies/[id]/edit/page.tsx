@@ -1,13 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { updateMovie } from "@/actions/movie";
 
-export default async function EditMoviePage({
+export default async function AdminEditMoviePage({
   params,
 }: {
   params: { id: string };
 }) {
+  const id = Number(params.id);
+
   const movie = await prisma.movie.findUnique({
-    where: { id: Number(params.id) },
+    where: { id },
   });
 
   if (!movie) return <div className="p-8">Movie not found</div>;
