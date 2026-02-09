@@ -6,6 +6,15 @@ import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+//read genreIds
+
+function readGenreIds(formData: FormData): number[] {
+  return formData
+    .getAll("genres")
+    .map((v) => Number(v))
+    .filter((n) => Number.isInteger(n) && n > 0);
+}
+
 //  CREATE
 export async function createMovie(formData: FormData): Promise<void> {
   const raw = Object.fromEntries(formData);
@@ -15,16 +24,25 @@ export async function createMovie(formData: FormData): Promise<void> {
     throw new Error(parsed.error.issues.map((i) => i.message).join(", "));
   }
 
-  await prisma.movie.create({
+  const genreIds = readGenreIds(formData);
+
+  const movie = await prisma.movie.create({
     data: {
       ...parsed.data,
       price: new Prisma.Decimal(parsed.data.price),
     },
   });
 
+  if (genreIds.length > 0) {
+    await prisma.movieGenre.createMany({
+      data: genreIds.map((genreId) => ({ movieId: movie.id, genreId })),
+      skipDuplicates: true,
+    });
+  }
+
   revalidatePath("/admin/movies");
   revalidatePath("/movies");
-  redirect("/admin/movies"); 
+  redirect("/admin/movies");
 }
 
 //  UPDATE
@@ -39,13 +57,30 @@ export async function updateMovie(
     throw new Error(parsed.error.issues.map((i) => i.message).join(", "));
   }
 
-  await prisma.movie.update({
-    where: { id },
-    data: {
-      ...parsed.data,
-      price: new Prisma.Decimal(parsed.data.price),
-    },
-  });
+  const genreIds = readGenreIds(formData);
+
+  await prisma.$transaction([
+    prisma.movie.update({
+      where: { id },
+      data: {
+        ...parsed.data,
+        price: new Prisma.Decimal(parsed.data.price),
+      },
+    }),
+
+    prisma.movieGenre.deleteMany({
+      where: { movieId: id },
+    }),
+
+    ...(genreIds.length > 0
+      ? [
+          prisma.movieGenre.createMany({
+            data: genreIds.map((genreId) => ({ movieId: id, genreId })),
+            skipDuplicates: true,
+          }),
+        ]
+      : []),
+  ]);
 
   revalidatePath("/admin/movies");
   revalidatePath("/movies");
@@ -54,6 +89,9 @@ export async function updateMovie(
 
 //  DELETE
 export async function deleteMovie(id: number): Promise<void> {
+
+  await prisma.movieGenre.deleteMany({ where: { movieId: id } });
+
   await prisma.movie.delete({ where: { id } });
 
   revalidatePath("/admin/movies");
