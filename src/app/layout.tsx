@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import GlobalHeader from "./_components/global-header";
 import GlobalFooter from "./_components/global-footer";
+import { twMerge } from "tailwind-merge";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -28,13 +29,17 @@ export default function RootLayout({
     return (
         <html lang="en" className="h-full">
             <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased h-full gap-4 flex flex-col justify-between`}>
-                <GlobalHeader className="p-1 flex-0" />
-                <div className="p-2 flex-1 text-center overflow-y-auto">
+                className={twMerge(
+                    geistSans.variable,
+                    geistMono.variable,
+                    "antialiased h-full flex flex-col items-stretch bg-background text-foreground",
+                )}>
+                <GlobalHeader />
+                <div className="flex-1 overflow-y-auto">
                     {children}
                     <Toaster richColors />
                 </div>
-                <GlobalFooter className="p-1 flex-0" />
+                <GlobalFooter />
             </body>
         </html>
     );

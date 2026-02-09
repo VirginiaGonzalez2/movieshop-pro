@@ -15,7 +15,7 @@ export default function GlobalHeader({ className, ...headerProps }: Props) {
     return (
         <header
             className={twMerge(
-                "w-full flex flex-row justify-between",
+                "p-1 w-full flex-0 flex flex-row justify-between",
                 className,
             )}
             {...headerProps}>
