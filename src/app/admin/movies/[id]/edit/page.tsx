@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { updateMovie } from "@/actions/movie";
+import { Role } from "@prisma/client";
 
 export default async function AdminEditMoviePage({
     params,
@@ -24,13 +25,28 @@ export default async function AdminEditMoviePage({
     if (!movie) return <div className="p-8">Movie not found</div>;
 
     // fetch all genres ids
-
     const genres = await prisma.genre.findMany({ orderBy: { name: "asc" } });
     const selected = await prisma.movieGenre.findMany({
         where: { movieId: movie.id },
         select: { genreId: true },
     });
     const selectedIds = new Set(selected.map((x) => x.genreId));
+
+    // People + selected roles
+    const people = await prisma.person.findMany({ orderBy: { name: "asc" } });
+
+    const selectedPeople = await prisma.moviePerson.findMany({
+        where: { movieId: movie.id },
+        select: { personId: true, role: true },
+    });
+
+    const selectedActorIds = new Set(
+        selectedPeople.filter((p) => p.role === Role.ACTOR).map((p) => p.personId),
+    );
+
+    const selectedDirectorIds = new Set(
+        selectedPeople.filter((p) => p.role === Role.DIRECTOR).map((p) => p.personId),
+    );
 
     const updateWithId = updateMovie.bind(null, movie.id);
 
@@ -94,6 +110,54 @@ export default async function AdminEditMoviePage({
                                         defaultChecked={selectedIds.has(g.id)}
                                     />
                                     {g.name}
+                                </label>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Actors */}
+                <div className="border rounded p-3">
+                    <div className="font-semibold mb-2">Actors</div>
+                    {people.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">
+                            No people yet. Create some in <code>/admin/people</code>.
+                        </p>
+                    ) : (
+                        <div className="grid grid-cols-2 gap-2">
+                            {people.map((p) => (
+                                <label key={p.id} className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        name="actors"
+                                        value={p.id}
+                                        defaultChecked={selectedActorIds.has(p.id)}
+                                    />
+                                    {p.name}
+                                </label>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Directors */}
+                <div className="border rounded p-3">
+                    <div className="font-semibold mb-2">Directors</div>
+                    {people.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">
+                            No people yet. Create some in <code>/admin/people</code>.
+                        </p>
+                    ) : (
+                        <div className="grid grid-cols-2 gap-2">
+                            {people.map((p) => (
+                                <label key={p.id} className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        name="directors"
+                                        value={p.id}
+                                        defaultChecked={selectedDirectorIds.has(p.id)}
+                                    />
+                                    {p.name}
                                 </label>
                             ))}
                         </div>

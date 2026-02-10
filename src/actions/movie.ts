@@ -2,15 +2,20 @@
 
 import { prisma } from "@/lib/prisma";
 import { movieSchema } from "@/lib/validations/movie";
-import { Prisma } from "@prisma/client";
+import { Prisma, Role } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-
-//read genreIds
 
 function readGenreIds(formData: FormData): number[] {
     return formData
         .getAll("genres")
+        .map((v) => Number(v))
+        .filter((n) => Number.isInteger(n) && n > 0);
+}
+
+function readPersonIds(formData: FormData, key: "actors" | "directors"): number[] {
+    return formData
+        .getAll(key)
         .map((v) => Number(v))
         .filter((n) => Number.isInteger(n) && n > 0);
 }
@@ -25,6 +30,8 @@ export async function createMovie(formData: FormData): Promise<void> {
     }
 
     const genreIds = readGenreIds(formData);
+    const actorIds = readPersonIds(formData, "actors");
+    const directorIds = readPersonIds(formData, "directors");
 
     const movie = await prisma.movie.create({
         data: {
@@ -36,6 +43,26 @@ export async function createMovie(formData: FormData): Promise<void> {
     if (genreIds.length > 0) {
         await prisma.movieGenre.createMany({
             data: genreIds.map((genreId) => ({ movieId: movie.id, genreId })),
+            skipDuplicates: true,
+        });
+    }
+
+    const moviePeople = [
+        ...actorIds.map((personId) => ({
+            movieId: movie.id,
+            personId,
+            role: Role.ACTOR as Role,
+        })),
+        ...directorIds.map((personId) => ({
+            movieId: movie.id,
+            personId,
+            role: Role.DIRECTOR as Role,
+        })),
+    ];
+
+    if (moviePeople.length > 0) {
+        await prisma.moviePerson.createMany({
+            data: moviePeople,
             skipDuplicates: true,
         });
     }
@@ -55,6 +82,21 @@ export async function updateMovie(id: number, formData: FormData): Promise<void>
     }
 
     const genreIds = readGenreIds(formData);
+    const actorIds = readPersonIds(formData, "actors");
+    const directorIds = readPersonIds(formData, "directors");
+
+    const moviePeople = [
+        ...actorIds.map((personId) => ({
+            movieId: id,
+            personId,
+            role: Role.ACTOR as Role,
+        })),
+        ...directorIds.map((personId) => ({
+            movieId: id,
+            personId,
+            role: Role.DIRECTOR as Role,
+        })),
+    ];
 
     await prisma.$transaction([
         prisma.movie.update({
@@ -65,14 +107,23 @@ export async function updateMovie(id: number, formData: FormData): Promise<void>
             },
         }),
 
-        prisma.movieGenre.deleteMany({
-            where: { movieId: id },
-        }),
-
+        // Replace genres
+        prisma.movieGenre.deleteMany({ where: { movieId: id } }),
         ...(genreIds.length > 0
             ? [
                   prisma.movieGenre.createMany({
                       data: genreIds.map((genreId) => ({ movieId: id, genreId })),
+                      skipDuplicates: true,
+                  }),
+              ]
+            : []),
+
+        // Replace people roles
+        prisma.moviePerson.deleteMany({ where: { movieId: id } }),
+        ...(moviePeople.length > 0
+            ? [
+                  prisma.moviePerson.createMany({
+                      data: moviePeople,
                       skipDuplicates: true,
                   }),
               ]
@@ -86,6 +137,7 @@ export async function updateMovie(id: number, formData: FormData): Promise<void>
 
 //  DELETE
 export async function deleteMovie(id: number): Promise<void> {
+    await prisma.moviePerson.deleteMany({ where: { movieId: id } });
     await prisma.movieGenre.deleteMany({ where: { movieId: id } });
 
     await prisma.movie.delete({ where: { id } });

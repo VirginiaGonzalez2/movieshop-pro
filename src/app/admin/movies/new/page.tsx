@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 
 export default async function AdminNewMoviePage() {
     const genres = await prisma.genre.findMany({ orderBy: { name: "asc" } });
+    const people = await prisma.person.findMany({ orderBy: { name: "asc" } });
 
     return (
         <div className="p-8 max-w-xl">
@@ -54,6 +55,44 @@ export default async function AdminNewMoviePage() {
                                 <label key={g.id} className="flex items-center gap-2">
                                     <input type="checkbox" name="genres" value={g.id} />
                                     {g.name}
+                                </label>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Actors */}
+                <div className="border rounded p-3">
+                    <div className="font-semibold mb-2">Actors</div>
+                    {people.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">
+                            No people yet. Create some in <code>/admin/people</code>.
+                        </p>
+                    ) : (
+                        <div className="grid grid-cols-2 gap-2">
+                            {people.map((p) => (
+                                <label key={p.id} className="flex items-center gap-2">
+                                    <input type="checkbox" name="actors" value={p.id} />
+                                    {p.name}
+                                </label>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Directors */}
+                <div className="border rounded p-3">
+                    <div className="font-semibold mb-2">Directors</div>
+                    {people.length === 0 ? (
+                        <p className="text-sm text-muted-foreground">
+                            No people yet. Create some in <code>/admin/people</code>.
+                        </p>
+                    ) : (
+                        <div className="grid grid-cols-2 gap-2">
+                            {people.map((p) => (
+                                <label key={p.id} className="flex items-center gap-2">
+                                    <input type="checkbox" name="directors" value={p.id} />
+                                    {p.name}
                                 </label>
                             ))}
                         </div>
