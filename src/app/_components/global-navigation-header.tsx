@@ -18,37 +18,27 @@ export default function GlobalNavigationHeader({ className }: Props) {
             </h1>
             <NavigationMenuList>
                 <NavigationMenuItem>
-                    <NavigationMenuLink
-                        asChild
-                        className="navigationMenuTriggerStyle()">
+                    <NavigationMenuLink asChild className="navigationMenuTriggerStyle()">
                         <Link href="/">Home</Link>
                     </NavigationMenuLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <NavigationMenuLink
-                        asChild
-                        className="navigationMenuTriggerStyle()">
+                    <NavigationMenuLink asChild className="navigationMenuTriggerStyle()">
                         <Link href="/movies">Movies</Link>
                     </NavigationMenuLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <NavigationMenuLink
-                        asChild
-                        className="navigationMenuTriggerStyle()">
+                    <NavigationMenuLink asChild className="navigationMenuTriggerStyle()">
                         <Link href="/orders">Orders</Link>
                     </NavigationMenuLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <NavigationMenuLink
-                        asChild
-                        className="navigationMenuTriggerStyle()">
+                    <NavigationMenuLink asChild className="navigationMenuTriggerStyle()">
                         <Link href="/cart">Cart</Link>
                     </NavigationMenuLink>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                    <NavigationMenuLink
-                        asChild
-                        className="navigationMenuTriggerStyle()">
+                    <NavigationMenuLink asChild className="navigationMenuTriggerStyle()">
                         <Link href="/about">About</Link>
                     </NavigationMenuLink>
                 </NavigationMenuItem>
