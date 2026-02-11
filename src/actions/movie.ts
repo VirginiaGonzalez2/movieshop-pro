@@ -11,10 +11,10 @@ export type MovieActionState =
     | { ok: false; message: string; fieldErrors?: Record<string, string[]> };
 
 function readGenreIds(formData: FormData): number[] {
-    return formData
-        .getAll("genres")
-        .map((v) => Number(v))
-        .filter((n) => Number.isInteger(n) && n > 0);
+  return formData
+    .getAll("genres")
+    .map((v) => Number(v))
+    .filter((n) => Number.isInteger(n) && n > 0);
 }
 
 function readPersonIds(formData: FormData, key: "actors" | "directors"): number[] {
@@ -45,12 +45,19 @@ export async function createMovie(
     const actorIds = readPersonIds(formData, "actors");
     const directorIds = readPersonIds(formData, "directors");
 
-    const movie = await prisma.movie.create({
-        data: {
-            ...parsed.data,
-            price: new Prisma.Decimal(parsed.data.price),
-        },
+  const movie = await prisma.movie.create({
+    data: {
+      ...parsed.data,
+      price: new Prisma.Decimal(parsed.data.price),
+    },
+  });
+
+  if (genreIds.length > 0) {
+    await prisma.movieGenre.createMany({
+      data: genreIds.map((genreId) => ({ movieId: movie.id, genreId })),
+      skipDuplicates: true,
     });
+  }
 
     if (genreIds.length > 0) {
         await prisma.movieGenre.createMany({
@@ -151,9 +158,9 @@ export async function updateMovie(
             : []),
     ]);
 
-    revalidatePath("/admin/movies");
-    revalidatePath("/movies");
-    redirect("/admin/movies");
+  revalidatePath("/admin/movies");
+  revalidatePath("/movies");
+  redirect("/admin/movies");
 }
 
 //  DELETE (delete can stay void)
@@ -161,8 +168,10 @@ export async function deleteMovie(id: number): Promise<void> {
     await prisma.moviePerson.deleteMany({ where: { movieId: id } });
     await prisma.movieGenre.deleteMany({ where: { movieId: id } });
 
-    await prisma.movie.delete({ where: { id } });
+  await prisma.movieGenre.deleteMany({ where: { movieId: id } });
 
-    revalidatePath("/admin/movies");
-    revalidatePath("/movies");
+  await prisma.movie.delete({ where: { id } });
+
+  revalidatePath("/admin/movies");
+  revalidatePath("/movies");
 }

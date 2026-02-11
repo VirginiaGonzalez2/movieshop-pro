@@ -28,8 +28,7 @@ export default function RootLayout({
     return (
         <html lang="en" className="h-full">
             <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased h-full gap-4 flex flex-col justify-between`}
-            >
+                className={`${geistSans.variable} ${geistMono.variable} antialiased h-full gap-4 flex flex-col justify-between`}>
                 <GlobalNavigationHeader className="p-2 pb-0 flex-0" />
                 <div className="p-2 flex-1 text-center overflow-y-auto">
                     {children}
