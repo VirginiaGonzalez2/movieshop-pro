@@ -6,6 +6,10 @@ import { Prisma, Role } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+export type MovieActionState =
+    | { ok: true }
+    | { ok: false; message: string; fieldErrors?: Record<string, string[]> };
+
 function readGenreIds(formData: FormData): number[] {
     return formData
         .getAll("genres")
@@ -21,12 +25,20 @@ function readPersonIds(formData: FormData, key: "actors" | "directors"): number[
 }
 
 //  CREATE
-export async function createMovie(formData: FormData): Promise<void> {
+export async function createMovie(
+    _prevState: MovieActionState,
+    formData: FormData,
+): Promise<MovieActionState> {
     const raw = Object.fromEntries(formData);
     const parsed = movieSchema.safeParse(raw);
 
     if (!parsed.success) {
-        throw new Error(parsed.error.issues.map((i) => i.message).join(", "));
+        const flattened = parsed.error.flatten();
+        return {
+            ok: false,
+            message: "Please fix the highlighted fields.",
+            fieldErrors: flattened.fieldErrors,
+        };
     }
 
     const genreIds = readGenreIds(formData);
@@ -73,12 +85,21 @@ export async function createMovie(formData: FormData): Promise<void> {
 }
 
 //  UPDATE
-export async function updateMovie(id: number, formData: FormData): Promise<void> {
+export async function updateMovie(
+    id: number,
+    _prevState: MovieActionState,
+    formData: FormData,
+): Promise<MovieActionState> {
     const raw = Object.fromEntries(formData);
     const parsed = movieSchema.safeParse(raw);
 
     if (!parsed.success) {
-        throw new Error(parsed.error.issues.map((i) => i.message).join(", "));
+        const flattened = parsed.error.flatten();
+        return {
+            ok: false,
+            message: "Please fix the highlighted fields.",
+            fieldErrors: flattened.fieldErrors,
+        };
     }
 
     const genreIds = readGenreIds(formData);
@@ -135,7 +156,7 @@ export async function updateMovie(id: number, formData: FormData): Promise<void>
     redirect("/admin/movies");
 }
 
-//  DELETE
+//  DELETE (delete can stay void)
 export async function deleteMovie(id: number): Promise<void> {
     await prisma.moviePerson.deleteMany({ where: { movieId: id } });
     await prisma.movieGenre.deleteMany({ where: { movieId: id } });
