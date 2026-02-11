@@ -42,10 +42,7 @@ async function saveShoppingCart(shoppingCart: ShoppingCart | null) {
     }
 }
 
-function findShoppingCartItem(
-    shoppingCart: ShoppingCart,
-    id: number,
-): ShoppingCartItem | null {
+function findShoppingCartItem(shoppingCart: ShoppingCart, id: number): ShoppingCartItem | null {
     for (const item of shoppingCart) {
         if (item.id === id) {
             return item;
