@@ -3,9 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { Role } from "@prisma/client";
 
 export default async function MoviesPage() {
-    const movies = await prisma.movie.findMany({
-        orderBy: { createdAt: "desc" },
-    });
+  const movies = await prisma.movie.findMany({
+    orderBy: { createdAt: "desc" },
+  });
 
     if (movies.length === 0) {
         return (
@@ -89,5 +89,7 @@ export default async function MoviesPage() {
                 })}
             </div>
         </div>
-    );
+      )}
+    </div>
+  );
 }

@@ -7,51 +7,51 @@ import { revalidatePath } from "next/cache";
 
 //  CREATE
 export async function createMovie(formData: FormData) {
-    const raw = Object.fromEntries(formData);
+  const raw = Object.fromEntries(formData);
 
-    const parsed = movieSchema.safeParse(raw);
-    if (!parsed.success) {
-        return { error: parsed.error.flatten() };
-    }
+  const parsed = movieSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { error: parsed.error.flatten() };
+  }
 
-    await prisma.movie.create({
-        data: {
-            ...parsed.data,
-            price: new Prisma.Decimal(parsed.data.price),
-        },
-    });
+  await prisma.movie.create({
+    data: {
+      ...parsed.data,
+      price: new Prisma.Decimal(parsed.data.price),
+    },
+  });
 
-    revalidatePath("/admin/movies");
-    revalidatePath("/movies");
-    return { success: true };
+  revalidatePath("/admin/movies");
+  revalidatePath("/movies");
+  return { success: true };
 }
 
 //  UPDATE
 export async function updateMovie(id: number, formData: FormData) {
-    const raw = Object.fromEntries(formData);
+  const raw = Object.fromEntries(formData);
 
-    const parsed = movieSchema.safeParse(raw);
-    if (!parsed.success) {
-        return { error: parsed.error.flatten() };
-    }
+  const parsed = movieSchema.safeParse(raw);
+  if (!parsed.success) {
+    return { error: parsed.error.flatten() };
+  }
 
-    await prisma.movie.update({
-        where: { id },
-        data: {
-            ...parsed.data,
-            price: new Prisma.Decimal(parsed.data.price),
-        },
-    });
+  await prisma.movie.update({
+    where: { id },
+    data: {
+      ...parsed.data,
+      price: new Prisma.Decimal(parsed.data.price),
+    },
+  });
 
-    revalidatePath("/admin/movies");
-    revalidatePath("/movies");
-    return { success: true };
+  revalidatePath("/admin/movies");
+  revalidatePath("/movies");
+  return { success: true };
 }
 
 //  DELETE
 export async function deleteMovie(id: number) {
-    await prisma.movie.delete({ where: { id } });
+  await prisma.movie.delete({ where: { id } });
 
-    revalidatePath("/admin/movies");
-    revalidatePath("/movies");
+  revalidatePath("/admin/movies");
+  revalidatePath("/movies");
 }
