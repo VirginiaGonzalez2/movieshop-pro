@@ -18,8 +18,6 @@ npx prisma generate
 npm run dev
 ```
 
-hfjQ5PdraZF92Bl3bDY9vVEyDy5CWCRS
-
 Create a file named .env and add the following to it:
 
 ```
