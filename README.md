@@ -14,8 +14,6 @@ npm install
 
 npx prisma deploy
 npx prisma generate
-
-npm run dev
 ```
 
 Create a file named .env and add the following to it:
