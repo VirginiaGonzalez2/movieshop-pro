@@ -2,7 +2,7 @@
  *  Author: Sabrina Bjurman
  *  Create Time: 2026-02-09 08:39:46
  *  Modified by: Sabrina Bjurman
- *  Modified time: 2026-02-12 01:18:28
+ *  Modified time: 2026-02-12 13:34:29
  *  Description: Primary account registration form.
  */
 
@@ -157,6 +157,12 @@ export function RegistrationForm({ className, ...rest }: Props) {
                 <Field>
                     <Button type="submit">Register</Button>
                     <FieldContinueWithLabel />
+                    <Button type="button" className="bg-green-600">
+                        Google
+                    </Button>
+                    <Button type="button" className="bg-blue-600">
+                        Facebook
+                    </Button>
                 </Field>
                 <FieldContent>
                     <p className="text-sm text-nowrap">
