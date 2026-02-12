@@ -2,7 +2,7 @@
  *  Author: Sabrina Bjurman
  *  Create Time: 2026-02-09 08:39:46
  *  Modified by: Sabrina Bjurman
- *  Modified time: 2026-02-11 11:12:06
+ *  Modified time: 2026-02-12 01:18:28
  *  Description: Primary account registration form.
  */
 
@@ -19,23 +19,21 @@ import {
     FieldLegend,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useOriginRouter } from "@/hooks/use-origin-router";
 import { authClient } from "@/lib/auth-client";
-import { useSearchParams } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
+import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import z from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { twMerge } from "tailwind-merge";
-import { useOriginRedirect } from "@/utils/navigation";
-import { LinkWithOrigin } from "../../../../components/navigation/LinkWithOrigin";
+import z from "zod";
+import { FieldContinueWithLabel } from "../../../../components/ui-composed/FieldContinueWithLabel";
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from "../../../../components/ui/collapsible";
-import { FieldContinueWithLabel } from "../../../../components/ui-composed/FieldContinueWithLabel";
-import Link from "next/link";
-import { useRef } from "react";
 
 const errUsernameLength = "Username must be between 2-20 characters long.";
 const errPasswordLength = "Password must be between 8-20 characters long.";
@@ -60,8 +58,7 @@ type FormValues = z.infer<typeof formSchema>;
 type Props = React.ComponentProps<"form">;
 
 export function RegistrationForm({ className, ...rest }: Props) {
-    const params = useSearchParams();
-    const redirectToOrigin = useOriginRedirect();
+    const router = useOriginRouter(true);
 
     const terms = useRef<HTMLButtonElement>(null);
 
@@ -96,7 +93,7 @@ export function RegistrationForm({ className, ...rest }: Props) {
             duration: 10000,
         });
 
-        redirectToOrigin();
+        router.returnToOrigin();
     }
 
     return (
@@ -191,13 +188,12 @@ export function RegistrationForm({ className, ...rest }: Props) {
                 <FieldContent>
                     <p className="text-sm text-nowrap">
                         Already have an account?{" "}
-                        <LinkWithOrigin
-                            href="/login"
+                        <Link
+                            href={router.formatUrl("/login")}
                             className="text-link-primary"
-                            searchParams={params}
                         >
                             Click here to log in
-                        </LinkWithOrigin>
+                        </Link>
                     </p>
                 </FieldContent>
                 <Collapsible>

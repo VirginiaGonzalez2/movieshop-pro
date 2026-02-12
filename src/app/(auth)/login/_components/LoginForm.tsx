@@ -2,12 +2,13 @@
  *  Author: Sabrina Bjurman
  *  Create Time: 2026-02-09 08:40:44
  *  Modified by: Sabrina Bjurman
- *  Modified time: 2026-02-11 11:42:59
+ *  Modified time: 2026-02-12 01:18:25
  *  Description: Default login form
  */
 
 "use client";
 
+import { FieldContinueWithLabel } from "@/components/ui-composed/FieldContinueWithLabel";
 import { Button } from "@/components/ui/button";
 import {
     Field,
@@ -20,16 +21,14 @@ import {
     FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { useOriginRouter } from "@/hooks/use-origin-router";
 import { authClient } from "@/lib/auth-client";
-import { useSearchParams } from "next/navigation";
-import { toast } from "sonner";
-import z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
-import { LinkWithOrigin } from "@/components/navigation/LinkWithOrigin";
-import { FieldContinueWithLabel } from "@/components/ui-composed/FieldContinueWithLabel";
-import { useOriginRedirect } from "@/utils/navigation";
+import z from "zod";
 
 const formSchema = z.object({
     email: z.email(),
@@ -41,10 +40,7 @@ type FormValues = z.infer<typeof formSchema>;
 type Props = React.ComponentProps<"form">;
 
 export function LoginForm({ className, ...rest }: Props) {
-    //const isMobile = useIsMobile();
-
-    const params = useSearchParams();
-    const redirectToOrigin = useOriginRedirect();
+    const router = useOriginRouter(true);
 
     const form = useForm<FormValues>({
         resolver: zodResolver(formSchema),
@@ -70,7 +66,7 @@ export function LoginForm({ className, ...rest }: Props) {
             return;
         }
 
-        redirectToOrigin();
+        router.returnToOrigin();
     }
 
     return (
@@ -113,18 +109,21 @@ export function LoginForm({ className, ...rest }: Props) {
                         name="password"
                         render={({ field, fieldState }) => (
                             <Field>
-                                <div className="flex justify-between">
-                                    <FieldLabel htmlFor={field.name}>
+                                <div className="w-full flex justify-between">
+                                    <FieldLabel
+                                        className="flex-0"
+                                        htmlFor={field.name}
+                                    >
                                         Password
                                     </FieldLabel>
-                                    <FieldContent className="text-sm text-link-primary place-self-end">
-                                        <LinkWithOrigin
-                                            href="/reset-password"
-                                            className=""
-                                            searchParams={params}
+                                    <FieldContent className="flex-0 text-sm text-link-primary text-nowrap">
+                                        <Link
+                                            href={router.formatUrl(
+                                                "/reset-password"
+                                            )}
                                         >
                                             Forgot your password?
-                                        </LinkWithOrigin>
+                                        </Link>
                                     </FieldContent>
                                 </div>
                                 <Input
@@ -147,14 +146,13 @@ export function LoginForm({ className, ...rest }: Props) {
                 <Field>
                     <FieldDescription>
                         Don&apos;t have an account? Click{" "}
-                        <LinkWithOrigin
+                        <Link
                             replace
-                            href="/register"
+                            href={router.formatUrl("/register")}
                             className="text-link-primary"
-                            searchParams={params}
                         >
                             here
-                        </LinkWithOrigin>{" "}
+                        </Link>{" "}
                         to register.
                     </FieldDescription>
                 </Field>

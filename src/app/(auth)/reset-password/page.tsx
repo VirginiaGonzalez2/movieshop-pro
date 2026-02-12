@@ -2,18 +2,24 @@
  *  Author: Sabrina Bjurman
  *  Create Time: 2026-02-10 15:05:25
  *  Modified by: Sabrina Bjurman
- *  Modified time: 2026-02-11 11:10:49
+ *  Modified time: 2026-02-12 01:18:39
  *  Description: Reset password page.
  */
 
 "use server";
 
+import { NoSessionChecker } from "@/components/auth/NoSessionChecker";
+import { useOriginRouter } from "@/hooks/use-origin-router";
 import { ResetPasswordForm } from "./_components/ResetPasswordForm";
 
 export default function ResetPasswordPage() {
+    const router = useOriginRouter(true);
+
     return (
-        <div className="w-full text-center">
-            <ResetPasswordForm className="flex-1" />
-        </div>
+        <main className="size-full flex justify-center items-center">
+            <NoSessionChecker originUrl={router.getOrigin()}>
+                <ResetPasswordForm className="m-4 flex-1" />
+            </NoSessionChecker>
+        </main>
     );
 }

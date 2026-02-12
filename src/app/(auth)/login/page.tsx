@@ -2,29 +2,24 @@
  *  Author: Sabrina Bjurman
  *  Create Time: 2026-02-09 09:21:53
  *  Modified by: Sabrina Bjurman
- *  Modified time: 2026-02-11 11:05:56
+ *  Modified time: 2026-02-12 01:18:22
  *  Description: Login page.
  */
 
-"use server";
+"use client";
 
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { NoSessionChecker } from "@/components/auth/NoSessionChecker";
+import { useOriginRouter } from "@/hooks/use-origin-router";
 import { LoginForm } from "./_components/LoginForm";
 
-export default async function LoginPage() {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
-
-    if (session) {
-        redirect("/");
-    }
+export default function LoginPage() {
+    const router = useOriginRouter(true);
 
     return (
-        <div className="w-full flex justify-center">
-            <LoginForm className="m-10 flex-1" />
-        </div>
+        <main className="size-full flex justify-center items-center">
+            <NoSessionChecker originUrl={router.getOrigin()}>
+                <LoginForm className="m-4  flex-1" />
+            </NoSessionChecker>
+        </main>
     );
 }

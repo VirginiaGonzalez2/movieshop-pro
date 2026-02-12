@@ -2,29 +2,24 @@
  *  Author: Sabrina Bjurman
  *  Create Time: 2026-02-09 14:40:49
  *  Modified by: Sabrina Bjurman
- *  Modified time: 2026-02-11 11:46:55
+ *  Modified time: 2026-02-12 01:18:19
  *  Description: Registration page.
  */
 
-"use server";
+"use client";
 
 import { RegistrationForm } from "@/app/(auth)/register/_components/RegistrationForm";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+import { NoSessionChecker } from "@/components/auth/NoSessionChecker";
+import { useOriginRouter } from "@/hooks/use-origin-router";
 
-export default async function RegisterPage() {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
-
-    if (session) {
-        redirect("/");
-    }
+export default function RegisterPage() {
+    const router = useOriginRouter(true);
 
     return (
-        <div className="w-full flex justify-center">
-            <RegistrationForm className="m-10 flex-1" />
-        </div>
+        <main className="size-full flex justify-center items-center">
+            <NoSessionChecker originUrl={router.getOrigin()}>
+                <RegistrationForm className="m-4 flex-1" />
+            </NoSessionChecker>
+        </main>
     );
 }
