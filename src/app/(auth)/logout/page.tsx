@@ -2,14 +2,13 @@
  *  Author: Sabrina Bjurman
  *  Create Time: 2026-02-12 13:17:01
  *  Modified by: Sabrina Bjurman
- *  Modified time: 2026-02-12 14:40:01
+ *  Modified time: 2026-02-12 16:06:59
  *  Description: Logout page.
  */
 
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Item, ItemContent } from "@/components/ui/item";
 import { useOriginRouter } from "@/hooks/use-origin-router";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
@@ -53,9 +52,9 @@ export default function LogoutPage() {
                 <main className="size-full flex justify-center items-center">
                     <div className="gap-8 flex-1 flex flex-col">
                         <p className="text-3xl">{getStatusMessage(status)}</p>
-                        <Button variant="link" className="text-xl text-link-primary">
+                        <Button asChild variant="link" className="text-xl text-link-primary">
                             <Link href={router.getOrigin()}>
-                                Click here to return to your last visisted page
+                                Click here to return to your last visited page
                             </Link>
                         </Button>
                     </div>
