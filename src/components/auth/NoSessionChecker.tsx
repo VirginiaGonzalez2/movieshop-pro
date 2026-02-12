@@ -2,31 +2,33 @@
  *  Author: Sabrina Bjurman
  *  Create Time: 2026-02-12 01:08:49
  *  Modified by: Sabrina Bjurman
- *  Modified time: 2026-02-12 01:18:45
+ *  Modified time: 2026-02-12 12:35:32
  *  Description: Wrapper component to enforce no current session.
+ *               Redireects to 'from' url or / if there is one.
  */
 
-"use server";
+"use client";
 
-import { auth } from "@/lib/auth";
-import { Url } from "next/dist/shared/lib/router/router";
-import { headers } from "next/headers";
+import { authClient } from "@/lib/auth-client";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 
 type Props = {
     children: ReactNode;
-    originUrl: Url;
+    originUrl: string;
 };
 
-export async function NoSessionChecker({ children, originUrl }: Props) {
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
+export function NoSessionChecker({ children, originUrl }: Props) {
+    const session = authClient.useSession();
 
-    if (session) {
-        redirect(originUrl.toString());
+    if (session.data) {
+        redirect(originUrl);
     }
 
-    return children;
+    if (session.isPending || session.isRefetching) {
+        // Loading
+        return <></>;
+    }
+
+    return <>{children}</>;
 }
