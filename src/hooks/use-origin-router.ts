@@ -54,17 +54,21 @@ class OriginRouter {
     public returnToOrigin(replace?: boolean): never {
         redirect(
             `/${this.originUrl}`,
-            replace ? RedirectType.replace : RedirectType.push
+            replace ? RedirectType.replace : RedirectType.push,
         );
     }
 }
 
 export function useOriginRouter(useExistingOnly?: boolean): OriginRouter {
-    const pathName = usePathname();
+    let pathName = usePathname();
     const params = useSearchParams();
 
+    if (params.size !== 0) {
+        pathName += `?${params}`;
+    }
+
     const originRouter = new OriginRouter(
-        params.get("from") || (useExistingOnly ? "" : pathName)
+        params.get("from") || (useExistingOnly ? "" : pathName),
     );
 
     return originRouter;
