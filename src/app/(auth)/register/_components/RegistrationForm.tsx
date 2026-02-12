@@ -2,7 +2,7 @@
  *  Author: Sabrina Bjurman
  *  Create Time: 2026-02-09 08:39:46
  *  Modified by: Sabrina Bjurman
- *  Modified time: 2026-02-12 01:18:28
+ *  Modified time: 2026-02-12 16:26:45
  *  Description: Primary account registration form.
  */
 
@@ -27,30 +27,13 @@ import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
-import z from "zod";
 import { FieldContinueWithLabel } from "../../../../components/ui-composed/FieldContinueWithLabel";
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
 } from "../../../../components/ui/collapsible";
-
-const errUsernameLength = "Username must be between 2-20 characters long.";
-const errPasswordLength = "Password must be between 8-20 characters long.";
-
-const formSchema = z
-    .object({
-        name: z.string().min(2, errUsernameLength).max(20, errPasswordLength),
-        email: z.email(),
-        password: z.string().min(8, errPasswordLength).max(128, errPasswordLength),
-        confirmPassword: z.string(),
-    })
-    .refine((values) => values.password === values.confirmPassword, {
-        error: "Passwords do not match",
-        path: ["confirmPassword"],
-    });
-
-type FormValues = z.infer<typeof formSchema>;
+import { registrationFormSchema, RegistrationFormValues } from "@/form-schemas/registration";
 
 type Props = React.ComponentProps<"form">;
 
@@ -59,8 +42,8 @@ export function RegistrationForm({ className, ...rest }: Props) {
 
     const terms = useRef<HTMLButtonElement>(null);
 
-    const form = useForm<FormValues>({
-        resolver: zodResolver(formSchema),
+    const form = useForm<RegistrationFormValues>({
+        resolver: zodResolver(registrationFormSchema),
         defaultValues: {
             name: "",
             email: "",
@@ -69,14 +52,12 @@ export function RegistrationForm({ className, ...rest }: Props) {
         },
     });
 
-    async function handleSubmit(values: FormValues) {
+    async function handleSubmit(values: RegistrationFormValues) {
         const { error } = await authClient.signUp.email({
             name: values.name,
             email: values.email,
             password: values.password,
         });
-
-        toast.message("HELLO!");
 
         if (error) {
             toast.error(error.message || "An unknown error occurred. Please try again later.");
@@ -86,8 +67,6 @@ export function RegistrationForm({ className, ...rest }: Props) {
         toast.warning("Before you can sign in you must verify your email.", {
             duration: 10000,
         });
-
-        router.returnToOrigin();
     }
 
     return (
@@ -157,6 +136,12 @@ export function RegistrationForm({ className, ...rest }: Props) {
                 <Field>
                     <Button type="submit">Register</Button>
                     <FieldContinueWithLabel />
+                    <Button type="button" className="bg-green-600">
+                        Google
+                    </Button>
+                    <Button type="button" className="bg-blue-600">
+                        Facebook
+                    </Button>
                 </Field>
                 <FieldContent>
                     <p className="text-sm text-nowrap">

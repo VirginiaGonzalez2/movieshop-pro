@@ -2,7 +2,7 @@
  *  Author: Sabrina Bjurman
  *  Create Time: 2026-02-09 08:40:44
  *  Modified by: Sabrina Bjurman
- *  Modified time: 2026-02-12 01:18:25
+ *  Modified time: 2026-02-12 16:26:19
  *  Description: Default login form
  */
 
@@ -21,6 +21,7 @@ import {
     FieldSet,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { loginFormSchema, LoginFormValues } from "@/form-schemas/login";
 import { useOriginRouter } from "@/hooks/use-origin-router";
 import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,29 +29,21 @@ import Link from "next/link";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
-import z from "zod";
-
-const formSchema = z.object({
-    email: z.email(),
-    password: z.string(),
-});
-
-type FormValues = z.infer<typeof formSchema>;
 
 type Props = React.ComponentProps<"form">;
 
 export function LoginForm({ className, ...rest }: Props) {
     const router = useOriginRouter(true);
 
-    const form = useForm<FormValues>({
-        resolver: zodResolver(formSchema),
+    const form = useForm<LoginFormValues>({
+        resolver: zodResolver(loginFormSchema),
         defaultValues: {
             email: "",
             password: "",
         },
     });
 
-    async function handleSubmit(values: FormValues) {
+    async function handleSubmit(values: LoginFormValues) {
         console.log(values);
 
         const { error } = await authClient.signIn.email({
@@ -62,8 +55,6 @@ export function LoginForm({ className, ...rest }: Props) {
             toast.error(error.message || "An unknown error occurred. Please try again later.");
             return;
         }
-
-        router.returnToOrigin();
     }
 
     return (
