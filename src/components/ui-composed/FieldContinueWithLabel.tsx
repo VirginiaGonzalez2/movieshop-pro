@@ -15,10 +15,7 @@ type Props = Omit<React.ComponentProps<typeof FieldContent>, "children">;
 
 export function FieldContinueWithLabel({ className, ...rest }: Props) {
     return (
-        <FieldContent
-            className={twMerge("flex-1 flex flex-row items-center", className)}
-            {...rest}
-        >
+        <FieldContent className={twMerge("flex-1 flex flex-row items-center", className)} {...rest}>
             <FieldSeparator className="flex-1" />
             <Label className="mt-0 text-sm text-muted-foreground flex-0 text-nowrap">
                 Or continue with

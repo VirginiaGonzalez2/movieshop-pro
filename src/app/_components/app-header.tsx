@@ -22,10 +22,7 @@ type Props = React.ComponentProps<"header">;
 export function AppHeader({ className, ...headerProps }: Props) {
     return (
         <header
-            className={twMerge(
-                "p-1 w-full flex-0 flex flex-row justify-between",
-                className
-            )}
+            className={twMerge("p-1 w-full flex-0 flex flex-row justify-between", className)}
             {...headerProps}
         >
             <MovieShopLogo variant="header" className="flex-0" />
@@ -35,19 +32,13 @@ export function AppHeader({ className, ...headerProps }: Props) {
                         <NavigationMenuLink href="/">Home</NavigationMenuLink>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
-                        <NavigationMenuLink href="/movies">
-                            Movies
-                        </NavigationMenuLink>
+                        <NavigationMenuLink href="/movies">Movies</NavigationMenuLink>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
-                        <NavigationMenuLink href="/orders">
-                            Orders
-                        </NavigationMenuLink>
+                        <NavigationMenuLink href="/orders">Orders</NavigationMenuLink>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
-                        <NavigationMenuLink href="/about">
-                            About
-                        </NavigationMenuLink>
+                        <NavigationMenuLink href="/about">About</NavigationMenuLink>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
                         <NavigationMenuIcon

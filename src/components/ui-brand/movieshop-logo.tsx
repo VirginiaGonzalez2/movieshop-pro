@@ -8,7 +8,8 @@ export default function MovieShopLogo({ variant, ...rest }: Props) {
     return (
         <h1
             {...rest}
-            className={`max-w-fit border-2 self-center text-nowrap ${variant === "header" ? "border-pink-500 bg-pink-300" : "border-green-500 bg-green-300"} rounded-xl`}>
+            className={`max-w-fit border-2 self-center text-nowrap ${variant === "header" ? "border-pink-500 bg-pink-300" : "border-green-500 bg-green-300"} rounded-xl`}
+        >
             MovieShop
         </h1>
     );

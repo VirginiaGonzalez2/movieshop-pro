@@ -42,10 +42,7 @@ const formSchema = z
     .object({
         name: z.string().min(2, errUsernameLength).max(20, errPasswordLength),
         email: z.email(),
-        password: z
-            .string()
-            .min(8, errPasswordLength)
-            .max(128, errPasswordLength),
+        password: z.string().min(8, errPasswordLength).max(128, errPasswordLength),
         confirmPassword: z.string(),
     })
     .refine((values) => values.password === values.confirmPassword, {
@@ -82,10 +79,7 @@ export function RegistrationForm({ className, ...rest }: Props) {
         toast.message("HELLO!");
 
         if (error) {
-            toast.error(
-                error.message ||
-                    "An unknown error occurred. Please try again later."
-            );
+            toast.error(error.message || "An unknown error occurred. Please try again later.");
             return;
         }
 
@@ -101,15 +95,15 @@ export function RegistrationForm({ className, ...rest }: Props) {
             onSubmit={form.handleSubmit(handleSubmit)}
             className={twMerge(
                 "p-4 border-2 max-w-100 rounded-xl flex flex-col justify-center items-center gap-2",
-                className
+                className,
             )}
             {...rest}
         >
             <FieldGroup className="justify-center">
                 <FieldLegend>Registration</FieldLegend>
                 <FieldDescription>
-                    Buy or rent the best and worst movies of all time.
-                    Registering your account with us is free.
+                    Buy or rent the best and worst movies of all time. Registering your account with
+                    us is free.
                 </FieldDescription>
                 <Controller
                     control={form.control}
@@ -117,14 +111,8 @@ export function RegistrationForm({ className, ...rest }: Props) {
                     render={({ field, fieldState }) => (
                         <Field>
                             <FieldLabel htmlFor={field.name}>Name</FieldLabel>
-                            <Input
-                                {...field}
-                                id={field.name}
-                                autoComplete="name"
-                            />
-                            {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                            )}
+                            <Input {...field} id={field.name} autoComplete="name" />
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
                     )}
                 />
@@ -134,15 +122,8 @@ export function RegistrationForm({ className, ...rest }: Props) {
                     render={({ field, fieldState }) => (
                         <Field>
                             <FieldLabel htmlFor={field.name}>E-mail</FieldLabel>
-                            <Input
-                                {...field}
-                                id={field.name}
-                                type="email"
-                                autoComplete="email"
-                            />
-                            {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                            )}
+                            <Input {...field} id={field.name} type="email" autoComplete="email" />
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
                     )}
                 />
@@ -151,18 +132,14 @@ export function RegistrationForm({ className, ...rest }: Props) {
                     name="password"
                     render={({ field, fieldState }) => (
                         <Field>
-                            <FieldLabel htmlFor={field.name}>
-                                Password
-                            </FieldLabel>
+                            <FieldLabel htmlFor={field.name}>Password</FieldLabel>
                             <Input
                                 {...field}
                                 id={field.name}
                                 type="password"
                                 autoComplete="new-password"
                             />
-                            {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                            )}
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
                     )}
                 />
@@ -171,13 +148,9 @@ export function RegistrationForm({ className, ...rest }: Props) {
                     name="confirmPassword"
                     render={({ field, fieldState }) => (
                         <Field>
-                            <FieldLabel htmlFor={field.name}>
-                                Confirm Password
-                            </FieldLabel>
+                            <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
                             <Input {...field} id={field.name} type="password" />
-                            {fieldState.invalid && (
-                                <FieldError errors={[fieldState.error]} />
-                            )}
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
                     )}
                 />
@@ -188,18 +161,15 @@ export function RegistrationForm({ className, ...rest }: Props) {
                 <FieldContent>
                     <p className="text-sm text-nowrap">
                         Already have an account?{" "}
-                        <Link
-                            href={router.formatUrl("/login")}
-                            className="text-link-primary"
-                        >
+                        <Link href={router.formatUrl("/login")} className="text-link-primary">
                             Click here to log in
                         </Link>
                     </p>
                 </FieldContent>
                 <Collapsible>
                     <FieldDescription className="text-xs">
-                        For less information about how we definitely don&apos;t
-                        use your data, do not read our non-existing{" "}
+                        For less information about how we definitely don&apos;t use your data, do
+                        not read our non-existing{" "}
                         <CollapsibleTrigger ref={terms}>
                             <Link
                                 href="#terms+services"
@@ -215,13 +185,11 @@ export function RegistrationForm({ className, ...rest }: Props) {
                     </FieldDescription>
                     <CollapsibleContent asChild>
                         <FieldDescription className="pt-2 text-[0.5rem]">
-                            Essentially, by registering your account with us,
-                            your soul, along with your firstborn child, will
-                            henceforth belong solely to us. We are definitely
-                            not an evil cabal of bloodsucking vampires and
-                            scheming devils that have roamed this world for
-                            thousands of years and going, and you agree to never
-                            make this claim or investigate it.
+                            Essentially, by registering your account with us, your soul, along with
+                            your firstborn child, will henceforth belong solely to us. We are
+                            definitely not an evil cabal of bloodsucking vampires and scheming
+                            devils that have roamed this world for thousands of years and going, and
+                            you agree to never make this claim or investigate it.
                         </FieldDescription>
                     </CollapsibleContent>
                 </Collapsible>

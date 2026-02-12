@@ -7,20 +7,13 @@
  */
 
 import { Url } from "next/dist/shared/lib/router/router";
-import {
-    redirect,
-    RedirectType,
-    usePathname,
-    useSearchParams,
-} from "next/navigation";
+import { redirect, RedirectType, usePathname, useSearchParams } from "next/navigation";
 
 class OriginRouter {
     public originUrl: string;
 
     public constructor(originUrl: string) {
-        this.originUrl = originUrl.startsWith("/")
-            ? originUrl.substring(1)
-            : originUrl;
+        this.originUrl = originUrl.startsWith("/") ? originUrl.substring(1) : originUrl;
     }
 
     public getOrigin(): string {
@@ -52,10 +45,7 @@ class OriginRouter {
     }
 
     public returnToOrigin(replace?: boolean): never {
-        redirect(
-            `/${this.originUrl}`,
-            replace ? RedirectType.replace : RedirectType.push
-        );
+        redirect(`/${this.originUrl}`, replace ? RedirectType.replace : RedirectType.push);
     }
 }
 
@@ -63,9 +53,7 @@ export function useOriginRouter(useExistingOnly?: boolean): OriginRouter {
     const pathName = usePathname();
     const params = useSearchParams();
 
-    const originRouter = new OriginRouter(
-        params.get("from") || (useExistingOnly ? "" : pathName)
-    );
+    const originRouter = new OriginRouter(params.get("from") || (useExistingOnly ? "" : pathName));
 
     return originRouter;
 }
