@@ -9,8 +9,20 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { useOriginRouter } from "@/hooks/use-origin-router";
+import { usePathname } from "next/navigation";
 
 export default function UserMenuDropdown() {
+    const pathName = usePathname();
+
+    const isAuthRoute =
+        pathName == "/login" ||
+        pathName == "/logout" ||
+        pathName == "/register" ||
+        pathName == "/reset-password";
+
+    const router = useOriginRouter(isAuthRoute);
+
     // 🔴 Temporary state (will be replaced with real auth later)
     const isAuthenticated = false;
 
@@ -29,13 +41,13 @@ export default function UserMenuDropdown() {
             <DropdownMenuContent align="end" className="w-44">
                 {/* 🔹 Temporary UI: show all options */}
                 <DropdownMenuItem asChild>
-                    <Link href="/auth/login">Login</Link>
+                    <Link href={router.formatUrl("/login")}>Login</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                    <Link href="/auth/register">Register</Link>
+                    <Link href={router.formatUrl("/register")}>Register</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                    <Link href="/auth/logout">Logout</Link>
+                    <Link href={router.formatUrl("/logout")}>Logout</Link>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

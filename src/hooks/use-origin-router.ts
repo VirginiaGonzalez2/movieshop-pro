@@ -2,8 +2,8 @@
  *  Author: Sabrina Bjurman
  *  Create Time: 2026-02-09 14:00:40
  * @ Modified by: Sabrina Bjurman
- * @ Modified time: 2026-02-12 01:08:00
- *  Description: Various navigation utility.
+ * @ Modified time: 2026-02-12 13:10:51
+ *  Description: A router-like hook that stores information about where it started.
  */
 
 import { Url } from "next/dist/shared/lib/router/router";
@@ -50,8 +50,12 @@ class OriginRouter {
 }
 
 export function useOriginRouter(useExistingOnly?: boolean): OriginRouter {
-    const pathName = usePathname();
+    let pathName = usePathname();
     const params = useSearchParams();
+
+    if (params.size !== 0) {
+        pathName += `?${params}`;
+    }
 
     const originRouter = new OriginRouter(params.get("from") || (useExistingOnly ? "" : pathName));
 
