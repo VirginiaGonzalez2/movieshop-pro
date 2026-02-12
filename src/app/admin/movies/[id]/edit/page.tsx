@@ -3,26 +3,26 @@ import { Role } from "@prisma/client";
 import MovieEditForm from "./movie-edit-form";
 
 export default async function AdminEditMoviePage({
-  params,
+    params,
 }: {
-  params: Promise<{ id: string }> | { id: string };
+    params: Promise<{ id: string }> | { id: string };
 }) {
-  const resolvedParams = await Promise.resolve(params);
-  const id = Number(resolvedParams.id);
+    const resolvedParams = await Promise.resolve(params);
+    const id = Number(resolvedParams.id);
 
-  if (!Number.isInteger(id) || id <= 0) {
-    return (
-      <div className="p-8">
-        <h1 className="text-xl font-semibold">Invalid movie id</h1>
-        <p className="text-muted-foreground">
-          URL must look like: <code>/admin/movies/1/edit</code>
-        </p>
-      </div>
-    );
-  }
+    if (!Number.isInteger(id) || id <= 0) {
+        return (
+            <div className="p-8">
+                <h1 className="text-xl font-semibold">Invalid movie id</h1>
+                <p className="text-muted-foreground">
+                    URL must look like: <code>/admin/movies/1/edit</code>
+                </p>
+            </div>
+        );
+    }
 
-  const movie = await prisma.movie.findUnique({ where: { id } });
-  if (!movie) return <div className="p-8">Movie not found</div>;
+    const movie = await prisma.movie.findUnique({ where: { id } });
+    if (!movie) return <div className="p-8">Movie not found</div>;
 
     const genres = await prisma.genre.findMany({ orderBy: { name: "asc" } });
     const people = await prisma.person.findMany({ orderBy: { name: "asc" } });

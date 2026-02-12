@@ -59,10 +59,7 @@ export function LoginForm({ className, ...rest }: Props) {
         });
 
         if (error) {
-            toast.error(
-                error.message ||
-                    "An unknown error occurred. Please try again later."
-            );
+            toast.error(error.message || "An unknown error occurred. Please try again later.");
             return;
         }
 
@@ -74,33 +71,27 @@ export function LoginForm({ className, ...rest }: Props) {
             onSubmit={form.handleSubmit(handleSubmit)}
             className={twMerge(
                 "p-4 border-2 max-w-100 rounded-xl gap-2 flex flex-col items-center",
-                className
+                className,
             )}
             {...rest}
         >
             <FieldGroup>
                 <FieldLegend>Log In</FieldLegend>
-                <FieldDescription>
-                    Log in to track your orders and more.
-                </FieldDescription>
+                <FieldDescription>Log in to track your orders and more.</FieldDescription>
                 <FieldSet>
                     <Controller
                         control={form.control}
                         name="email"
                         render={({ field, fieldState }) => (
                             <Field>
-                                <FieldLabel htmlFor={field.name}>
-                                    E-mail
-                                </FieldLabel>
+                                <FieldLabel htmlFor={field.name}>E-mail</FieldLabel>
                                 <Input
                                     {...field}
                                     id={field.name}
                                     type="email"
                                     // autoComplete="email"
                                 />
-                                {fieldState.invalid && (
-                                    <FieldError errors={[fieldState.error]} />
-                                )}
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>
                         )}
                     />
@@ -110,18 +101,11 @@ export function LoginForm({ className, ...rest }: Props) {
                         render={({ field, fieldState }) => (
                             <Field>
                                 <div className="w-full flex justify-between">
-                                    <FieldLabel
-                                        className="flex-0"
-                                        htmlFor={field.name}
-                                    >
+                                    <FieldLabel className="flex-0" htmlFor={field.name}>
                                         Password
                                     </FieldLabel>
                                     <FieldContent className="flex-0 text-sm text-link-primary text-nowrap">
-                                        <Link
-                                            href={router.formatUrl(
-                                                "/reset-password"
-                                            )}
-                                        >
+                                        <Link href={router.formatUrl("/reset-password")}>
                                             Forgot your password?
                                         </Link>
                                     </FieldContent>
@@ -132,9 +116,7 @@ export function LoginForm({ className, ...rest }: Props) {
                                     type="password"
                                     // autoComplete="password"
                                 />
-                                {fieldState.invalid && (
-                                    <FieldError errors={[fieldState.error]} />
-                                )}
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                             </Field>
                         )}
                     />

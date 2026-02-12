@@ -22,7 +22,7 @@ export function AppFooter({ className, ...rest }: Props) {
         <footer
             className={twMerge(
                 "p-1 flex-0 flex justify-between items-center bg-foreground text-nowrap",
-                className
+                className,
             )}
             {...rest}
         >
@@ -49,11 +49,7 @@ export function AppFooter({ className, ...rest }: Props) {
                     src="/social-media/facebook.png"
                     alt="Facebook"
                 />
-                <SocialMediaButton
-                    href={undefined}
-                    src="/social-media/tiktok.png"
-                    alt="TikTok"
-                />
+                <SocialMediaButton href={undefined} src="/social-media/tiktok.png" alt="TikTok" />
                 <SocialMediaButton
                     href={undefined}
                     src="/social-media/twitter.png"
@@ -70,13 +66,7 @@ export function AppFooter({ className, ...rest }: Props) {
 }
 
 const Menu = ({ className, children, ...rest }: React.ComponentProps<"ul">) => (
-    <ul
-        className={twMerge(
-            "flex flex-nowrap items-center justify-start",
-            className
-        )}
-        {...rest}
-    >
+    <ul className={twMerge("flex flex-nowrap items-center justify-start", className)} {...rest}>
         {children}
     </ul>
 );
@@ -87,17 +77,11 @@ const MenuSeparator = () => (
 
 const MenuButton = (props: { href?: string; children: ReactNode }) => (
     <Button asChild variant="link" className="text-background" type="button">
-        <Link href={props.href ?? "#FAKE_OR_NOT_YET_IMPLEMENTED_LINK"}>
-            {props.children}
-        </Link>
+        <Link href={props.href ?? "#FAKE_OR_NOT_YET_IMPLEMENTED_LINK"}>{props.children}</Link>
     </Button>
 );
 
-const SocialMediaButton = (props: {
-    href?: string;
-    src: string | StaticImport;
-    alt: string;
-}) => (
+const SocialMediaButton = (props: { href?: string; src: string | StaticImport; alt: string }) => (
     <li className="flex-0">
         <Link href={props.href ?? "#FAKE_OR_NOT_YET_IMPLEMENTED_LINK"}>
             <Image

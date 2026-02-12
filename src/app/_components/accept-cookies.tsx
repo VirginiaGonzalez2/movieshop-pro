@@ -31,12 +31,7 @@ export default function AcceptCookies() {
     return (
         <div className="pt-15 pb-20 absolute bottom-0 w-full h-[80%] gap-2 bg-blue-100 flex flex-col items-center justify-around">
             <Label className="text-xl">Accept the cookies or else...</Label>
-            <Image
-                alt="A delicious cookie"
-                src="/cookie.png"
-                width={200}
-                height={200}
-            />
+            <Image alt="A delicious cookie" src="/cookie.png" width={200} height={200} />
             <Label className="text-xl">Do you accept?</Label>
             <div className="gap-4 flex flex-col justify-around">
                 <div className="w-fit gap-2 flex">
@@ -47,7 +42,8 @@ export default function AcceptCookies() {
                         {noButtonFlag && (
                             <Button
                                 className="float-right"
-                                onMouseEnter={() => setNoButtonFlag(false)}>
+                                onMouseEnter={() => setNoButtonFlag(false)}
+                            >
                                 No
                             </Button>
                         )}
@@ -56,7 +52,8 @@ export default function AcceptCookies() {
                         {!noButtonFlag && (
                             <Button
                                 className="float-left"
-                                onMouseEnter={() => setNoButtonFlag(true)}>
+                                onMouseEnter={() => setNoButtonFlag(true)}
+                            >
                                 No
                             </Button>
                         )}
