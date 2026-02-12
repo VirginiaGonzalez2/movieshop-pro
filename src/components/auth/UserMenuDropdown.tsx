@@ -1,16 +1,19 @@
 "use client";
 
-import Link from "next/link";
-import { User } from "lucide-react";
-
 import {
     DropdownMenu,
-    DropdownMenuTrigger,
     DropdownMenuContent,
     DropdownMenuItem,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useOriginRouter } from "@/hooks/use-origin-router";
+import { authClient } from "@/lib/auth-client";
+import { User } from "lucide-react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { MouseEvent } from "react";
+
+type LoginStatus = "pending" | "loggedin" | "notloggedin";
 
 export default function UserMenuDropdown() {
     const pathName = usePathname();
@@ -23,8 +26,22 @@ export default function UserMenuDropdown() {
 
     const router = useOriginRouter(isAuthRoute);
 
-    // 🔴 Temporary state (will be replaced with real auth later)
-    const isAuthenticated = false;
+    const session = authClient.useSession();
+
+    const loginStatus: LoginStatus =
+        session.isPending || session.isRefetching
+            ? "pending"
+            : session.data
+              ? "loggedin"
+              : "notloggedin";
+
+    function blockWhilePending(event: MouseEvent<HTMLAnchorElement>) {
+        if (loginStatus === "pending") {
+            event.preventDefault();
+        }
+    }
+
+    // TODO: Use session data to display name and email profile pic etc.
 
     return (
         <DropdownMenu>
@@ -39,16 +56,38 @@ export default function UserMenuDropdown() {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="w-44">
-                {/* 🔹 Temporary UI: show all options */}
-                <DropdownMenuItem asChild>
-                    <Link href={router.formatUrl("/login")}>Login</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                    <Link href={router.formatUrl("/register")}>Register</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                    <Link href={router.formatUrl("/logout")}>Logout</Link>
-                </DropdownMenuItem>
+                {loginStatus !== "loggedin" ? (
+                    <>
+                        <DropdownMenuItem asChild>
+                            <Link
+                                replace
+                                href={router.formatUrl("/login")}
+                                onClick={blockWhilePending}
+                            >
+                                Log In
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                            <Link
+                                replace
+                                href={router.formatUrl("/register")}
+                                onClick={blockWhilePending}
+                            >
+                                Register
+                            </Link>
+                        </DropdownMenuItem>
+                    </>
+                ) : (
+                    <DropdownMenuItem asChild>
+                        <Link
+                            replace
+                            href={router.formatUrl("/logout")}
+                            onClick={blockWhilePending}
+                        >
+                            Log Out
+                        </Link>
+                    </DropdownMenuItem>
+                )}
             </DropdownMenuContent>
         </DropdownMenu>
     );
