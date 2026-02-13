@@ -2,7 +2,7 @@ import { cookies } from "next/dist/server/request/cookies";
 
 type ShoppingCartItem = {
     id: number;
-    quantity: number;
+    qty: number;
 };
 
 type ShoppingCart = ShoppingCartItem[];
@@ -21,24 +21,40 @@ async function getShoppingCart(): Promise<ShoppingCart | undefined> {
     const parsed = JSON.parse(cookie.value);
 
     if (!(parsed instanceof Array)) {
-        clearShoppingCart();
+        await clearShoppingCart();
         return undefined;
     }
 
-    // TODO: Check for and remove invalid items.
+    let save = false;
+
+    let i = parsed.length - 1;
+    while (i >= 0) {
+        const item = parsed[i];
+        if (!(item.id instanceof Number && item.qty instanceof Number && item.qty > 0)) {
+            parsed.copyWithin(i, i + 1);
+            parsed.pop();
+            save = true;
+        } else {
+            i--;
+        }
+    }
+
+    if (save) {
+        await saveShoppingCart(parsed);
+    }
 
     return parsed;
 }
 
 async function saveShoppingCart(shoppingCart: ShoppingCart | null) {
     if (shoppingCart) {
-        cookieStore.set({
+        await cookieStore.set({
             name: shoppingCartCookie,
             value: JSON.stringify(shoppingCart),
             expires: Date.now() + shoppingCartLifetime,
         });
     } else {
-        cookieStore.delete(shoppingCartCookie);
+        await cookieStore.delete(shoppingCartCookie);
     }
 }
 
@@ -52,53 +68,53 @@ function findShoppingCartItem(shoppingCart: ShoppingCart, id: number): ShoppingC
     return null;
 }
 
-function addShoppingCartItem(item: ShoppingCartItem) {
-    getShoppingCart().then((shoppingCart) => {
-        let existing = undefined;
+async function addShoppingCartItem(item: ShoppingCartItem) {
+    let shoppingCart = await getShoppingCart();
 
-        if (shoppingCart) {
-            existing = findShoppingCartItem(shoppingCart, item.id);
-        } else {
-            shoppingCart = [];
-        }
+    let existing = undefined;
 
-        if (existing) {
-            // If it already exists add to quantity.
-            existing.quantity += item.quantity;
-        } else {
-            shoppingCart.push(item);
-        }
+    if (shoppingCart) {
+        existing = findShoppingCartItem(shoppingCart, item.id);
+    } else {
+        shoppingCart = [];
+    }
 
-        saveShoppingCart(shoppingCart);
-    });
+    if (existing) {
+        // If it already exists add to quantity.
+        existing.qty += item.qty;
+    } else {
+        shoppingCart.push(item);
+    }
+
+    return saveShoppingCart(shoppingCart);
 }
 
-function removeShoppingCartItem(id: number): void {
-    getShoppingCart().then((shoppingCart) => {
-        if (!shoppingCart) {
-            return;
-        }
+async function removeShoppingCartItem(id: number) {
+    const shoppingCart = await getShoppingCart();
 
-        for (let i = 0; i < shoppingCart.length; i++) {
-            const item = shoppingCart[i];
-            if (item.id === id) {
-                shoppingCart.copyWithin(i - 1, i);
-                shoppingCart.pop();
-                saveShoppingCart(shoppingCart);
-                break;
-            }
+    if (!shoppingCart) {
+        return;
+    }
+
+    for (let i = 0; i < shoppingCart.length; i++) {
+        const item = shoppingCart[i];
+        if (item.id === id) {
+            shoppingCart.copyWithin(i - 1, i);
+            shoppingCart.pop();
+            return saveShoppingCart(shoppingCart);
         }
-    });
+    }
 }
 
-function clearShoppingCart() {
-    saveShoppingCart(null);
+async function clearShoppingCart() {
+    return saveShoppingCart(null);
 }
 
 export {
-    getShoppingCart,
     addShoppingCartItem,
-    removeShoppingCartItem,
     clearShoppingCart,
+    getShoppingCart,
+    removeShoppingCartItem,
     type ShoppingCart,
+    type ShoppingCartItem,
 };
