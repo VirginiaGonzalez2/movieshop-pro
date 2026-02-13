@@ -27,7 +27,7 @@ import { useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
-import { FieldContinueWithLabel } from "../../../../components/ui-composed/FieldContinueWithLabel";
+import { FieldContinueWithLabel } from "../../../../components/ui-custom-shadcn/FieldContinueWithLabel";
 import {
     Collapsible,
     CollapsibleContent,

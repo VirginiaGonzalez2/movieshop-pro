@@ -8,7 +8,7 @@
 
 "use client";
 
-import { FieldContinueWithLabel } from "@/components/ui-composed/FieldContinueWithLabel";
+import { FieldContinueWithLabel } from "@/components/ui-custom-shadcn/FieldContinueWithLabel";
 import { Button } from "@/components/ui/button";
 import {
     Field,
