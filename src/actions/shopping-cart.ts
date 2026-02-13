@@ -47,14 +47,15 @@ async function getShoppingCart(): Promise<ShoppingCart | undefined> {
 }
 
 async function saveShoppingCart(shoppingCart: ShoppingCart | null) {
+    const cookieStore = await cookies();
     if (shoppingCart) {
-        await cookieStore.set({
+        cookieStore.set({
             name: shoppingCartCookie,
             value: JSON.stringify(shoppingCart),
             expires: Date.now() + shoppingCartLifetime,
         });
     } else {
-        await cookieStore.delete(shoppingCartCookie);
+        cookieStore.delete(shoppingCartCookie);
     }
 }
 
