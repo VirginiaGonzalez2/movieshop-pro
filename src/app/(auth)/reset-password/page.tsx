@@ -2,11 +2,11 @@
  *  Author: Sabrina Bjurman
  *  Create Time: 2026-02-10 15:05:25
  *  Modified by: Sabrina Bjurman
- *  Modified time: 2026-02-12 01:18:39
+ *  Modified time: 2026-02-12 15:50:41
  *  Description: Reset password page.
  */
 
-"use server";
+"use client";
 
 import { NoSessionChecker } from "@/components/auth/NoSessionChecker";
 import { useOriginRouter } from "@/hooks/use-origin-router";
