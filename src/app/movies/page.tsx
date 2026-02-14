@@ -40,7 +40,7 @@ export default async function MoviesPage() {
         byMovie.set(mp.movieId, entry);
     }
 
-    // Prepare serializable data for the Client component
+    //imageUrl (for MovieCard UI poster)
     const items = movies.map((m) => {
         const info = byMovie.get(m.id) ?? { actors: [], directors: [] };
 
@@ -50,6 +50,7 @@ export default async function MoviesPage() {
             price: m.price.toString(),
             stock: m.stock,
             runtime: m.runtime,
+            imageUrl: m.imageUrl ?? null,
             actors: info.actors,
             directors: info.directors,
         };

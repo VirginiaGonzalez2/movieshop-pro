@@ -4,17 +4,18 @@ import { useMemo, useState } from "react";
 import MoviesSearchBar from "./search-bar";
 import MovieCard from "@/components/movies/MovieCard";
 
-type MovieCardType = {
+type MovieCardItem = {
     id: number;
     title: string;
     price: string;
     stock: number;
     runtime: number;
+    imageUrl: string | null;
     directors: string[];
     actors: string[];
 };
 
-export default function MoviesClient({ items }: { items: MovieCardType[] }) {
+export default function MoviesClient({ items }: { items: MovieCardItem[] }) {
     const [q, setQ] = useState("");
 
     const filtered = useMemo(() => {
@@ -31,7 +32,8 @@ export default function MoviesClient({ items }: { items: MovieCardType[] }) {
                 <MoviesSearchBar onSearch={setQ} />
             </div>
 
-            <div className="grid gap-4">
+            {/* nicer responsive grid */}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {filtered.map((movie) => (
                     <MovieCard key={movie.id} movie={movie} />
                 ))}
