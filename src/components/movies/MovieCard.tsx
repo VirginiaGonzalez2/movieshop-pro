@@ -1,10 +1,8 @@
-"use client";
-
 import Link from "next/link";
 import { PriceTag } from "@/components/ui/PriceTag";
 import { RatingStars } from "@/components/ui/RatingStars";
 
-export type MovieCardItem = {
+type Movie = {
     id: number;
     title: string;
     price: string;
@@ -14,38 +12,38 @@ export type MovieCardItem = {
     imageUrl?: string | null;
 };
 
-export default function MovieCard({ movie }: { movie: MovieCardItem }) {
+export default function MovieCard({ movie }: { movie: Movie }) {
     return (
         <Link
             href={`/movies/${movie.id}`}
-            className="block border rounded-lg overflow-hidden hover:shadow-sm transition"
+            className="block border rounded-lg overflow-hidden hover:shadow-md transition"
         >
-            <div className="bg-muted aspect-[2/3] w-full flex items-center justify-center">
+            {/* Poster */}
+            <div className="aspect-[2/3] bg-muted flex items-center justify-center overflow-hidden">
                 {movie.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                         src={movie.imageUrl}
                         alt={movie.title}
                         className="h-full w-full object-cover"
-                        loading="lazy"
                     />
                 ) : (
-                    <div className="text-sm text-muted-foreground">No Image</div>
+                    <div className="text-sm text-muted-foreground">No image</div>
                 )}
             </div>
 
-            <div className="p-4 space-y-2">
-                <div className="font-semibold">{movie.title}</div>
+            {/* Content */}
+            <div className="p-3 space-y-2">
+                <div className="font-semibold line-clamp-1">{movie.title}</div>
 
-                <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
+                <div className="flex items-center justify-between text-sm">
                     <PriceTag amount={movie.price} />
-                    <span>•</span>
-                    <span>{movie.runtime} min</span>
-                    <span>•</span>
-                    <span>Stock: {movie.stock}</span>
+                    <span className="text-muted-foreground">{movie.runtime} min</span>
                 </div>
 
-                <RatingStars value={movie.rating} />
+                <div className="flex items-center justify-between">
+                    <RatingStars value={movie.rating} />
+                    <span className="text-xs text-muted-foreground">Stock: {movie.stock}</span>
+                </div>
             </div>
         </Link>
     );
