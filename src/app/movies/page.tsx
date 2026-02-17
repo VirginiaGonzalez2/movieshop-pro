@@ -26,6 +26,7 @@ export default async function MoviesPage() {
         orderBy: [{ movieId: "asc" }, { personId: "asc" }],
     });
 
+    // Map movieId to actors, directors
     const byMovie = new Map<number, { actors: string[]; directors: string[] }>();
 
     for (const mp of moviePeople) {
@@ -40,7 +41,6 @@ export default async function MoviesPage() {
         byMovie.set(mp.movieId, entry);
     }
 
-    // Prepare serializable data for the Client component
     const items = movies.map((m) => {
         const info = byMovie.get(m.id) ?? { actors: [], directors: [] };
 
@@ -50,8 +50,10 @@ export default async function MoviesPage() {
             price: m.price.toString(),
             stock: m.stock,
             runtime: m.runtime,
-            actors: info.actors,
+            rating: m.rating,
+            imageUrl: m.imageUrl ?? null,
             directors: info.directors,
+            actors: info.actors,
         };
     });
 
