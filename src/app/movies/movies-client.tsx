@@ -1,28 +1,27 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import MoviesSearchBar from "./search-bar";
-import { PriceTag } from "@/components/ui/PriceTag";
-import { RatingStars } from "@/components/ui/RatingStars";
+import MovieCard from "@/components/movies/MovieCard";
 
-type MovieCard = {
+type MovieCardItem = {
     id: number;
     title: string;
     price: string;
     stock: number;
     runtime: number;
+    rating: number;
+    imageUrl?: string | null;
     directors: string[];
     actors: string[];
 };
 
-export default function MoviesClient({ items }: { items: MovieCard[] }) {
+export default function MoviesClient({ items }: { items: MovieCardItem[] }) {
     const [q, setQ] = useState("");
 
     const filtered = useMemo(() => {
         const query = q.trim().toLowerCase();
         if (!query) return items;
-
         return items.filter((m) => m.title.toLowerCase().includes(query));
     }, [q, items]);
 
@@ -33,46 +32,20 @@ export default function MoviesClient({ items }: { items: MovieCard[] }) {
                 <MoviesSearchBar onSearch={setQ} />
             </div>
 
-            <div className="grid gap-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {filtered.map((movie) => (
-                    <div
+                    <MovieCard
                         key={movie.id}
-                        className="border rounded p-4 flex items-start justify-between"
-                    >
-                        <div className="space-y-1">
-                            <div className="font-semibold text-lg">{movie.title}</div>
-
-                            <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-2">
-                                <PriceTag amount={movie.price} />
-                                <span>•</span>
-                                <span>Stock: {movie.stock}</span>
-                                <span>•</span>
-                                <span>Runtime: {movie.runtime} min</span>
-                            </div>
-
-                            {/* Demo rating (until add rating to DB) */}
-                            <div className="text-sm flex items-center gap-2">
-                                <RatingStars value={4} />
-                                <span className="text-muted-foreground">(demo)</span>
-                            </div>
-
-                            <div className="text-sm">
-                                <span className="font-semibold">Director:</span>{" "}
-                                {movie.directors.length > 0 ? movie.directors.join(", ") : "—"}
-                            </div>
-
-                            <div className="text-sm">
-                                <span className="font-semibold">Cast:</span>{" "}
-                                {movie.actors.length > 0 ? movie.actors.join(", ") : "—"}
-                            </div>
-                        </div>
-
-                        <div className="text-sm">
-                            <Link className="text-blue-600" href={`/movies`}>
-                                View
-                            </Link>
-                        </div>
-                    </div>
+                        movie={{
+                            id: movie.id,
+                            title: movie.title,
+                            price: movie.price,
+                            stock: movie.stock,
+                            runtime: movie.runtime,
+                            rating: movie.rating,
+                            imageUrl: movie.imageUrl ?? null,
+                        }}
+                    />
                 ))}
 
                 {filtered.length === 0 ? (

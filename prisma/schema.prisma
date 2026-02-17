@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -75,6 +74,8 @@ model Movie {
   releaseDate DateTime
   runtime     Int
   imageUrl    String?
+  rating Int @default(0)
+
   stock       Int
 
   genres      MovieGenre[]
