@@ -5,10 +5,7 @@ import { movieSchema } from "@/lib/validations/movie";
 import { Prisma, Role } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-
-export type MovieActionState =
-    | { ok: true }
-    | { ok: false; message: string; fieldErrors?: Record<string, string[]> };
+import { savePublicUpload } from "@/lib/upload";
 
 function readGenreIds(formData: FormData): number[] {
     return formData
@@ -24,40 +21,38 @@ function readPersonIds(formData: FormData, key: "actors" | "directors"): number[
         .filter((n) => Number.isInteger(n) && n > 0);
 }
 
+function normalizeImageUrl(value: string | undefined): string | null {
+    if (!value) return null;
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : null;
+}
+
 //  CREATE
-export async function createMovie(
-    _prevState: MovieActionState,
-    formData: FormData,
-): Promise<MovieActionState> {
+export async function createMovie(formData: FormData): Promise<void> {
     const raw = Object.fromEntries(formData);
     const parsed = movieSchema.safeParse(raw);
 
     if (!parsed.success) {
-        const flattened = parsed.error.flatten();
-        return {
-            ok: false,
-            message: "Please fix the highlighted fields.",
-            fieldErrors: flattened.fieldErrors,
-        };
+        throw new Error(parsed.error.issues.map((i) => i.message).join(", "));
     }
 
     const genreIds = readGenreIds(formData);
     const actorIds = readPersonIds(formData, "actors");
     const directorIds = readPersonIds(formData, "directors");
 
+    // image upload 
+    const imageFile = formData.get("image");
+    const uploadedPath =
+        imageFile instanceof File && imageFile.size > 0 ? await savePublicUpload(imageFile) : "";
+
     const movie = await prisma.movie.create({
         data: {
             ...parsed.data,
             price: new Prisma.Decimal(parsed.data.price),
+            rating: parsed.data.rating ?? 0,
+            imageUrl: uploadedPath || normalizeImageUrl(parsed.data.imageUrl) || null,
         },
     });
-
-    if (genreIds.length > 0) {
-        await prisma.movieGenre.createMany({
-            data: genreIds.map((genreId) => ({ movieId: movie.id, genreId })),
-            skipDuplicates: true,
-        });
-    }
 
     if (genreIds.length > 0) {
         await prisma.movieGenre.createMany({
@@ -92,26 +87,22 @@ export async function createMovie(
 }
 
 //  UPDATE
-export async function updateMovie(
-    id: number,
-    _prevState: MovieActionState,
-    formData: FormData,
-): Promise<MovieActionState> {
+export async function updateMovie(id: number, formData: FormData): Promise<void> {
     const raw = Object.fromEntries(formData);
     const parsed = movieSchema.safeParse(raw);
 
     if (!parsed.success) {
-        const flattened = parsed.error.flatten();
-        return {
-            ok: false,
-            message: "Please fix the highlighted fields.",
-            fieldErrors: flattened.fieldErrors,
-        };
+        throw new Error(parsed.error.issues.map((i) => i.message).join(", "));
     }
 
     const genreIds = readGenreIds(formData);
     const actorIds = readPersonIds(formData, "actors");
     const directorIds = readPersonIds(formData, "directors");
+
+    // image upload
+    const imageFile = formData.get("image");
+    const uploadedPath =
+        imageFile instanceof File && imageFile.size > 0 ? await savePublicUpload(imageFile) : "";
 
     const moviePeople = [
         ...actorIds.map((personId) => ({
@@ -132,10 +123,12 @@ export async function updateMovie(
             data: {
                 ...parsed.data,
                 price: new Prisma.Decimal(parsed.data.price),
+                rating: parsed.data.rating ?? 0,
+                imageUrl: uploadedPath || normalizeImageUrl(parsed.data.imageUrl) || null,
             },
         }),
 
-        // Replace genres
+        // genres
         prisma.movieGenre.deleteMany({ where: { movieId: id } }),
         ...(genreIds.length > 0
             ? [
@@ -146,7 +139,7 @@ export async function updateMovie(
               ]
             : []),
 
-        // Replace people roles
+        // people roles
         prisma.moviePerson.deleteMany({ where: { movieId: id } }),
         ...(moviePeople.length > 0
             ? [
@@ -163,11 +156,9 @@ export async function updateMovie(
     redirect("/admin/movies");
 }
 
-//  DELETE (delete can stay void)
+//  DELETE
 export async function deleteMovie(id: number): Promise<void> {
     await prisma.moviePerson.deleteMany({ where: { movieId: id } });
-    await prisma.movieGenre.deleteMany({ where: { movieId: id } });
-
     await prisma.movieGenre.deleteMany({ where: { movieId: id } });
 
     await prisma.movie.delete({ where: { id } });
