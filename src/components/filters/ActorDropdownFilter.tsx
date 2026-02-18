@@ -1,6 +1,6 @@
 "use client";
 
-import { toggleDirector } from "@/actions/directorDropdown";
+import { toggleActor } from "@/actions/actorDropdown";
 import {
     Accordion,
     AccordionContent,
@@ -11,21 +11,21 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { usePathname } from "next/navigation";
 import { useTransition } from "react";
 
-type DirectorDropdownFilterProps = {
-    directors: {
+type ActorDropdownFilterProps = {
+    actors: {
         id: string;
         name: string;
     }[];
     selected: string[];
 };
 
-function DirectorDropdownFilter({ directors, selected }: DirectorDropdownFilterProps) {
+function ActorDropdownFilter({ actors, selected }: ActorDropdownFilterProps) {
     const [, startTransition] = useTransition();
     const pathname = usePathname();
 
     function onToggle(id: string) {
         startTransition(() => {
-            toggleDirector(id, selected, pathname);
+            toggleActor(id, selected, pathname);
         });
     }
 
@@ -36,15 +36,15 @@ function DirectorDropdownFilter({ directors, selected }: DirectorDropdownFilterP
                 <AccordionContent>
                     <ScrollArea className="h-40 w-48 rounded-md border">
                         <div className="pl-3 pt-1 space-y-2">
-                            {directors.map((d) => (
-                                <label key={d.id} className="flex items-center gap-2">
+                            {actors.map((a) => (
+                                <label key={a.id} className="flex items-center gap-2">
                                     <input
                                         type="checkbox"
-                                        checked={selected.includes(d.id)}
-                                        onChange={() => onToggle(d.id)}
+                                        checked={selected.includes(a.id)}
+                                        onChange={() => onToggle(a.id)}
                                     />
                                     {/* Alter 'name' to what's appropriate for the genre db table */}
-                                    {d.name}
+                                    {a.name}
                                 </label>
                             ))}
                         </div>
@@ -55,4 +55,4 @@ function DirectorDropdownFilter({ directors, selected }: DirectorDropdownFilterP
     );
 }
 
-export { DirectorDropdownFilter };
+export { ActorDropdownFilter };
