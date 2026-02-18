@@ -11,9 +11,6 @@ git clone git@github.com:Gr-25-16/a-plus-movieshop.git MovieShop
 cd MovieShop
 
 npm install
-
-npx prisma deploy
-npx prisma generate
 ```
 
 Create a file named .env and add the following to it:
@@ -30,6 +27,10 @@ BETTER_AUTH_URL=http://localhost:3000
 Finally, run the development server:
 
 ```bash
+npx prisma migrate deploy
+npx prisma generate
+npx prisma db seed
+
 npm run dev
 ```
 
