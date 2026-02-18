@@ -14,12 +14,13 @@ type Props = {
 };
 
 export function AuthGuard({ children, redirectTo = "/login" }: Props) {
-    const router = useOriginRouter();
+    const router = useOriginRouter(true);
+
     const session = authClient.useSession();
 
     // While session is loading, render nothing
     if (session.isPending || session.isRefetching) {
-        return <></>;
+        return null;
     }
 
     // Not logged-in go to login
