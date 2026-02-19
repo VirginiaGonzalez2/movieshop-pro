@@ -39,7 +39,7 @@ function DirectorDropdownFilter({ directors, selected }: DirectorDropdownFilterP
                             {directors.map((d) => (
                                 <label key={d.id} className="flex items-center gap-2">
                                     <input
-                                        type="checkbox"
+                                        type="checkbox"     
                                         checked={selected.includes(d.id)}
                                         onChange={() => onToggle(d.id)}
                                     />
