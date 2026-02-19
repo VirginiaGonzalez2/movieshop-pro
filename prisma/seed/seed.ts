@@ -86,7 +86,7 @@ async function main() {
                 runtime: Number(row.Runtime ?? 90),
                 rating: Number(row.Rating ?? 0),
                 stock: 10,
-                imageUrl: null,
+                imageUrl: "/images/the-dark-knight.jpg",
             },
         });
 
