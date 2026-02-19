@@ -22,18 +22,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
     return (
-        <html lang="en" className="h-full">
+        <html lang="en">
             <body
-                className={`${geistSans.variable} ${geistMono.variable} antialiased h-full flex flex-col`}
+                className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
             >
-                <AppHeader className="p-2 pb-0 shrink-0" />
+                <AppHeader />
 
-                <main className="p-2 flex-1 overflow-y-auto text-center">
+                <main className="p-2 flex-1 text-center">
                     {children}
                     <Toaster richColors />
                 </main>
 
-                <AppFooter className="p-2 pt-0 shrink-0" />
+                <AppFooter />
             </body>
         </html>
     );
