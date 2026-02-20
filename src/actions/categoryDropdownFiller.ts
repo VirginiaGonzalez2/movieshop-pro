@@ -6,15 +6,17 @@ import { Role } from "@prisma/client";
 
 // Genres
 export async function getGenres() {
-  return prisma.genre.findMany({
-    orderBy: { name: "asc" }
+    const genres = await prisma.genre.findMany({
+        orderBy: { name: "asc" }
   });
+
+  return genres;
 }
 
 // People by role (director/actor)
 export async function getPeopleByRole(role: Role)
 {
-    return prisma.person.findMany({
+    const persons = await prisma.person.findMany({
         where: {
             movies:     {
                 some:   { role }
@@ -22,6 +24,8 @@ export async function getPeopleByRole(role: Role)
         },
         orderBy: { name: "asc" }
     });
+
+    return persons;
 }
 
 export async function getDirectors()
