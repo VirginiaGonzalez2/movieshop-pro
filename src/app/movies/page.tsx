@@ -1,10 +1,103 @@
 import { prisma } from "@/lib/prisma";
-import { Role } from "@prisma/client";
+import { Role, Prisma } from "@prisma/client";
 import MoviesClient from "./movies-client";
 
-export default async function MoviesPage() {
+/**
+ * Force dynamic rendering because the page depends on URL query parameters
+ * (sorting, filters, pagination).
+ */
+export const dynamic = "force-dynamic";
+
+/**
+ * MoviesPage (Server Component)
+ *
+ * Responsibilities:
+ * - Handle server-side sorting
+ * - Parse filter parameters (genres, directors, actors)
+ * - Prepare layout structure (sidebar + main content)
+ * - Fetch and transform movie data
+ *
+ * NOTE:
+ * Filtering logic will be implemented after filter integration is finalized.
+ */
+export default async function MoviesPage({
+    searchParams,
+}: {
+    searchParams: Promise<{
+        sort?: string;
+        genres?: string | string[];
+        directors?: string | string[];
+        actors?: string | string[];
+        page?: string;
+    }>;
+}) {
+    /**
+     * Next.js 15+ requires awaiting searchParams
+     */
+    const params = await searchParams;
+
+    /**
+     * ----------------------------------------
+     * 1️⃣ Parse Sorting Parameter
+     * ----------------------------------------
+     */
+    const sort = params?.sort ?? "new";
+
+    let orderBy: { createdAt: "desc" } | { title: "asc" } | { price: "asc" } | { rating: "desc" };
+
+    switch (sort) {
+        case "az":
+            orderBy = { title: "asc" };
+            break;
+        case "price":
+            orderBy = { price: "asc" };
+            break;
+        case "popular":
+            orderBy = { rating: "desc" };
+            break;
+        case "new":
+        default:
+            orderBy = { createdAt: "desc" };
+            break;
+    }
+
+    /**
+     * ----------------------------------------
+     * 2️⃣ Parse Filter Parameters
+     * ----------------------------------------
+     * Filters use comma-separated values:
+     * Example:
+     * ?genres=1,2&directors=3&actors=5,8
+     */
+    const selectedGenres = Array.isArray(params.genres)
+        ? params.genres
+        : (params.genres?.split(",") ?? []);
+
+    const selectedDirectors = Array.isArray(params.directors)
+        ? params.directors
+        : (params.directors?.split(",") ?? []);
+
+    const selectedActors = Array.isArray(params.actors)
+        ? params.actors
+        : (params.actors?.split(",") ?? []);
+
+    /**
+     * ----------------------------------------
+     * 3️⃣ Prepare Prisma WHERE
+     * ----------------------------------------
+     * Filtering logic will be implemented once
+     * filter integration is finalized.
+     */
+    const where: Prisma.MovieWhereInput = {};
+
+    /**
+     * ----------------------------------------
+     * 4️⃣ Fetch Movies (Sorted)
+     * ----------------------------------------
+     */
     const movies = await prisma.movie.findMany({
-        orderBy: { createdAt: "desc" },
+        where,
+        orderBy,
     });
 
     if (movies.length === 0) {
@@ -18,6 +111,11 @@ export default async function MoviesPage() {
         );
     }
 
+    /**
+     * ----------------------------------------
+     * 5️⃣ Fetch Related People
+     * ----------------------------------------
+     */
     const movieIds = movies.map((m) => m.id);
 
     const moviePeople = await prisma.moviePerson.findMany({
@@ -26,7 +124,9 @@ export default async function MoviesPage() {
         orderBy: [{ movieId: "asc" }, { personId: "asc" }],
     });
 
-    // Map movieId to actors, directors
+    /**
+     * Group actors and directors by movieId
+     */
     const byMovie = new Map<number, { actors: string[]; directors: string[] }>();
 
     for (const mp of moviePeople) {
@@ -41,6 +141,11 @@ export default async function MoviesPage() {
         byMovie.set(mp.movieId, entry);
     }
 
+    /**
+     * ----------------------------------------
+     * 6️⃣ Transform Data for MoviesClient
+     * ----------------------------------------
+     */
     const items = movies.map((m) => {
         const info = byMovie.get(m.id) ?? { actors: [], directors: [] };
 
@@ -57,5 +162,27 @@ export default async function MoviesPage() {
         };
     });
 
-    return <MoviesClient items={items} />;
+    /**
+     * ----------------------------------------
+     * 7️⃣ Layout Structure
+     * ----------------------------------------
+     * 12-column grid:
+     * - Sidebar (filters) → col-span-3
+     * - Main content → col-span-9
+     *
+     * MoviePanel will be integrated into the sidebar.
+     */
+    return (
+        <div className="mx-auto max-w-7xl px-6 py-8">
+            <div className="grid grid-cols-12 gap-8">
+                {/* Sidebar Placeholder (Filters) */}
+                <aside className="col-span-3">{/* MoviePanel will be rendered here */}</aside>
+
+                {/* Main Content */}
+                <div className="col-span-9">
+                    <MoviesClient items={items} />
+                </div>
+            </div>
+        </div>
+    );
 }

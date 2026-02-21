@@ -37,12 +37,23 @@ export default function MovieCard({ movie }: { movie: MovieCardItem }) {
             <div className="p-4 space-y-2">
                 <div className="font-semibold">{movie.title}</div>
 
-                <div className="text-sm text-muted-foreground flex items-center gap-2 flex-wrap">
-                    <PriceTag amount={movie.price} />
-                    <span>•</span>
-                    <span>{movie.runtime} min</span>
-                    <span>•</span>
-                    <span>Stock: {movie.stock}</span>
+                <div className="flex items-start justify-between">
+                    {/* Primary price */}
+                    <div className="text-lg font-semibold">
+                        <PriceTag amount={movie.price} />
+                    </div>
+
+                    {/* Secondary metadata */}
+                    <div className="text-xs text-muted-foreground text-right">
+                        <div>{movie.runtime} min</div>
+                        <div>
+                            {movie.stock > 0 ? (
+                                <span className="text-green-600">In stock ({movie.stock})</span>
+                            ) : (
+                                <span className="text-red-500">Out of stock</span>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
                 <RatingStars value={movie.rating} />
