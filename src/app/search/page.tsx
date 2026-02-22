@@ -105,7 +105,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                         >
                             <h2 className="mb-2 text-lg font-medium">{movie.title}</h2>
 
-                            <p className="mb-4 line-clamp-3 text-sm text-muted-foreground">
+                            <p className="mb-4 text-sm text-muted-foreground">
                                 {movie.description}
                             </p>
 
