@@ -24,13 +24,17 @@ BETTER_AUTH_SECRET=<REPLACE WITH UNIQUE 32-BYTE BASE64-ENCODED SECRET>
 BETTER_AUTH_URL=http://localhost:3000
 ```
 
-Finally, run the development server:
+Initialize Prisma and seed the database.
 
 ```bash
 npx prisma migrate deploy
 npx prisma generate
 npx prisma db seed
+```
 
+Finally, run the development server:
+
+```bash
 npm run dev
 ```
 
