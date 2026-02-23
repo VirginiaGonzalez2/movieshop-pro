@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-16 09:20:35
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-18 14:42:26
+ *   Modified time: 2026-02-18 15:30:15
  *   Description: Add, remove and set quantity of item in cart.
  */
 
@@ -19,16 +19,18 @@ import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
 import { MinusIcon, PlusIcon } from "lucide-react";
 import { ChangeEvent, ComponentProps, FocusEvent, InputEvent, useRef, useState } from "react";
+import { twMerge } from "tailwind-merge";
 
 type Props = ComponentProps<typeof ButtonGroup> & {
     itemId: number;
     quantity: number;
+    stock: number;
 };
 
 // Just for sanity.
 const MAX_QUANTITY = 999;
 
-export function CartItemControls({ itemId, quantity, ...buttonGroupProps }: Props) {
+export function CartItemControls({ itemId, quantity, stock, ...buttonGroupProps }: Props) {
     const [updating, setUpdating] = useState(false);
 
     const inputRef = useRef<HTMLInputElement>(null);
@@ -101,7 +103,10 @@ export function CartItemControls({ itemId, quantity, ...buttonGroupProps }: Prop
                 <MinusIcon />
             </Button>
             <Input
-                className="w-12 text-center"
+                className={twMerge(
+                    "w-12 text-center",
+                    quantity > stock ? "text-red-600" : undefined,
+                )}
                 type="text"
                 ref={inputRef}
                 defaultValue={quantity}

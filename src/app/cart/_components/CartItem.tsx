@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-18 13:18:06
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-18 14:15:37
+ *   Modified time: 2026-02-18 15:36:43
  *   Description:
  */
 
@@ -43,7 +43,11 @@ export default async function CartItem({ item }: Props) {
                     <GenreList genres={item.genres} />
                 </ItemGroup>
                 <div className="flex-1 flex justify-end">
-                    <CartItemControls itemId={item.itemId} quantity={item.quantity} />
+                    <CartItemControls
+                        itemId={item.itemId}
+                        quantity={item.quantity}
+                        stock={item.stock}
+                    />
                 </div>
                 <ItemContent className="flex-0">{formatter.format(Number(item.price))}</ItemContent>
             </li>
