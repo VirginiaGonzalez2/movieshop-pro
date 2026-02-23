@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
-import { PriceTag } from "@/components/ui/PriceTag";
-import { RatingStars } from "@/components/ui/RatingStars";
+import MovieHeroSection from "@/components/movie-detail/MovieHeroSection";
+import MovieDescription from "@/components/movie-detail/MovieDescription";
 
 export default async function MovieDetailsPage({
     params,
@@ -46,30 +46,16 @@ export default async function MovieDetailsPage({
                 ← Back to Movies
             </Link>
 
-            <div className="border rounded p-6 space-y-3">
-                <h1 className="text-3xl font-bold">{movie.title}</h1>
+            <MovieHeroSection
+                title={movie.title}
+                price={movie.price.toString()}
+                runtime={movie.runtime}
+                stock={movie.stock}
+                rating={movie.rating}
+                imageUrl={movie.imageUrl ?? null}
+            />
 
-                <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-2">
-                    <PriceTag amount={movie.price.toString()} />
-                    <span>•</span>
-                    <span>Runtime: {movie.runtime} min</span>
-                    <span>•</span>
-                    <span>Stock: {movie.stock}</span>
-                </div>
-
-                <RatingStars value={movie.rating} />
-
-                <p className="leading-relaxed">{movie.description}</p>
-
-                {movie.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                        src={movie.imageUrl}
-                        alt={movie.title}
-                        className="w-full max-w-md rounded border"
-                    />
-                ) : null}
-            </div>
+            <MovieDescription description={movie.description} />
         </div>
     );
 }
