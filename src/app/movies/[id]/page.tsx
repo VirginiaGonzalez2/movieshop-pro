@@ -2,7 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import MovieHeroSection from "@/components/movie-detail/MovieHeroSection";
 import MovieDescription from "@/components/movie-detail/MovieDescription";
-import MovieTrailerSection from "@/components/movie-detail/MovieTrailerSection";
+import RecommendedMoviesSection from "@/components/movie-detail/RecommendedMoviesSection";
 
 export default async function MovieDetailsPage({
     params,
@@ -28,6 +28,9 @@ export default async function MovieDetailsPage({
 
     const movie = await prisma.movie.findUnique({
         where: { id },
+        include: {
+            genres: { select: { genreId: true } },
+        },
     });
 
     if (!movie) {
@@ -41,8 +44,33 @@ export default async function MovieDetailsPage({
         );
     }
 
+    const genreIds = movie.genres.map((g) => g.genreId);
+
+    const recommended = genreIds.length
+        ? await prisma.movie.findMany({
+              where: {
+                  id: { not: movie.id },
+                  genres: {
+                      some: { genreId: { in: genreIds } },
+                  },
+              },
+              orderBy: { createdAt: "desc" },
+              take: 6,
+          })
+        : [];
+
+    const recommendedItems = recommended.map((m) => ({
+        id: m.id,
+        title: m.title,
+        price: m.price.toString(),
+        stock: m.stock,
+        runtime: m.runtime,
+        rating: m.rating,
+        imageUrl: m.imageUrl ?? null,
+    }));
+
     return (
-        <div className="p-8 max-w-3xl space-y-4">
+        <div className="p-8 max-w-4xl space-y-4">
             <Link className="text-blue-600" href="/movies">
                 ← Back to Movies
             </Link>
@@ -59,7 +87,7 @@ export default async function MovieDetailsPage({
 
             <MovieDescription description={movie.description} />
 
-            <MovieTrailerSection trailerUrl={movie.trailerUrl ?? null} title={movie.title} />
+            <RecommendedMoviesSection items={recommendedItems} />
         </div>
     );
 }
