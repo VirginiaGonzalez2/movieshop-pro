@@ -2,6 +2,40 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import MovieHeroSection from "@/components/movie-detail/MovieHeroSection";
 import MovieDescription from "@/components/movie-detail/MovieDescription";
+import SocialShareActions from "@/components/movie-detail/SocialShareActions";
+import { headers } from "next/headers";
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ id: string }> | { id: string };
+}) {
+    const resolved = await Promise.resolve(params);
+    const id = Number(resolved.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+        return { title: "Movie | MovieShop" };
+    }
+
+    const movie = await prisma.movie.findUnique({
+        where: { id },
+        select: { title: true },
+    });
+
+    return {
+        title: movie?.title ? `${movie.title} | MovieShop` : "Movie | MovieShop",
+    };
+}
+
+async function buildAbsoluteUrl(path: string) {
+    const h = await headers();
+
+    const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
+
+    const proto = h.get("x-forwarded-proto") ?? "http";
+
+    return `${proto}://${host}${path}`;
+}
 
 export default async function MovieDetailsPage({
     params,
@@ -40,6 +74,9 @@ export default async function MovieDetailsPage({
         );
     }
 
+    const shareUrl = await buildAbsoluteUrl(`/movies/${movie.id}`);
+    const shareTitle = `${movie.title} | MovieShop`;
+
     return (
         <div className="p-8 max-w-3xl space-y-4">
             <Link className="text-blue-600" href="/movies">
@@ -53,7 +90,10 @@ export default async function MovieDetailsPage({
                 stock={movie.stock}
                 rating={movie.rating}
                 imageUrl={movie.imageUrl ?? null}
+                trailerUrl={movie.trailerUrl ?? null}
             />
+
+            <SocialShareActions url={shareUrl} title={shareTitle} />
 
             <MovieDescription description={movie.description} />
         </div>
