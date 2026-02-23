@@ -14,6 +14,7 @@ export async function sendContactMessage(prevState: { success: boolean }, formDa
     const email = formData.get("email") as string;
     const message = formData.get("message") as string;
 
+    // Basic validation to ensure required fields exist
     if (!name || !email || !message) {
         return { success: false };
     }
