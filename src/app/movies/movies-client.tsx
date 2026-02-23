@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import MoviesSearchBar from "./search-bar";
 import MovieCard, { type MovieCardItem } from "@/components/movies/MovieCard";
-
+import MoviesSortBar from "./MoviesSortBar";
 type MoviesClientItem = MovieCardItem & {
     directors: string[];
     actors: string[];
@@ -26,6 +26,9 @@ export default function MoviesClient({ items }: { items: MoviesClientItem[] }) {
                 <MoviesSearchBar onSearch={setQ} />
             </div>
 
+            <div className="mb-6">
+                <MoviesSortBar />
+            </div>
             {filtered.length === 0 ? (
                 <div className="text-sm text-muted-foreground">No movies match “{q}”.</div>
             ) : (
