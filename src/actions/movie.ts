@@ -27,6 +27,12 @@ function normalizeImageUrl(value: string | undefined): string | null {
     return trimmed.length > 0 ? trimmed : null;
 }
 
+function normalizeTrailerUrl(value: string | undefined): string | null {
+    if (!value) return null;
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : null;
+}
+
 //  CREATE
 export async function createMovie(formData: FormData): Promise<void> {
     const raw = Object.fromEntries(formData);
@@ -40,7 +46,7 @@ export async function createMovie(formData: FormData): Promise<void> {
     const actorIds = readPersonIds(formData, "actors");
     const directorIds = readPersonIds(formData, "directors");
 
-    // image upload 
+    // image upload
     const imageFile = formData.get("image");
     const uploadedPath =
         imageFile instanceof File && imageFile.size > 0 ? await savePublicUpload(imageFile) : "";
@@ -50,7 +56,11 @@ export async function createMovie(formData: FormData): Promise<void> {
             ...parsed.data,
             price: new Prisma.Decimal(parsed.data.price),
             rating: parsed.data.rating ?? 0,
+
             imageUrl: uploadedPath || normalizeImageUrl(parsed.data.imageUrl) || null,
+
+            // new: trailerUrl (stored in DB)
+            trailerUrl: normalizeTrailerUrl(parsed.data.trailerUrl) || null,
         },
     });
 
@@ -124,7 +134,11 @@ export async function updateMovie(id: number, formData: FormData): Promise<void>
                 ...parsed.data,
                 price: new Prisma.Decimal(parsed.data.price),
                 rating: parsed.data.rating ?? 0,
+
                 imageUrl: uploadedPath || normalizeImageUrl(parsed.data.imageUrl) || null,
+
+                // new: trailerUrl (stored in DB)
+                trailerUrl: normalizeTrailerUrl(parsed.data.trailerUrl) || null,
             },
         }),
 

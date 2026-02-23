@@ -2,6 +2,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import MovieHeroSection from "@/components/movie-detail/MovieHeroSection";
 import MovieDescription from "@/components/movie-detail/MovieDescription";
+import MovieTrailerSection from "@/components/movie-detail/MovieTrailerSection";
 
 export default async function MovieDetailsPage({
     params,
@@ -53,9 +54,12 @@ export default async function MovieDetailsPage({
                 stock={movie.stock}
                 rating={movie.rating}
                 imageUrl={movie.imageUrl ?? null}
+                trailerUrl={movie.trailerUrl ?? null}
             />
 
             <MovieDescription description={movie.description} />
+
+            <MovieTrailerSection trailerUrl={movie.trailerUrl ?? null} title={movie.title} />
         </div>
     );
 }
