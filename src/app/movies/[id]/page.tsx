@@ -1,10 +1,16 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
+
 import MovieHeroSection from "@/components/movie-detail/MovieHeroSection";
 import MovieDescription from "@/components/movie-detail/MovieDescription";
+import MovieTrailerSection from "@/components/movie-detail/MovieTrailerSection";
 import RecommendedMoviesSection from "@/components/movie-detail/RecommendedMoviesSection";
+import MovieRatingSection from "@/components/movie-detail/MovieRatingSection";
+import WishlistToggle from "@/components/movie-detail/WishlistToggle";
 import SocialShareActions from "@/components/movie-detail/SocialShareActions";
+
+import { getMovieRatingSummary } from "@/actions/movie-rating";
 
 export async function generateMetadata({
     params,
@@ -75,33 +81,34 @@ export default async function MovieDetailsPage({
         );
     }
 
+    // Ratings summary (real ratings table)
+    const { avgRating, ratingCount } = await getMovieRatingSummary(movie.id);
+
     // Social share
     const shareUrl = await buildAbsoluteUrl(`/movies/${movie.id}`);
     const shareTitle = `${movie.title} | MovieShop`;
 
-    // Recommendations (same-genre)
-    const genreIds = movie.genres.map((g) => g.genreId);
+    // Recommendations: same genre, exclude current
+    const genreIds = movie.genres.map((mg) => mg.genreId);
 
-    const recommended = genreIds.length
+    const rec = genreIds.length
         ? await prisma.movie.findMany({
               where: {
                   id: { not: movie.id },
-                  genres: {
-                      some: { genreId: { in: genreIds } },
-                  },
+                  genres: { some: { genreId: { in: genreIds } } },
               },
               orderBy: { createdAt: "desc" },
               take: 6,
           })
         : [];
 
-    const recommendedItems = recommended.map((m) => ({
+    const recItems = rec.map((m) => ({
         id: m.id,
         title: m.title,
         price: m.price.toString(),
         stock: m.stock,
         runtime: m.runtime,
-        rating: m.rating,
+        rating: Math.round((m as any).rating ?? 0),
         imageUrl: m.imageUrl ?? null,
     }));
 
@@ -116,16 +123,26 @@ export default async function MovieDetailsPage({
                 price={movie.price.toString()}
                 runtime={movie.runtime}
                 stock={movie.stock}
-                rating={movie.rating}
+                rating={Math.round(avgRating)} // display avg as stars
                 imageUrl={movie.imageUrl ?? null}
                 trailerUrl={movie.trailerUrl ?? null}
+            />
+
+            <MovieTrailerSection trailerUrl={movie.trailerUrl ?? null} title={movie.title} />
+
+            <WishlistToggle movieId={movie.id} />
+
+            <MovieRatingSection
+                movieId={movie.id}
+                avgRating={avgRating}
+                ratingCount={ratingCount}
             />
 
             <SocialShareActions url={shareUrl} title={shareTitle} />
 
             <MovieDescription description={movie.description} />
 
-            <RecommendedMoviesSection items={recommendedItems} />
+            <RecommendedMoviesSection title="More like this" items={recItems} />
         </div>
     );
 }

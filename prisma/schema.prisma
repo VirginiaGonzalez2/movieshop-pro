@@ -7,7 +7,7 @@ datasource db {
 }
 
 model account {
-  id                    String    @id
+  id                    String   @id
   accountId             String
   providerId            String
   userId                String
@@ -18,9 +18,9 @@ model account {
   refreshTokenExpiresAt DateTime?
   scope                 String?
   password              String?
-  createdAt             DateTime  @default(now())
+  createdAt             DateTime @default(now())
   updatedAt             DateTime
-  user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  user     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -40,15 +40,17 @@ model session {
 }
 
 model user {
-  id            String    @id
+  id            String   @id
   name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
+  email         String   @unique
+  emailVerified Boolean  @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
+  createdAt     DateTime @default(now())
   updatedAt     DateTime
   account       account[]
   session       session[]
+
+  movieRatings  MovieRating[]
 }
 
 model verification {
@@ -63,7 +65,7 @@ model verification {
 }
 
 model Movie {
-  id          Int           @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   title       String
   description String
   price       Decimal
@@ -72,12 +74,14 @@ model Movie {
   imageUrl    String?
   trailerUrl  String?
   stock       Int
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  rating      Int           @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  rating      Int      @default(0)
+
   genres      MovieGenre[]
   people      MoviePerson[]
   orderItems  OrderItem[]
+  ratings     MovieRating[]
 }
 
 model Genre {
@@ -107,8 +111,8 @@ model MoviePerson {
   movieId  Int
   personId Int
   role     Role
-  movie    Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
-  person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+  movie    Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  person   Person  @relation(fields: [personId], references: [id], onDelete: Cascade)
 
   @@id([movieId, personId, role])
 }
@@ -143,4 +147,21 @@ model ContactMessage {
 enum Role {
   ACTOR
   DIRECTOR
+}
+
+model MovieRating {
+  id        Int      @id @default(autoincrement())
+  movieId   Int
+  userId    String
+  value     Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  user  user  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([movieId, userId])
+  @@index([movieId])
+  @@index([userId])
 }

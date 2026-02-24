@@ -33,7 +33,7 @@ function normalizeTrailerUrl(value: string | undefined): string | null {
     return trimmed.length > 0 ? trimmed : null;
 }
 
-//  CREATE
+// CREATE
 export async function createMovie(formData: FormData): Promise<void> {
     const raw = Object.fromEntries(formData);
     const parsed = movieSchema.safeParse(raw);
@@ -57,13 +57,15 @@ export async function createMovie(formData: FormData): Promise<void> {
             price: new Prisma.Decimal(parsed.data.price),
             rating: parsed.data.rating ?? 0,
 
+            // image: upload preferred, fallback to imageUrl if present
             imageUrl: uploadedPath || normalizeImageUrl(parsed.data.imageUrl) || null,
 
-            // new: trailerUrl (stored in DB)
+            // trailerUrl stored in DB
             trailerUrl: normalizeTrailerUrl(parsed.data.trailerUrl) || null,
         },
     });
 
+    // genres
     if (genreIds.length > 0) {
         await prisma.movieGenre.createMany({
             data: genreIds.map((genreId) => ({ movieId: movie.id, genreId })),
@@ -71,6 +73,7 @@ export async function createMovie(formData: FormData): Promise<void> {
         });
     }
 
+    // people roles
     const moviePeople = [
         ...actorIds.map((personId) => ({
             movieId: movie.id,
@@ -96,7 +99,7 @@ export async function createMovie(formData: FormData): Promise<void> {
     redirect("/admin/movies");
 }
 
-//  UPDATE
+// UPDATE
 export async function updateMovie(id: number, formData: FormData): Promise<void> {
     const raw = Object.fromEntries(formData);
     const parsed = movieSchema.safeParse(raw);
@@ -135,9 +138,10 @@ export async function updateMovie(id: number, formData: FormData): Promise<void>
                 price: new Prisma.Decimal(parsed.data.price),
                 rating: parsed.data.rating ?? 0,
 
+                // image: if upload provided use it; else keep URL fallback
                 imageUrl: uploadedPath || normalizeImageUrl(parsed.data.imageUrl) || null,
 
-                // new: trailerUrl (stored in DB)
+                // trailerUrl stored in DB
                 trailerUrl: normalizeTrailerUrl(parsed.data.trailerUrl) || null,
             },
         }),
@@ -170,7 +174,7 @@ export async function updateMovie(id: number, formData: FormData): Promise<void>
     redirect("/admin/movies");
 }
 
-//  DELETE
+// DELETE
 export async function deleteMovie(id: number): Promise<void> {
     await prisma.moviePerson.deleteMany({ where: { movieId: id } });
     await prisma.movieGenre.deleteMany({ where: { movieId: id } });
