@@ -9,8 +9,7 @@ export default async function AdminNewMoviePage() {
         <div className="p-8 max-w-xl">
             <h1 className="text-2xl font-bold mb-6">Add Movie</h1>
 
-            {/* encType for file upload */}
-            <form action={createMovie} className="space-y-4" encType="multipart/form-data">
+            <form action={createMovie} className="space-y-4">
                 <input name="title" placeholder="Title" className="w-full border p-2" />
 
                 <textarea
@@ -64,6 +63,13 @@ export default async function AdminNewMoviePage() {
                 <input
                     name="imageUrl"
                     placeholder="Image URL (optional)"
+                    className="w-full border p-2"
+                />
+
+                {/* trailer URL */}
+                <input
+                    name="trailerUrl"
+                    placeholder="Trailer URL (YouTube link)"
                     className="w-full border p-2"
                 />
 
