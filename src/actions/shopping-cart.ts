@@ -19,6 +19,11 @@ type ShoppingCartItem = {
 const shoppingCartCookie = "shopping-cart";
 const shoppingCartLifetime = 7 * 24 * 3600 * 1000; // One week.
 
+/**
+ * Gets the shopping cart.
+ * @returns Array of ShoppingCartItem objects which include id and quantity (qty),
+ * or null if the shopping cart is empty.
+ */
 async function getShoppingCart(): Promise<ShoppingCartItem[] | null> {
     const cookieStore = await cookies();
 
@@ -43,6 +48,10 @@ async function getShoppingCart(): Promise<ShoppingCartItem[] | null> {
     return null;
 }
 
+/**
+ * Saves the shopping cart. Will overwrite any existing saved shopping cart.
+ * @param shoppingCart Array of ShoppingCartItem.
+ */
 async function saveShoppingCart(shoppingCart: ShoppingCartItem[]) {
     const cookieStore = await cookies();
     if (shoppingCart.length > 0) {
@@ -98,7 +107,7 @@ function modifyShoppingCartItem(
 
 /**
  * Add an item or update the quantity of an item.
- * @param itemId
+ * @param itemId Movie ID.
  * @param quantity (Optional) Number of items to add. Defaults to 1.
  * @returns New quantity of the item.
  */
@@ -160,7 +169,7 @@ async function removeShoppingCartItem(
 }
 
 /**
- *
+ * Set the quantity of an item.
  * @param itemId If the item does not exist, it will be added.
  * @param newQuantity If 0 the item will be removed.
  */
@@ -177,6 +186,11 @@ async function updateShoppingCartItem(itemId: number, newQuantity: number) {
     await saveShoppingCart(shoppingCart);
 }
 
+/**
+ * Gets the current quantity of an item in the shopping cart.
+ * @param itemId
+ * @returns The quantity of itemId stored in the shopping cart.
+ */
 async function getShoppingCartItemQuantity(itemId: number): Promise<number> {
     const shoppingCart = await getShoppingCart();
 
@@ -204,6 +218,11 @@ type ShoppingCartItemInfo = {
     stock: number;
 };
 
+/**
+ * Gets the shopping cart and also information about the movies added to it.
+ * @returns Array of ShoppingCartItemInfo objects. See the ShoppingCartItemInfo
+ * type for more information about what is included.
+ */
 async function getShoppingCartInfo(): Promise<ShoppingCartItemInfo[] | null> {
     const shoppingCart = await getShoppingCart();
 
