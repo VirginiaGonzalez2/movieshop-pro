@@ -70,6 +70,7 @@ model Movie {
   releaseDate DateTime
   runtime     Int
   imageUrl    String?
+  trailerUrl  String?
   stock       Int
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt

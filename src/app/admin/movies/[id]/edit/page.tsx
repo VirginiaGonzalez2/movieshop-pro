@@ -50,8 +50,7 @@ export default async function AdminEditMoviePage({
         <div className="p-8 max-w-xl">
             <h1 className="text-2xl font-bold mb-6">Edit Movie</h1>
 
-            {/* encType for file upload */}
-            <form action={updateWithId} className="space-y-4" encType="multipart/form-data">
+            <form action={updateWithId} className="space-y-4">
                 <input name="title" defaultValue={movie.title} className="w-full border p-2" />
 
                 <textarea
@@ -110,6 +109,13 @@ export default async function AdminEditMoviePage({
                 <input
                     name="imageUrl"
                     defaultValue={movie.imageUrl ?? ""}
+                    className="w-full border p-2"
+                />
+
+                <input
+                    name="trailerUrl"
+                    defaultValue={movie.trailerUrl ?? ""}
+                    placeholder="Trailer URL (YouTube link)"
                     className="w-full border p-2"
                 />
 
