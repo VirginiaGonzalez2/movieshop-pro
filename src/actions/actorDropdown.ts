@@ -16,7 +16,7 @@ export async function toggleActor(id: string, current: string[], pathname: strin
         params.set("genres", Array.from(set).join(","));
 
     // Should be removed later
-    console.log("SERVER ACTION FIRED", id, current)
+    console.log("SERVER ACTION FIRED AS SHOULD", id, current)
 
     // Change after use in IRL
     redirect(`${pathname}?${params.toString()}`, RedirectType.replace);

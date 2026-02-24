@@ -19,7 +19,7 @@ type DirectorDropdownFilterProps = {
     selected: string[];
 };
 
-// Director
+// Director filter
 function DirectorDropdownFilter({ directors, selected }: DirectorDropdownFilterProps) {
     const [, startTransition] = useTransition();
     const pathname = usePathname();

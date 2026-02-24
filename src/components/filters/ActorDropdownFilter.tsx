@@ -19,7 +19,7 @@ type ActorDropdownFilterProps = {
     selected: string[];
 };
 
-// Actor
+// Actor filter
 function ActorDropdownFilter({ actors, selected }: ActorDropdownFilterProps) {
     const [, startTransition] = useTransition();
     const pathname = usePathname();

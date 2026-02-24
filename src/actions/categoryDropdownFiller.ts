@@ -27,11 +27,13 @@ export async function getPeopleByRole(role: Role)
     return persons;
 }
 
+// Directors
 export async function getDirectors()
 {
     return getPeopleByRole(Role.DIRECTOR);
 }
 
+// Actors
 export async function getActors()
 {
     return getPeopleByRole(Role.ACTOR);

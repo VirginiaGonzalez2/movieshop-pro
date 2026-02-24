@@ -16,6 +16,7 @@ type MovieFilterPanelProps = {
   // movies?: Movie[]; // if you want to display movies here
 };
 
+// MovieFilterPanel
 export default function MovieFilterPanel({
   genres,
   selectedGenres,

@@ -16,7 +16,7 @@ export async function toggleDirector(id: string, current: string[], pathname: st
         params.set("genres", Array.from(set).join(","));
 
     // Should be removed later
-    console.log("SERVER ACTION FIRED AS IT SHOULD", id, current)
+    console.log("SERVER ACTION FIRED AS IT SHOULD!", id, current)
 
     // Change after use in IRL
     redirect(`${pathname}?${params.toString()}`, RedirectType.replace);
