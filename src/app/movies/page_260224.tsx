@@ -1,8 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { Role, Prisma } from "@prisma/client";
 import MoviesClient from "./movies-client";
-import MoviePanel from "@/components/filters/MovieFilterPanel";
-import { getActors, getDirectors, getGenres } from "@/actions/categoryDropdownFiller";
 
 /**
  * Force dynamic rendering because the page depends on URL query parameters
@@ -18,6 +16,9 @@ export const dynamic = "force-dynamic";
  * - Parse filter parameters (genres, directors, actors)
  * - Prepare layout structure (sidebar + main content)
  * - Fetch and transform movie data
+ *
+ * NOTE:
+ * Filtering logic will be implemented after filter integration is finalized.
  */
 export default async function MoviesPage({
     searchParams,
@@ -42,11 +43,7 @@ export default async function MoviesPage({
      */
     const sort = params?.sort ?? "new";
 
-    let orderBy:
-        | { createdAt: "desc" }
-        | { title: "asc" }
-        | { price: "asc" }
-        | { rating: "desc" };
+    let orderBy: { createdAt: "desc" } | { title: "asc" } | { price: "asc" } | { rating: "desc" };
 
     switch (sort) {
         case "az":
@@ -66,70 +63,36 @@ export default async function MoviesPage({
 
     /**
      * ----------------------------------------
-     * 2️⃣ Parse Filters
+     * 2️⃣ Parse Filter Parameters
      * ----------------------------------------
+     * Filters use comma-separated values:
+     * Example:
+     * ?genres=1,2&directors=3&actors=5,8
      */
     const selectedGenres = Array.isArray(params.genres)
         ? params.genres
-        : params.genres?.split(",") ?? [];
+        : (params.genres?.split(",") ?? []);
 
     const selectedDirectors = Array.isArray(params.directors)
         ? params.directors
-        : params.directors?.split(",") ?? [];
+        : (params.directors?.split(",") ?? []);
 
     const selectedActors = Array.isArray(params.actors)
         ? params.actors
-        : params.actors?.split(",") ?? [];
+        : (params.actors?.split(",") ?? []);
 
     /**
      * ----------------------------------------
-     * 3️⃣ Fetch Dropdown Data
+     * 3️⃣ Prepare Prisma WHERE
      * ----------------------------------------
+     * Filtering logic will be implemented once
+     * filter integration is finalized.
      */
-    const [genres, directors, actors] = await Promise.all([
-        getGenres(),
-        getDirectors(),
-        getActors(),
-    ]);
+    const where: Prisma.MovieWhereInput = {};
 
     /**
      * ----------------------------------------
-     * 4️⃣ Build Prisma WHERE
-     * ----------------------------------------
-     */
-    const where: Prisma.MovieWhereInput = {
-        AND: [
-            selectedGenres.length > 0
-                ? { genres: { some: { genreId: { in: selectedGenres.map(Number) } } } }
-                : {},
-
-            selectedDirectors.length > 0
-                ? {
-                      people: {
-                          some: {
-                              role: "DIRECTOR",
-                              personId: { in: selectedDirectors.map(Number) },
-                          },
-                      },
-                  }
-                : {},
-
-            selectedActors.length > 0
-                ? {
-                      people: {
-                          some: {
-                              role: "ACTOR",
-                              personId: { in: selectedActors.map(Number) },
-                          },
-                      },
-                  }
-                : {},
-        ],
-    };
-
-    /**
-     * ----------------------------------------
-     * 5️⃣ Fetch Movies
+     * 4️⃣ Fetch Movies (Sorted)
      * ----------------------------------------
      */
     const movies = await prisma.movie.findMany({
@@ -141,16 +104,8 @@ export default async function MoviesPage({
         return (
             <div className="p-8">
                 <h1 className="text-2xl font-bold mb-2">Movies</h1>
-                <MoviePanel
-                    genres={genres.map(g => ({ id: g.id.toString(), name: g.name }))}
-                    selectedGenres={selectedGenres}
-                    directors={directors.map(d => ({ id: d.id.toString(), name: d.name }))}
-                    selectedDirectors={selectedDirectors}
-                    actors={actors.map(a => ({ id: a.id.toString(), name: a.name }))}
-                    selectedActors={selectedActors}
-                />
-                <p className="text-muted-foreground mt-4">
-                    No movies found with the selected filters.
+                <p className="text-muted-foreground">
+                    No movies found yet. Add some movies first (admin page).
                 </p>
             </div>
         );
@@ -158,7 +113,7 @@ export default async function MoviesPage({
 
     /**
      * ----------------------------------------
-     * 6️⃣ Fetch Related People
+     * 5️⃣ Fetch Related People
      * ----------------------------------------
      */
     const movieIds = movies.map((m) => m.id);
@@ -177,8 +132,11 @@ export default async function MoviesPage({
     for (const mp of moviePeople) {
         const entry = byMovie.get(mp.movieId) ?? { actors: [], directors: [] };
 
-        if (mp.role === Role.ACTOR) entry.actors.push(mp.person.name);
-        if (mp.role === Role.DIRECTOR) entry.directors.push(mp.person.name);
+        if (mp.role === Role.ACTOR) {
+            entry.actors.push(mp.person.name);
+        } else if (mp.role === Role.DIRECTOR) {
+            entry.directors.push(mp.person.name);
+        }
 
         byMovie.set(mp.movieId, entry);
     }
@@ -187,7 +145,7 @@ export default async function MoviesPage({
      * ----------------------------------------
      * 6️⃣ Transform Data for MoviesClient
      * ----------------------------------------
-     */   
+     */
     const items = movies.map((m) => {
         const info = byMovie.get(m.id) ?? { actors: [], directors: [] };
 
@@ -206,23 +164,19 @@ export default async function MoviesPage({
 
     /**
      * ----------------------------------------
-     * 7️⃣ Layout (Sidebar + Movies)
+     * 7️⃣ Layout Structure
      * ----------------------------------------
+     * 12-column grid:
+     * - Sidebar (filters) → col-span-3
+     * - Main content → col-span-9
+     *
+     * MoviePanel will be integrated into the sidebar.
      */
     return (
         <div className="mx-auto max-w-7xl px-6 py-8">
             <div className="grid grid-cols-12 gap-8">
-                {/* Sidebar */}
-                <aside className="col-span-3">
-                    <MoviePanel
-                        genres={genres.map(g => ({ id: g.id.toString(), name: g.name }))}
-                        selectedGenres={selectedGenres}
-                        directors={directors.map(d => ({ id: d.id.toString(), name: d.name }))}
-                        selectedDirectors={selectedDirectors}
-                        actors={actors.map(a => ({ id: a.id.toString(), name: a.name }))}
-                        selectedActors={selectedActors}
-                    />
-                </aside>
+                {/* Sidebar Placeholder (Filters) */}
+                <aside className="col-span-3">{/* MoviePanel will be rendered here */}</aside>
 
                 {/* Main Content */}
                 <div className="col-span-9">
