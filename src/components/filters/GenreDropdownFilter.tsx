@@ -8,6 +8,7 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { usePathname } from "next/navigation";
 import { useTransition } from "react";
 
 type GenreDropdownFilterProps = {
@@ -18,12 +19,14 @@ type GenreDropdownFilterProps = {
     selected: string[];
 };
 
+// Genre filter
 function GenreDropdownFilter({ genres, selected }: GenreDropdownFilterProps) {
     const [, startTransition] = useTransition();
+    const pathname = usePathname();
 
     function onToggle(id: string) {
         startTransition(() => {
-            toggleGenre(id, selected);
+            toggleGenre(id, selected, pathname);
         });
     }
 
@@ -40,7 +43,7 @@ function GenreDropdownFilter({ genres, selected }: GenreDropdownFilterProps) {
                                         type="checkbox"
                                         checked={selected.includes(g.id)}
                                         onChange={() => onToggle(g.id)}
-                                    />
+                                        />
                                     {/* Alter 'name' to what's appropriate for the genre db table */}
                                     {g.name}
                                 </label>
