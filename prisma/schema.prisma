@@ -43,15 +43,17 @@ model session {
 
 // better-auth
 model user {
-  id            String    @id
+  id            String        @id
   name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
+  email         String        @unique
+  emailVerified Boolean       @default(false)
   image         String?
-  createdAt     DateTime  @default(now())
+  createdAt     DateTime      @default(now())
   updatedAt     DateTime
   account       account[]
   session       session[]
+
+  movieRatings  MovieRating[]
 }
 
 // better-auth
@@ -74,13 +76,13 @@ model Movie {
   releaseDate DateTime
   runtime     Int
   imageUrl    String?
-  rating Int @default(0)
-
+  trailerUrl  String?
   stock       Int
 
   genres      MovieGenre[]
   people      MoviePerson[]
   orderItems  OrderItem[]
+  ratings     MovieRating[]
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -147,4 +149,21 @@ model OrderItem {
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
   movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+}
+
+model MovieRating {
+  id        Int      @id @default(autoincrement())
+  movieId   Int
+  userId    String
+  value     Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  user  user  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([movieId, userId])
+  @@index([movieId])
+  @@index([userId])
 }
