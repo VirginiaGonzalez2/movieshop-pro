@@ -19,6 +19,7 @@ type GenreDropdownFilterProps = {
     selected: string[];
 };
 
+// Genre
 function GenreDropdownFilter({ genres, selected }: GenreDropdownFilterProps) {
     const [, startTransition] = useTransition();
     const pathname = usePathname();

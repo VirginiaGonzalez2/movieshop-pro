@@ -3,7 +3,6 @@
 import { prisma } from "@/lib/prisma";
 import { Role } from "@prisma/client";
 
-
 // Genres
 export async function getGenres() {
     const genres = await prisma.genre.findMany({

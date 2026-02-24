@@ -2,8 +2,6 @@
 
 import { redirect, RedirectType } from "next/navigation";
 
-
-
 export async function toggleActor(id: string, current: string[], pathname: string) {
     const set = new Set(current);
 
