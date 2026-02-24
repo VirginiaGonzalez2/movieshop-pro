@@ -1,7 +1,7 @@
 import { GenreDropdownFilter } from "@/components/filters/GenreDropdownFilter";
 import { DirectorDropdownFilter } from "@/components/filters/DirectorDropdownFilter";
 import { ActorDropdownFilter } from "@/components/filters/ActorDropdownFilter";
-import { Accordion } from "../ui/accordion";
+// import { Accordion } from "../ui/accordion";
 
 type MovieFilterPanelProps = {
   genres: { id: string; name: string }[];
