@@ -2,37 +2,25 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-12 08:45:41
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-18 15:01:15
+ *   Modified time: 2026-02-24 12:01:48
  *   Description: Cart page.
  */
 
 "use server";
 
-import { getShoppingCart, getShoppingCartInfo } from "@/actions/shopping-cart";
+import { getShoppingCartInfo } from "@/actions/shopping-cart";
 import { LinkButton } from "@/components/ui-custom-shadcn/LinkButton";
-import { TestCart } from "./_components/TestCart";
-import { prisma } from "@/lib/prisma";
-import {
-    Item,
-    ItemContent,
-    ItemGroup,
-    ItemHeader,
-    ItemMedia,
-    ItemSeparator,
-} from "@/components/ui/item";
-import Image from "next/image";
-import { Genre } from "@prisma/client";
-import { CartItemControls } from "./_components/CartItemControls";
 import CartItem from "./_components/CartItem";
+import { TestCart } from "./_components/TestCart";
 
 export default async function CartPage() {
     const shoppingCartInfo = await getShoppingCartInfo();
 
     let totalPrice = 0;
     if (shoppingCartInfo) {
-        shoppingCartInfo.forEach((value) => {
-            totalPrice += value.price * value.quantity;
-        });
+        for (const item of shoppingCartInfo) {
+            totalPrice += item.price * item.quantity;
+        }
     }
 
     return (
