@@ -21,40 +21,32 @@ export default function MovieHeroSection({
     imageUrl,
     trailerUrl,
 }: Props) {
+    const poster = (
+        <div className="bg-muted aspect-[2/3] w-full flex items-center justify-center overflow-hidden rounded border">
+            {imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                    src={imageUrl}
+                    alt={title}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                />
+            ) : (
+                <div className="text-sm text-muted-foreground">No Image</div>
+            )}
+        </div>
+    );
+
     return (
         <div className="border rounded p-6 space-y-4">
             {/* Poster */}
             <div className="w-full max-w-md">
                 {trailerUrl ? (
                     <Link href={trailerUrl} target="_blank" rel="noreferrer" className="block">
-                        <div className="bg-muted aspect-[2/3] w-full flex items-center justify-center overflow-hidden rounded border">
-                            {imageUrl ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                    src={imageUrl}
-                                    alt={title}
-                                    className="h-full w-full object-cover"
-                                    loading="lazy"
-                                />
-                            ) : (
-                                <div className="text-sm text-muted-foreground">No Image</div>
-                            )}
-                        </div>
+                        {poster}
                     </Link>
                 ) : (
-                    <div className="bg-muted aspect-[2/3] w-full flex items-center justify-center overflow-hidden rounded border">
-                        {imageUrl ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                                src={imageUrl}
-                                alt={title}
-                                className="h-full w-full object-cover"
-                                loading="lazy"
-                            />
-                        ) : (
-                            <div className="text-sm text-muted-foreground">No Image</div>
-                        )}
-                    </div>
+                    poster
                 )}
 
                 {trailerUrl ? (

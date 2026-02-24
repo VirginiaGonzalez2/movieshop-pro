@@ -1,8 +1,39 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import MovieHeroSection from "@/components/movie-detail/MovieHeroSection";
 import MovieDescription from "@/components/movie-detail/MovieDescription";
 import RecommendedMoviesSection from "@/components/movie-detail/RecommendedMoviesSection";
+import SocialShareActions from "@/components/movie-detail/SocialShareActions";
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ id: string }> | { id: string };
+}) {
+    const resolved = await Promise.resolve(params);
+    const id = Number(resolved.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+        return { title: "Movie | MovieShop" };
+    }
+
+    const movie = await prisma.movie.findUnique({
+        where: { id },
+        select: { title: true },
+    });
+
+    return {
+        title: movie?.title ? `${movie.title} | MovieShop` : "Movie | MovieShop",
+    };
+}
+
+async function buildAbsoluteUrl(path: string) {
+    const h = await headers();
+    const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
+    const proto = h.get("x-forwarded-proto") ?? "http";
+    return `${proto}://${host}${path}`;
+}
 
 export default async function MovieDetailsPage({
     params,
@@ -44,6 +75,11 @@ export default async function MovieDetailsPage({
         );
     }
 
+    // Social share
+    const shareUrl = await buildAbsoluteUrl(`/movies/${movie.id}`);
+    const shareTitle = `${movie.title} | MovieShop`;
+
+    // Recommendations (same-genre)
     const genreIds = movie.genres.map((g) => g.genreId);
 
     const recommended = genreIds.length
@@ -84,6 +120,8 @@ export default async function MovieDetailsPage({
                 imageUrl={movie.imageUrl ?? null}
                 trailerUrl={movie.trailerUrl ?? null}
             />
+
+            <SocialShareActions url={shareUrl} title={shareTitle} />
 
             <MovieDescription description={movie.description} />
 
