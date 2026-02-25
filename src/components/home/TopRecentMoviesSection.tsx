@@ -11,22 +11,24 @@ export default async function TopRecentMoviesSection()
 
   return (
     <div className="grid grid-cols-5 gap-4">
-      {movies.map((movie) => (
-        <MovieCard
-          key={movie.id}
-          movie={
-            {
+      {movies.length > 0 ? (
+        movies.map((movie) => (
+          <MovieCard
+            key={movie.id}
+            movie={{
               id: movie.id,
               title: movie.title,
-              price: movie.price.toString(),   // Prisma Decimal → string
+              price: movie.price.toString(),
               stock: movie.stock,
               runtime: movie.runtime,
               rating: movie.rating,
               imageUrl: movie.imageUrl,
-            }
-          }
-        />
-      ))}
+            }}
+          />
+        ))
+      ) : (
+        <p>No results found.</p>
+      )}
     </div>
   );
 }
