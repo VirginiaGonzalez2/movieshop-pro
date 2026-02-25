@@ -6,19 +6,9 @@ import { getActors, getDirectors, getGenres } from "@/actions/categoryDropdownFi
 
 /**
  * Force dynamic rendering because the page depends on URL query parameters
- * (sorting, filters, pagination).
  */
 export const dynamic = "force-dynamic";
 
-/**
- * MoviesPage (Server Component)
- *
- * Responsibilities:
- * - Handle server-side sorting
- * - Parse filter parameters (genres, directors, actors)
- * - Prepare layout structure (sidebar + main content)
- * - Fetch and transform movie data
- */
 export default async function MoviesPage({
     searchParams,
 }: {
@@ -31,7 +21,7 @@ export default async function MoviesPage({
     }>;
 }) {
     /**
-     * Next.js 15+ requires awaiting searchParams
+     * Await search params (Next.js 15+ requirement)
      */
     const params = await searchParams;
 
@@ -42,11 +32,7 @@ export default async function MoviesPage({
      */
     const sort = params?.sort ?? "new";
 
-    let orderBy:
-        | { createdAt: "desc" }
-        | { title: "asc" }
-        | { price: "asc" }
-        | { rating: "desc" };
+    let orderBy: { createdAt: "desc" } | { title: "asc" } | { price: "asc" } | { rating: "desc" };
 
     switch (sort) {
         case "az":
@@ -71,15 +57,15 @@ export default async function MoviesPage({
      */
     const selectedGenres = Array.isArray(params.genres)
         ? params.genres
-        : params.genres?.split(",") ?? [];
+        : (params.genres?.split(",") ?? []);
 
     const selectedDirectors = Array.isArray(params.directors)
         ? params.directors
-        : params.directors?.split(",") ?? [];
+        : (params.directors?.split(",") ?? []);
 
     const selectedActors = Array.isArray(params.actors)
         ? params.actors
-        : params.actors?.split(",") ?? [];
+        : (params.actors?.split(",") ?? []);
 
     /**
      * ----------------------------------------
@@ -100,7 +86,13 @@ export default async function MoviesPage({
     const where: Prisma.MovieWhereInput = {
         AND: [
             selectedGenres.length > 0
-                ? { genres: { some: { genreId: { in: selectedGenres.map(Number) } } } }
+                ? {
+                      genres: {
+                          some: {
+                              genreId: { in: selectedGenres.map(Number) },
+                          },
+                      },
+                  }
                 : {},
 
             selectedDirectors.length > 0
@@ -137,18 +129,46 @@ export default async function MoviesPage({
         orderBy,
     });
 
+    /**
+     * Handle empty result case
+     */
     if (movies.length === 0) {
         return (
-            <div className="p-8">
-                <h1 className="text-2xl font-bold mb-2">Movies</h1>
-                <MoviePanel
-                    genres={genres.map(g => ({ id: g.id.toString(), name: g.name }))}
-                    selectedGenres={selectedGenres}
-                    directors={directors.map(d => ({ id: d.id.toString(), name: d.name }))}
-                    selectedDirectors={selectedDirectors}
-                    actors={actors.map(a => ({ id: a.id.toString(), name: a.name }))}
-                    selectedActors={selectedActors}
-                />
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
+                <h1 className="text-2xl font-bold mb-4">Movies</h1>
+
+                {/* Mobile Filters */}
+                <div className="md:hidden mb-4">
+                    <details className="bg-white rounded-xl shadow-sm border">
+                        <summary className="cursor-pointer px-4 py-3 font-medium">Filters</summary>
+                        <div className="p-4 border-t">
+                            <MoviePanel
+                                genres={genres.map((g) => ({ id: g.id.toString(), name: g.name }))}
+                                selectedGenres={selectedGenres}
+                                directors={directors.map((d) => ({
+                                    id: d.id.toString(),
+                                    name: d.name,
+                                }))}
+                                selectedDirectors={selectedDirectors}
+                                actors={actors.map((a) => ({ id: a.id.toString(), name: a.name }))}
+                                selectedActors={selectedActors}
+                            />
+                        </div>
+                    </details>
+                </div>
+
+                {/* Desktop Filters */}
+                <div className="hidden md:block">
+                    <MoviePanel
+                        genres={genres.map((g) => ({ id: g.id.toString(), name: g.name }))}
+                        selectedGenres={selectedGenres}
+                        directors={directors.map((d) => ({ id: d.id.toString(), name: d.name }))}
+                        selectedDirectors={selectedDirectors}
+                        actors={actors.map((a) => ({ id: a.id.toString(), name: a.name }))}
+                        selectedActors={selectedActors}
+                    />
+                </div>
+
                 <p className="text-muted-foreground mt-4">
                     No movies found with the selected filters.
                 </p>
@@ -175,7 +195,10 @@ export default async function MoviesPage({
     const byMovie = new Map<number, { actors: string[]; directors: string[] }>();
 
     for (const mp of moviePeople) {
-        const entry = byMovie.get(mp.movieId) ?? { actors: [], directors: [] };
+        const entry = byMovie.get(mp.movieId) ?? {
+            actors: [],
+            directors: [],
+        };
 
         if (mp.role === Role.ACTOR) entry.actors.push(mp.person.name);
         if (mp.role === Role.DIRECTOR) entry.directors.push(mp.person.name);
@@ -185,11 +208,14 @@ export default async function MoviesPage({
 
     /**
      * ----------------------------------------
-     * 6️⃣ Transform Data for MoviesClient
+     * 7️⃣ Transform Data for MoviesClient
      * ----------------------------------------
-     */   
+     */
     const items = movies.map((m) => {
-        const info = byMovie.get(m.id) ?? { actors: [], directors: [] };
+        const info = byMovie.get(m.id) ?? {
+            actors: [],
+            directors: [],
+        };
 
         return {
             id: m.id,
@@ -206,26 +232,46 @@ export default async function MoviesPage({
 
     /**
      * ----------------------------------------
-     * 7️⃣ Layout (Sidebar + Movies)
+     * 8️⃣ Responsive Layout
      * ----------------------------------------
      */
     return (
-        <div className="mx-auto max-w-7xl px-6 py-8">
-            <div className="grid grid-cols-12 gap-8">
-                {/* Sidebar */}
-                <aside className="col-span-3">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
+                {/* Mobile Filters (accordion style) */}
+                <div className="md:hidden mb-4">
+                    <details className="bg-white rounded-xl shadow-sm border">
+                        <summary className="cursor-pointer px-4 py-3 font-medium">Filters</summary>
+                        <div className="p-4 border-t">
+                            <MoviePanel
+                                genres={genres.map((g) => ({ id: g.id.toString(), name: g.name }))}
+                                selectedGenres={selectedGenres}
+                                directors={directors.map((d) => ({
+                                    id: d.id.toString(),
+                                    name: d.name,
+                                }))}
+                                selectedDirectors={selectedDirectors}
+                                actors={actors.map((a) => ({ id: a.id.toString(), name: a.name }))}
+                                selectedActors={selectedActors}
+                            />
+                        </div>
+                    </details>
+                </div>
+
+                {/* Desktop Sidebar */}
+                <aside className="hidden md:block md:col-span-3">
                     <MoviePanel
-                        genres={genres.map(g => ({ id: g.id.toString(), name: g.name }))}
+                        genres={genres.map((g) => ({ id: g.id.toString(), name: g.name }))}
                         selectedGenres={selectedGenres}
-                        directors={directors.map(d => ({ id: d.id.toString(), name: d.name }))}
+                        directors={directors.map((d) => ({ id: d.id.toString(), name: d.name }))}
                         selectedDirectors={selectedDirectors}
-                        actors={actors.map(a => ({ id: a.id.toString(), name: a.name }))}
+                        actors={actors.map((a) => ({ id: a.id.toString(), name: a.name }))}
                         selectedActors={selectedActors}
                     />
                 </aside>
 
-                {/* Main Content */}
-                <div className="col-span-9">
+                {/* Movies Grid */}
+                <div className="col-span-1 md:col-span-9">
                     <MoviesClient items={items} />
                 </div>
             </div>
