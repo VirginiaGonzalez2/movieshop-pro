@@ -1,7 +1,45 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { PriceTag } from "@/components/ui/PriceTag";
-import { RatingStars } from "@/components/ui/RatingStars";
+
+import MovieHeroSection from "@/components/movie-detail/MovieHeroSection";
+import MovieDescription from "@/components/movie-detail/MovieDescription";
+import MovieTrailerSection from "@/components/movie-detail/MovieTrailerSection";
+import RecommendedMoviesSection from "@/components/movie-detail/RecommendedMoviesSection";
+import MovieRatingSection from "@/components/movie-detail/MovieRatingSection";
+import WishlistToggle from "@/components/movie-detail/WishlistToggle";
+import SocialShareActions from "@/components/movie-detail/SocialShareActions";
+
+import { getMovieRatingSummary } from "@/actions/movie-rating";
+
+export async function generateMetadata({
+    params,
+}: {
+    params: Promise<{ id: string }> | { id: string };
+}) {
+    const resolved = await Promise.resolve(params);
+    const id = Number(resolved.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+        return { title: "Movie | MovieShop" };
+    }
+
+    const movie = await prisma.movie.findUnique({
+        where: { id },
+        select: { title: true },
+    });
+
+    return {
+        title: movie?.title ? `${movie.title} | MovieShop` : "Movie | MovieShop",
+    };
+}
+
+async function buildAbsoluteUrl(path: string) {
+    const h = await headers();
+    const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
+    const proto = h.get("x-forwarded-proto") ?? "http";
+    return `${proto}://${host}${path}`;
+}
 
 export default async function MovieDetailsPage({
     params,
@@ -27,6 +65,9 @@ export default async function MovieDetailsPage({
 
     const movie = await prisma.movie.findUnique({
         where: { id },
+        include: {
+            genres: { select: { genreId: true } },
+        },
     });
 
     if (!movie) {
@@ -40,36 +81,68 @@ export default async function MovieDetailsPage({
         );
     }
 
+    // Ratings summary (real ratings table)
+    const { avgRating, ratingCount } = await getMovieRatingSummary(movie.id);
+
+    // Social share
+    const shareUrl = await buildAbsoluteUrl(`/movies/${movie.id}`);
+    const shareTitle = `${movie.title} | MovieShop`;
+
+    // Recommendations: same genre, exclude current
+    const genreIds = movie.genres.map((mg) => mg.genreId);
+
+    const rec = genreIds.length
+        ? await prisma.movie.findMany({
+              where: {
+                  id: { not: movie.id },
+                  genres: { some: { genreId: { in: genreIds } } },
+              },
+              orderBy: { createdAt: "desc" },
+              take: 6,
+          })
+        : [];
+
+    const recItems = rec.map((m) => ({
+        id: m.id,
+        title: m.title,
+        price: m.price.toString(),
+        stock: m.stock,
+        runtime: m.runtime,
+        rating: Math.round((m as any).rating ?? 0),
+        imageUrl: m.imageUrl ?? null,
+    }));
+
     return (
-        <div className="p-8 max-w-3xl space-y-4">
+        <div className="p-8 max-w-4xl space-y-4">
             <Link className="text-blue-600" href="/movies">
                 ← Back to Movies
             </Link>
 
-            <div className="border rounded p-6 space-y-3">
-                <h1 className="text-3xl font-bold">{movie.title}</h1>
+            <MovieHeroSection
+                title={movie.title}
+                price={movie.price.toString()}
+                runtime={movie.runtime}
+                stock={movie.stock}
+                rating={Math.round(avgRating)} // display avg as stars
+                imageUrl={movie.imageUrl ?? null}
+                trailerUrl={movie.trailerUrl ?? null}
+            />
 
-                <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-2">
-                    <PriceTag amount={movie.price.toString()} />
-                    <span>•</span>
-                    <span>Runtime: {movie.runtime} min</span>
-                    <span>•</span>
-                    <span>Stock: {movie.stock}</span>
-                </div>
+            <MovieTrailerSection trailerUrl={movie.trailerUrl ?? null} title={movie.title} />
 
-                <RatingStars value={movie.rating} />
+            <WishlistToggle movieId={movie.id} />
 
-                <p className="leading-relaxed">{movie.description}</p>
+            <MovieRatingSection
+                movieId={movie.id}
+                avgRating={avgRating}
+                ratingCount={ratingCount}
+            />
 
-                {movie.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                        src={movie.imageUrl}
-                        alt={movie.title}
-                        className="w-full max-w-md rounded border"
-                    />
-                ) : null}
-            </div>
+            <SocialShareActions url={shareUrl} title={shareTitle} />
+
+            <MovieDescription description={movie.description} />
+
+            <RecommendedMoviesSection title="More like this" items={recItems} />
         </div>
     );
 }

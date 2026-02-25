@@ -27,13 +27,28 @@ export default function AppFooter() {
                     <h3 className="font-semibold mb-3">Customer Help</h3>
                     <ul className="space-y-2 text-muted-foreground">
                         <li>
-                            <Link href="/help-center">Help Center</Link>
+                            <Link
+                                href="/help-center"
+                                className="hover:text-foreground transition-colors"
+                            >
+                                Help Center
+                            </Link>
                         </li>
                         <li>
-                            <Link href="/returns-refunds">Returns & Refunds</Link>
+                            <Link
+                                href="/returns-refunds"
+                                className="hover:text-foreground transition-colors"
+                            >
+                                Returns & Refunds
+                            </Link>
                         </li>
                         <li>
-                            <Link href="/buying-guide">Buying Guide</Link>
+                            <Link
+                                href="/buying-guide"
+                                className="hover:text-foreground transition-colors"
+                            >
+                                Buying Guide
+                            </Link>
                         </li>
                     </ul>
                 </div>
@@ -43,10 +58,20 @@ export default function AppFooter() {
                     <h3 className="font-semibold mb-3">Legal</h3>
                     <ul className="space-y-2 text-muted-foreground">
                         <li>
-                            <Link href="/gdpr-privacy">GDPR & Privacy Policy</Link>
+                            <Link
+                                href="/gdpr-privacy"
+                                className="hover:text-foreground transition-colors"
+                            >
+                                GDPR & Privacy Policy
+                            </Link>
                         </li>
                         <li>
-                            <Link href="/terms-conditions">Terms & Conditions</Link>
+                            <Link
+                                href="/terms-conditions"
+                                className="hover:text-foreground transition-colors"
+                            >
+                                Terms & Conditions
+                            </Link>
                         </li>
                     </ul>
                 </div>
@@ -56,10 +81,20 @@ export default function AppFooter() {
                     <h3 className="font-semibold mb-3">Contact</h3>
                     <ul className="space-y-2 text-muted-foreground">
                         <li>
-                            <Link href="/contact-us">Contact Us</Link>
+                            <Link
+                                href="/contact"
+                                className="hover:text-foreground transition-colors"
+                            >
+                                Contact Us
+                            </Link>
                         </li>
                         <li>
-                            <Link href="/customer-support">Customer Support</Link>
+                            <Link
+                                href="/customer-support"
+                                className="hover:text-foreground transition-colors"
+                            >
+                                Customer Support
+                            </Link>
                         </li>
                     </ul>
                 </div>

@@ -2,7 +2,6 @@
 
 import { authClient } from "@/lib/auth-client";
 import { useOriginRouter } from "@/hooks/use-origin-router";
-import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 
 type Props = {
@@ -25,7 +24,7 @@ export function AuthGuard({ children, redirectTo = "/login" }: Props) {
 
     // Not logged-in go to login
     if (!session.data) {
-        redirect(router.formatUrl(redirectTo));
+        router.replace(redirectTo);
     }
 
     // Logged-in render page

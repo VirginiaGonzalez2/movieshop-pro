@@ -1,13 +1,23 @@
+/**
+ * @ Author: Sabrina Bjurman
+ * @ Create Time: 2026-02-??
+ * @ Modified by: Sabrina Bjurman
+ * @ Modified time: 2026-02-25 08:51:22
+ * @ Description: Password validation.
+ */
+
 import z from "zod";
 
-const errUsernameLength = "Username must be between 2-20 characters long.";
-const errPasswordLength = "Password must be between 8-20 characters long.";
+const errUsernameLengthMin = "Username must be atleast 2 characters.";
+const errUsernameLengthMax = "Please pick a username shorter than 128 characters.";
+const errPasswordLengthMin = "Password must be atleast 8 characters long.";
+const errPasswordLengthMax = "Please make your password shorter than 128 characters.";
 
 export const registrationFormSchema = z
     .object({
-        name: z.string().min(2, errUsernameLength).max(20, errPasswordLength),
+        name: z.string().min(2, errUsernameLengthMin).max(128, errUsernameLengthMax),
         email: z.email(),
-        password: z.string().min(8, errPasswordLength).max(128, errPasswordLength),
+        password: z.string().min(8, errPasswordLengthMin).max(128, errPasswordLengthMax),
         confirmPassword: z.string(),
     })
     .refine((values) => values.password === values.confirmPassword, {

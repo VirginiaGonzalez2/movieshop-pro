@@ -8,6 +8,7 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { usePathname } from "next/navigation";
 import { useTransition } from "react";
 
 type DirectorDropdownFilterProps = {
@@ -18,31 +19,36 @@ type DirectorDropdownFilterProps = {
     selected: string[];
 };
 
+// Director filter component
 function DirectorDropdownFilter({ directors, selected }: DirectorDropdownFilterProps) {
     const [, startTransition] = useTransition();
+    const pathname = usePathname();
 
+    // Handles toggling a director filter
     function onToggle(id: string) {
         startTransition(() => {
-            toggleDirector(id, selected);
+            toggleDirector(id, selected, pathname);
         });
     }
 
     return (
         <Accordion type="single" collapsible className="max-w-lg">
-            <AccordionItem value="Genre" className="border-b px-4 last:border-b-0">
-                <AccordionTrigger>Genre</AccordionTrigger>
+            {/* ✅ Changed value from "Genre" to "Directors" */}
+            <AccordionItem value="Directors" className="border-b px-4 last:border-b-0">
+                {/* ✅ Changed label from "Genre" to "Directors" */}
+                <AccordionTrigger>Directors</AccordionTrigger>
+
                 <AccordionContent>
                     <ScrollArea className="h-40 w-48 rounded-md border">
                         <div className="pl-3 pt-1 space-y-2">
-                            {directors.map((g) => (
-                                <label key={g.id} className="flex items-center gap-2">
+                            {directors.map((d) => (
+                                <label key={d.id} className="flex items-center gap-2">
                                     <input
                                         type="checkbox"
-                                        checked={selected.includes(g.id)}
-                                        onChange={() => onToggle(g.id)}
+                                        checked={selected.includes(d.id)}
+                                        onChange={() => onToggle(d.id)}
                                     />
-                                    {/* Alter 'name' to what's appropriate for the genre db table */}
-                                    {g.name}
+                                    {d.name}
                                 </label>
                             ))}
                         </div>

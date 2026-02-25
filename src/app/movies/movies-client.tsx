@@ -2,9 +2,23 @@
 
 import { useMemo, useState } from "react";
 import MoviesSearchBar from "./search-bar";
-import MovieCard, { type MovieCardItem } from "@/components/movies/MovieCard";
+import MoviesSortBar from "./MoviesSortBar";
+import MovieCard from "@/components/movies/MovieCard";
 
-type MoviesClientItem = MovieCardItem & {
+/**
+ * Local type definition.
+ * We define it here to avoid depending on
+ * internal exports from MovieCard.
+ * This prevents breaking if teammates change that file.
+ */
+type MoviesClientItem = {
+    id: number;
+    title: string;
+    price: string;
+    stock: number;
+    runtime: number;
+    rating: number;
+    imageUrl: string | null;
     directors: string[];
     actors: string[];
 };
@@ -14,9 +28,20 @@ export default function MoviesClient({ items }: { items: MoviesClientItem[] }) {
 
     const filtered = useMemo(() => {
         const query = q.trim().toLowerCase();
+
         if (!query) return items;
 
-        return items.filter((m) => m.title.toLowerCase().includes(query));
+        return items.filter((movie) => {
+            const matchesTitle = movie.title.toLowerCase().includes(query);
+
+            const matchesDirector = movie.directors.some((director) =>
+                director.toLowerCase().includes(query),
+            );
+
+            const matchesActor = movie.actors.some((actor) => actor.toLowerCase().includes(query));
+
+            return matchesTitle || matchesDirector || matchesActor;
+        });
     }, [q, items]);
 
     return (
@@ -24,6 +49,10 @@ export default function MoviesClient({ items }: { items: MoviesClientItem[] }) {
             <div className="flex items-start justify-between gap-4 mb-6">
                 <h1 className="text-2xl font-bold">Movies</h1>
                 <MoviesSearchBar onSearch={setQ} />
+            </div>
+
+            <div className="mb-6">
+                <MoviesSortBar />
             </div>
 
             {filtered.length === 0 ? (
@@ -40,7 +69,7 @@ export default function MoviesClient({ items }: { items: MoviesClientItem[] }) {
                                 stock: movie.stock,
                                 runtime: movie.runtime,
                                 rating: movie.rating,
-                                imageUrl: movie.imageUrl ?? null,
+                                imageUrl: movie.imageUrl,
                             }}
                         />
                     ))}

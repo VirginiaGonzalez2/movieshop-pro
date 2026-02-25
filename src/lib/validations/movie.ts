@@ -6,7 +6,9 @@ export const movieSchema = z.object({
     price: z.coerce.number().positive("Price must be positive"),
     releaseDate: z.coerce.date(),
     runtime: z.coerce.number().int().min(1, "Runtime must be at least 1 minute"),
-    imageUrl: z.string().url().optional().or(z.literal("")),
-    rating: z.coerce.number().int().min(0).max(5).optional(),
+
+    imageUrl: z.string().optional().or(z.literal("")),
+    trailerUrl: z.string().optional().or(z.literal("")),
+
     stock: z.coerce.number().int().min(0, "Stock cannot be negative"),
 });
