@@ -17,19 +17,19 @@ export default function HomeSectionSeparator()
         <h1 className="text-2xl font-bold mb-4">Horizontal button rows</h1>
       </div>
       <div>
-        <h1 className="text-2xl font-bold mb-4">Top 5 most recent</h1>
+        <h1 className="text-left text-2xl font-bold mb-4">Top 5 most recent</h1>
         <TopRecentMoviesSection />
       </div>
       <div>
-        <h1 className="text-2xl font-bold mb-4">Top 5 most purchased</h1>
+        <h1 className="text-left text-2xl font-bold mb-4">Top 5 most purchased</h1>
         <TopPurchasedMoviesSection />
       </div>
       <div>
-        <h1 className="text-2xl font-bold mb-4">Top 5 oldest</h1>
+        <h1 className="text-left text-2xl font-bold mb-4">Top 5 oldest</h1>
         <TopOldestMoviesSection />
       </div>
       <div>
-          <h1 className="text-2xl font-bold mb-4">Top 5 cheapest</h1>
+          <h1 className="text-left text-2xl font-bold mb-4">Top 5 cheapest</h1>
           <TopCheapestMoviesSection />
       </div>
       <div className="columns-2 border">
