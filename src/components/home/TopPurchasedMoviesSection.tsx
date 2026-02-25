@@ -34,9 +34,14 @@ export default async function TopPurchasedMoviesSection()
 
   return (
     <div className="grid grid-cols-5 gap-4">
-      {movieItems.map((movie) => (
-        <MovieCard key={movie.id} movie={movie} />
-      ))}
+      {movies.length > 0 ? (      
+          movieItems.map((movie) => (
+            <MovieCard key={movie.id} movie={movie} />
+          ))
+        ) : (
+          <p className="text-left text-2xl">No results found.</p>
+        )
+      }
     </div>
   );
 }
