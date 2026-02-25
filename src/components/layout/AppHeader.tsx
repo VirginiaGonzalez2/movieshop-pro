@@ -1,18 +1,32 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
+import { Menu, X } from "lucide-react";
+
 import UserMenuDropdown from "@/components/auth/UserMenuDropdown";
 import NavSearch from "@/components/nav/NavSearch";
 
+/**
+ * Responsive Application Header
+ *
+ * Features:
+ * - Desktop navigation (unchanged)
+ * - Mobile burger menu
+ * - Clean slide-down mobile panel
+ * - Keeps NavSearch + UserMenuDropdown
+ * - Professional responsive layout
+ */
+
 export default function AppHeader() {
+    const [isOpen, setIsOpen] = useState(false);
+
     return (
-        <header className="border-b bg-background">
-            <div className="mx-auto max-w-7xl px-0 pr-6 h-20 sm:h-24 flex items-center justify-between">
-                {/* LEFT — LOGO (ALWAYS LINKS TO HOME) */}
-                <Link
-                    href="/"
-                    className="flex items-center min-h-0 ml-0"
-                    style={{ height: "100%", marginLeft: 0, paddingLeft: 0 }}
-                >
+        <header className="border-b bg-background relative z-50">
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 h-20 sm:h-24 flex items-center justify-between">
+                {/* LEFT — LOGO */}
+                <Link href="/" className="flex items-center min-h-0" style={{ height: "100%" }}>
                     <div
                         className="relative"
                         style={{ height: "100%", width: "auto", aspectRatio: "7/2" }}
@@ -28,20 +42,64 @@ export default function AppHeader() {
                     </div>
                 </Link>
 
-                {/* CENTER — NAVIGATION */}
-                <nav className="hidden items-center gap-6 text-sm font-medium md:flex">
+                {/* DESKTOP NAVIGATION */}
+                <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
                     <Link href="/">Home</Link>
                     <Link href="/movies">Movies</Link>
                     <Link href="/orders">Orders</Link>
                     <Link href="/cart">Cart</Link>
                     <Link href="/contact">Contact</Link>
                 </nav>
-                {/* SEARCH */}
-                <NavSearch />
 
-                {/* RIGHT — USER MENU */}
-                <UserMenuDropdown />
+                {/* RIGHT SIDE (Desktop) */}
+                <div className="hidden md:flex items-center gap-4">
+                    <NavSearch />
+                    <UserMenuDropdown />
+                </div>
+
+                {/* MOBILE RIGHT SIDE */}
+                <div className="flex items-center gap-3 md:hidden">
+                    <UserMenuDropdown />
+
+                    {/* Burger Button */}
+                    <button onClick={() => setIsOpen(!isOpen)} aria-label="Toggle Menu">
+                        {isOpen ? <X size={26} /> : <Menu size={26} />}
+                    </button>
+                </div>
             </div>
+
+            {/* MOBILE MENU PANEL */}
+            {isOpen && (
+                <div className="md:hidden border-t bg-background shadow-lg animate-in fade-in slide-in-from-top duration-200">
+                    <div className="px-6 py-6 flex flex-col gap-5 text-base font-medium">
+                        {/* Mobile Navigation Links */}
+                        <Link href="/" onClick={() => setIsOpen(false)}>
+                            Home
+                        </Link>
+
+                        <Link href="/movies" onClick={() => setIsOpen(false)}>
+                            Movies
+                        </Link>
+
+                        <Link href="/orders" onClick={() => setIsOpen(false)}>
+                            Orders
+                        </Link>
+
+                        <Link href="/cart" onClick={() => setIsOpen(false)}>
+                            Cart
+                        </Link>
+
+                        <Link href="/contact" onClick={() => setIsOpen(false)}>
+                            Contact
+                        </Link>
+
+                        {/* Mobile Search */}
+                        <div className="pt-2">
+                            <NavSearch />
+                        </div>
+                    </div>
+                </div>
+            )}
         </header>
     );
 }
