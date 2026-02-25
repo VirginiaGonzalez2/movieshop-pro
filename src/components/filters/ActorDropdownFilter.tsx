@@ -19,11 +19,12 @@ type ActorDropdownFilterProps = {
     selected: string[];
 };
 
-// Actor filter
+// Actor filter component
 function ActorDropdownFilter({ actors, selected }: ActorDropdownFilterProps) {
     const [, startTransition] = useTransition();
     const pathname = usePathname();
 
+    // Handles toggling an actor filter
     function onToggle(id: string) {
         startTransition(() => {
             toggleActor(id, selected, pathname);
@@ -32,8 +33,11 @@ function ActorDropdownFilter({ actors, selected }: ActorDropdownFilterProps) {
 
     return (
         <Accordion type="single" collapsible className="max-w-lg">
-            <AccordionItem value="Genre" className="border-b px-4 last:border-b-0">
-                <AccordionTrigger>Genre</AccordionTrigger>
+            {/* ✅ Changed value from "Genre" to "Actors" */}
+            <AccordionItem value="Actors" className="border-b px-4 last:border-b-0">
+                {/* ✅ Changed label from "Genre" to "Actors" */}
+                <AccordionTrigger>Actors</AccordionTrigger>
+
                 <AccordionContent>
                     <ScrollArea className="h-40 w-48 rounded-md border">
                         <div className="pl-3 pt-1 space-y-2">
@@ -44,7 +48,6 @@ function ActorDropdownFilter({ actors, selected }: ActorDropdownFilterProps) {
                                         checked={selected.includes(a.id)}
                                         onChange={() => onToggle(a.id)}
                                     />
-                                    {/* Alter 'name' to what's appropriate for the genre db table */}
                                     {a.name}
                                 </label>
                             ))}
