@@ -31,7 +31,7 @@ function GenreDropdownFilter({ genres, selected }: GenreDropdownFilterProps) {
     }
 
     return (
-        <Accordion type="single" collapsible className="max-w-lg">
+        // <Accordion type="single" collapsible className="max-w-lg">
             <AccordionItem value="Genre" className="border-b px-4 last:border-b-0">
                 <AccordionTrigger>Genre</AccordionTrigger>
                 <AccordionContent>
@@ -52,7 +52,7 @@ function GenreDropdownFilter({ genres, selected }: GenreDropdownFilterProps) {
                     </ScrollArea>
                 </AccordionContent>
             </AccordionItem>
-        </Accordion>
+        // </Accordion>
     );
 }
 

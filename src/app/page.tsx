@@ -1,9 +1,9 @@
-import HomeSectionSeparator from "@/components/home/HomeSectionSeparator";
+    import HomeSectionSeparator from "@/components/home/HomeSectionSeparator";
 
-export default function Home() {
-    return (
-        <div>
-            <HomeSectionSeparator />
-        </div>
-    );
-}
+    export default function Home() {
+        return (
+            <div>
+                <HomeSectionSeparator />
+            </div>
+        );
+    }
