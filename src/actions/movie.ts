@@ -46,7 +46,6 @@ export async function createMovie(formData: FormData): Promise<void> {
     const actorIds = readPersonIds(formData, "actors");
     const directorIds = readPersonIds(formData, "directors");
 
-    // image upload
     const imageFile = formData.get("image");
     const uploadedPath =
         imageFile instanceof File && imageFile.size > 0 ? await savePublicUpload(imageFile) : "";
@@ -55,17 +54,11 @@ export async function createMovie(formData: FormData): Promise<void> {
         data: {
             ...parsed.data,
             price: new Prisma.Decimal(parsed.data.price),
-            rating: parsed.data.rating ?? 0,
-
-            // image: upload preferred, fallback to imageUrl if present
             imageUrl: uploadedPath || normalizeImageUrl(parsed.data.imageUrl) || null,
-
-            // trailerUrl stored in DB
-            trailerUrl: normalizeTrailerUrl(parsed.data.trailerUrl) || null,
+            trailerUrl: normalizeTrailerUrl((parsed.data as any).trailerUrl) || null,
         },
     });
 
-    // genres
     if (genreIds.length > 0) {
         await prisma.movieGenre.createMany({
             data: genreIds.map((genreId) => ({ movieId: movie.id, genreId })),
@@ -73,7 +66,6 @@ export async function createMovie(formData: FormData): Promise<void> {
         });
     }
 
-    // people roles
     const moviePeople = [
         ...actorIds.map((personId) => ({
             movieId: movie.id,
@@ -99,7 +91,7 @@ export async function createMovie(formData: FormData): Promise<void> {
     redirect("/admin/movies");
 }
 
-// UPDATE
+// UPDATE (works with <form action={updateWithId}>)
 export async function updateMovie(id: number, formData: FormData): Promise<void> {
     const raw = Object.fromEntries(formData);
     const parsed = movieSchema.safeParse(raw);
@@ -112,7 +104,6 @@ export async function updateMovie(id: number, formData: FormData): Promise<void>
     const actorIds = readPersonIds(formData, "actors");
     const directorIds = readPersonIds(formData, "directors");
 
-    // image upload
     const imageFile = formData.get("image");
     const uploadedPath =
         imageFile instanceof File && imageFile.size > 0 ? await savePublicUpload(imageFile) : "";
@@ -136,17 +127,11 @@ export async function updateMovie(id: number, formData: FormData): Promise<void>
             data: {
                 ...parsed.data,
                 price: new Prisma.Decimal(parsed.data.price),
-                rating: parsed.data.rating ?? 0,
-
-                // image: if upload provided use it; else keep URL fallback
                 imageUrl: uploadedPath || normalizeImageUrl(parsed.data.imageUrl) || null,
-
-                // trailerUrl stored in DB
-                trailerUrl: normalizeTrailerUrl(parsed.data.trailerUrl) || null,
+                trailerUrl: normalizeTrailerUrl((parsed.data as any).trailerUrl) || null,
             },
         }),
 
-        // genres
         prisma.movieGenre.deleteMany({ where: { movieId: id } }),
         ...(genreIds.length > 0
             ? [
@@ -157,7 +142,6 @@ export async function updateMovie(id: number, formData: FormData): Promise<void>
               ]
             : []),
 
-        // people roles
         prisma.moviePerson.deleteMany({ where: { movieId: id } }),
         ...(moviePeople.length > 0
             ? [

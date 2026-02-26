@@ -81,16 +81,6 @@ export default async function AdminEditMoviePage({
                     className="w-full border p-2"
                 />
 
-                {/* rating input */}
-                <input
-                    name="rating"
-                    type="number"
-                    min={0}
-                    max={5}
-                    defaultValue={movie.rating}
-                    className="w-full border p-2"
-                />
-
                 {/* file upload */}
                 <div className="space-y-1">
                     <div className="text-sm font-medium">Poster Image (Upload)</div>
@@ -105,7 +95,7 @@ export default async function AdminEditMoviePage({
                     </p>
                 </div>
 
-                {/*Image URL as fallback */}
+                {/* Image URL as fallback */}
                 <input
                     name="imageUrl"
                     defaultValue={movie.imageUrl ?? ""}

@@ -19,7 +19,7 @@ type SeedMovieRow = {
     Price?: number;
     Year?: string | number;
     Runtime?: number;
-    Rating?: number; // ignored now (we use MovieRating table later)
+    Rating?: number; // ignored (real ratings come from MovieRating)
     Genre?: string;
 };
 
@@ -114,7 +114,7 @@ async function main() {
                 stock: 10,
                 imageUrl: toImagePath(title),
                 createdAt,
-                // trailerUrl: null (optional, leave empty)
+                // trailerUrl: null (optional)
             },
         });
 
@@ -134,7 +134,7 @@ async function main() {
      * ----------------------------------------
      */
 
-    // Only fetch IDs to avoid selecting columns that might drift in shared DBs
+    // Only select what we need (avoid selecting missing columns in shared DBs)
     const movies = await prisma.movie.findMany({
         select: { id: true },
     });
