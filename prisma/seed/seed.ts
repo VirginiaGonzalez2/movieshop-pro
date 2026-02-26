@@ -19,7 +19,7 @@ type SeedMovieRow = {
     Price?: number;
     Year?: string | number;
     Runtime?: number;
-    Rating?: number;
+    Rating?: number; // ignored (real ratings come from MovieRating)
     Genre?: string;
 };
 
@@ -61,7 +61,7 @@ async function main() {
 
     /**
      * ----------------------------------------
-     * MOVIES + GENRES (UNCHANGED LOGIC)
+     * MOVIES + GENRES
      * ----------------------------------------
      */
 
@@ -103,7 +103,6 @@ async function main() {
         }
 
         const price = new Prisma.Decimal((i + 1) * 50);
-        const rating = Number(((i % 5) + 1).toFixed(1));
         const createdAt = new Date(Date.now() - i * 1000 * 60 * 60 * 24);
 
         const movie = await prisma.movie.create({
@@ -113,10 +112,10 @@ async function main() {
                 price,
                 releaseDate: toReleaseDate(row.Year),
                 runtime: Number(row.Runtime ?? 90),
-                rating,
                 stock: 10,
                 imageUrl: toImagePath(title),
                 createdAt,
+                // trailerUrl: null (optional)
             },
         });
 
@@ -132,11 +131,14 @@ async function main() {
 
     /**
      * ----------------------------------------
-     * ADD PEOPLE + ROLES (NEW SECTION ONLY)
+     * ADD PEOPLE + ROLES
      * ----------------------------------------
      */
 
-    const movies = await prisma.movie.findMany();
+    // Only select what we need (avoid selecting missing columns in shared DBs)
+    const movies = await prisma.movie.findMany({
+        select: { id: true },
+    });
 
     const directorNames = [
         "Christopher Nolan",

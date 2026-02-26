@@ -4,9 +4,16 @@ import { prisma } from "@/lib/prisma";
 import { authClient } from "@/lib/auth-client";
 import { revalidatePath } from "next/cache";
 
+function getUserIdFromSession(sessionResult: any): string | null {
+    // Many auth clients return { data, error }.
+    // keep this minimal and safe without assuming too much.
+    const userId = sessionResult?.data?.user?.id;
+    return typeof userId === "string" && userId.length > 0 ? userId : null;
+}
+
 export async function getMyWishlistState(movieId: number): Promise<boolean> {
     const session = await authClient.getSession();
-    const userId = session?.user?.id;
+    const userId = getUserIdFromSession(session);
 
     if (!userId) return false;
 
@@ -20,7 +27,7 @@ export async function getMyWishlistState(movieId: number): Promise<boolean> {
 
 export async function toggleWishlist(movieId: number): Promise<boolean> {
     const session = await authClient.getSession();
-    const userId = session?.user?.id;
+    const userId = getUserIdFromSession(session);
 
     if (!userId) throw new Error("Unauthorized");
 
