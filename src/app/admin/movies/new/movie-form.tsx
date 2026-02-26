@@ -1,27 +1,22 @@
 "use client";
 
-import { useActionState } from "react";
-import { createMovie, type MovieActionState } from "@/actions/movie";
+import { createMovie } from "@/actions/movie";
 
 type Genre = { id: number; name: string };
 type Person = { id: number; name: string };
 
-const initialState: MovieActionState = { ok: true };
-
 export default function NewMovieForm({ genres, people }: { genres: Genre[]; people: Person[] }) {
-    const [state, action] = useActionState(createMovie, initialState);
-
-    const fe = state.ok ? undefined : state.fieldErrors;
+    // Band-aid solution kinda /Sabrina
+    async function onSubmitForm(data: FormData) {
+        // Where am I supposed to get prevState from? /Sabrina
+        const result = await createMovie(/*prevState: */ { ok: true }, data);
+        console.log("result", result);
+    }
 
     return (
-        <form action={action} className="space-y-4">
-            {!state.ok && (
-                <div className="border border-red-500 rounded p-3 text-sm">{state.message}</div>
-            )}
-
+        <form action={onSubmitForm} className="space-y-4">
             <div>
                 <input name="title" placeholder="Title" className="w-full border p-2" />
-                {fe?.title && <p className="text-red-600 text-sm">{fe.title[0]}</p>}
             </div>
 
             <div>
@@ -30,7 +25,6 @@ export default function NewMovieForm({ genres, people }: { genres: Genre[]; peop
                     placeholder="Description"
                     className="w-full border p-2"
                 />
-                {fe?.description && <p className="text-red-600 text-sm">{fe.description[0]}</p>}
             </div>
 
             <div>
@@ -41,12 +35,10 @@ export default function NewMovieForm({ genres, people }: { genres: Genre[]; peop
                     placeholder="Price"
                     className="w-full border p-2"
                 />
-                {fe?.price && <p className="text-red-600 text-sm">{fe.price[0]}</p>}
             </div>
 
             <div>
                 <input name="releaseDate" type="date" className="w-full border p-2" />
-                {fe?.releaseDate && <p className="text-red-600 text-sm">{fe.releaseDate[0]}</p>}
             </div>
 
             <div>
@@ -56,12 +48,27 @@ export default function NewMovieForm({ genres, people }: { genres: Genre[]; peop
                     placeholder="Runtime"
                     className="w-full border p-2"
                 />
-                {fe?.runtime && <p className="text-red-600 text-sm">{fe.runtime[0]}</p>}
+            </div>
+
+            {/* file upload */}
+            <div className="space-y-1">
+                <div className="text-sm font-medium">Poster Image (Upload)</div>
+                <input name="image" type="file" accept="image/*" className="w-full border p-2" />
+                <p className="text-xs text-muted-foreground">
+                    Upload overrides Image URL. Leave empty to use Image URL below.
+                </p>
             </div>
 
             <div>
                 <input name="imageUrl" placeholder="Image URL" className="w-full border p-2" />
-                {fe?.imageUrl && <p className="text-red-600 text-sm">{fe.imageUrl[0]}</p>}
+            </div>
+
+            <div>
+                <input
+                    name="trailerUrl"
+                    placeholder="Trailer URL (YouTube link)"
+                    className="w-full border p-2"
+                />
             </div>
 
             <div>
@@ -71,7 +78,6 @@ export default function NewMovieForm({ genres, people }: { genres: Genre[]; peop
                     placeholder="Stock"
                     className="w-full border p-2"
                 />
-                {fe?.stock && <p className="text-red-600 text-sm">{fe.stock[0]}</p>}
             </div>
 
             {/* Genres */}

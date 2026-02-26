@@ -8,7 +8,7 @@ datasource db {
 
 // better-auth
 model account {
-  id                    String    @id
+  id                    String   @id
   accountId             String
   providerId            String
   userId                String
@@ -19,9 +19,9 @@ model account {
   refreshTokenExpiresAt DateTime?
   scope                 String?
   password              String?
-  createdAt             DateTime  @default(now())
+  createdAt             DateTime @default(now())
   updatedAt             DateTime
-  user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  user     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }

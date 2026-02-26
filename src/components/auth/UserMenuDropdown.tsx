@@ -12,6 +12,7 @@ import { User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MouseEvent } from "react";
+import { Button } from "../ui/button";
 
 type LoginStatus = "pending" | "loggedin" | "notloggedin";
 
@@ -46,13 +47,13 @@ export default function UserMenuDropdown() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <button
+                <Button
                     type="button"
                     aria-label="User menu"
                     className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted transition"
                 >
                     <User className="h-5 w-5" />
-                </button>
+                </Button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="w-44">

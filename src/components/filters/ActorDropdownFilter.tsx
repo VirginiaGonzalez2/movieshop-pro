@@ -33,7 +33,7 @@ function ActorDropdownFilter({ actors, selected }: ActorDropdownFilterProps) {
 
     return (
         <Accordion type="single" collapsible className="max-w-lg">
-            {/* ✅ Changed value from "Genre" to "Actors" */}
+            {/* // ✅ Changed value from "Genre" to "Actors" */}
             <AccordionItem value="Actors" className="border-b px-4 last:border-b-0">
                 {/* ✅ Changed label from "Genre" to "Actors" */}
                 <AccordionTrigger>Actors</AccordionTrigger>
