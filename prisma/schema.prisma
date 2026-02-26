@@ -7,7 +7,7 @@ datasource db {
 }
 
 model account {
-  id                    String    @id
+  id                    String   @id
   accountId             String
   providerId            String
   userId                String
@@ -18,9 +18,9 @@ model account {
   refreshTokenExpiresAt DateTime?
   scope                 String?
   password              String?
-  createdAt             DateTime  @default(now())
+  createdAt             DateTime @default(now())
   updatedAt             DateTime
-  user                  user      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  user     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -40,14 +40,15 @@ model session {
 }
 
 model user {
-  id            String        @id
+  id            String         @id
   name          String
-  email         String        @unique
-  emailVerified Boolean       @default(false)
+  email         String         @unique
+  emailVerified Boolean        @default(false)
   image         String?
-  createdAt     DateTime      @default(now())
+  createdAt     DateTime       @default(now())
   updatedAt     DateTime
   movieRatings  MovieRating[]
+  WishlistItem  WishlistItem[]
   account       account[]
   session       session[]
 }
@@ -64,22 +65,22 @@ model verification {
 }
 
 model Movie {
-  id          Int           @id @default(autoincrement())
-  title       String
-  description String
-  price       Decimal
-  releaseDate DateTime
-  runtime     Int
-  imageUrl    String?
-  stock       Int
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  trailerUrl  String?
-  rating      Int           @default(0)
-  genres      MovieGenre[]
-  people      MoviePerson[]
-  ratings     MovieRating[]
-  orderItems  OrderItem[]
+  id           Int            @id @default(autoincrement())
+  title        String
+  description  String
+  price        Decimal
+  releaseDate  DateTime
+  runtime      Int
+  imageUrl     String?
+  stock        Int
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  trailerUrl   String?
+  genres       MovieGenre[]
+  people       MoviePerson[]
+  ratings      MovieRating[]
+  orderItems   OrderItem[]
+  WishlistItem WishlistItem[]
 }
 
 model Genre {
@@ -109,8 +110,8 @@ model MoviePerson {
   movieId  Int
   personId Int
   role     Role
-  movie    Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
-  person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+  movie    Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  person   Person  @relation(fields: [personId], references: [id], onDelete: Cascade)
 
   @@id([movieId, personId, role])
 }
@@ -135,11 +136,14 @@ model OrderItem {
 }
 
 model ContactMessage {
-  id        String   @id @default(cuid())
+  id        Int      @id @default(autoincrement())
   name      String
   email     String
   message   String
   createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([email])
 }
 
 model MovieRating {
@@ -150,6 +154,19 @@ model MovieRating {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([movieId, userId])
+  @@index([movieId])
+  @@index([userId])
+}
+
+model WishlistItem {
+  id        Int      @id @default(autoincrement())
+  movieId   Int
+  userId    String
+  createdAt DateTime @default(now())
+  Movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
   user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([movieId, userId])
