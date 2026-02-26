@@ -1,8 +1,5 @@
 "use client";
 
-import { useActionState } from "react";
-import { updateMovie, type MovieActionState } from "@/actions/movie";
-
 type Genre = { id: number; name: string };
 type Person = { id: number; name: string };
 
@@ -15,6 +12,7 @@ type MovieFormMovie = {
     runtime: number;
     imageUrl: string;
     stock: number;
+    trailerUrl?: string;
 };
 
 type Props = {
@@ -24,9 +22,8 @@ type Props = {
     selectedGenreIds: number[];
     selectedActorIds: number[];
     selectedDirectorIds: number[];
+    action: (formData: FormData) => void | Promise<void>;
 };
-
-const initialState: MovieActionState = { ok: true };
 
 export default function MovieEditForm({
     movie,
@@ -35,25 +32,16 @@ export default function MovieEditForm({
     selectedGenreIds,
     selectedActorIds,
     selectedDirectorIds,
+    action,
 }: Props) {
-    const updateWithId = updateMovie.bind(null, movie.id);
-    const [state, action] = useActionState(updateWithId, initialState);
-
-    const fe = state.ok ? undefined : state.fieldErrors;
-
     const selectedGenreSet = new Set(selectedGenreIds);
     const selectedActorSet = new Set(selectedActorIds);
     const selectedDirectorSet = new Set(selectedDirectorIds);
 
     return (
         <form action={action} className="space-y-4">
-            {!state.ok ? (
-                <div className="border border-red-500 rounded p-3 text-sm">{state.message}</div>
-            ) : null}
-
             <div>
                 <input name="title" defaultValue={movie.title} className="w-full border p-2" />
-                {fe?.title?.length ? <p className="text-red-600 text-sm">{fe.title[0]}</p> : null}
             </div>
 
             <div>
@@ -62,9 +50,6 @@ export default function MovieEditForm({
                     defaultValue={movie.description}
                     className="w-full border p-2"
                 />
-                {fe?.description?.length ? (
-                    <p className="text-red-600 text-sm">{fe.description[0]}</p>
-                ) : null}
             </div>
 
             <div>
@@ -75,7 +60,6 @@ export default function MovieEditForm({
                     defaultValue={movie.price}
                     className="w-full border p-2"
                 />
-                {fe?.price?.length ? <p className="text-red-600 text-sm">{fe.price[0]}</p> : null}
             </div>
 
             <div>
@@ -85,9 +69,6 @@ export default function MovieEditForm({
                     defaultValue={movie.releaseDate}
                     className="w-full border p-2"
                 />
-                {fe?.releaseDate?.length ? (
-                    <p className="text-red-600 text-sm">{fe.releaseDate[0]}</p>
-                ) : null}
             </div>
 
             <div>
@@ -97,20 +78,33 @@ export default function MovieEditForm({
                     defaultValue={movie.runtime}
                     className="w-full border p-2"
                 />
-                {fe?.runtime?.length ? (
-                    <p className="text-red-600 text-sm">{fe.runtime[0]}</p>
-                ) : null}
+            </div>
+
+            {/* file upload */}
+            <div className="space-y-1">
+                <div className="text-sm font-medium">Poster Image (Upload)</div>
+                <input name="image" type="file" accept="image/*" className="w-full border p-2" />
+                <p className="text-xs text-muted-foreground">
+                    Upload overrides Image URL. Leave empty to keep current.
+                </p>
+            </div>
+
+            {/* Image URL fallback */}
+            <div>
+                <input
+                    name="imageUrl"
+                    defaultValue={movie.imageUrl ?? ""}
+                    className="w-full border p-2"
+                />
             </div>
 
             <div>
                 <input
-                    name="imageUrl"
-                    defaultValue={movie.imageUrl}
+                    name="trailerUrl"
+                    defaultValue={movie.trailerUrl ?? ""}
+                    placeholder="Trailer URL (YouTube link)"
                     className="w-full border p-2"
                 />
-                {fe?.imageUrl?.length ? (
-                    <p className="text-red-600 text-sm">{fe.imageUrl[0]}</p>
-                ) : null}
             </div>
 
             <div>
@@ -120,7 +114,6 @@ export default function MovieEditForm({
                     defaultValue={movie.stock}
                     className="w-full border p-2"
                 />
-                {fe?.stock?.length ? <p className="text-red-600 text-sm">{fe.stock[0]}</p> : null}
             </div>
 
             {/* Genres */}
