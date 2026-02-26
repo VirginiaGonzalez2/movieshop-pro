@@ -13,7 +13,8 @@ type MovieFormMovie = {
     price: string; // Decimal -> string
     releaseDate: string; // Date -> YYYY-MM-DD
     runtime: number;
-    imageUrl: string;
+    imageUrl: string | null;
+    trailerUrl: string | null;
     stock: number;
 };
 
@@ -102,10 +103,34 @@ export default function MovieEditForm({
                 ) : null}
             </div>
 
+            {/* Trailer URL */}
+            <div>
+                <input
+                    name="trailerUrl"
+                    defaultValue={movie.trailerUrl ?? ""}
+                    placeholder="Trailer URL (YouTube link)"
+                    className="w-full border p-2"
+                />
+                {fe?.trailerUrl?.length ? (
+                    <p className="text-red-600 text-sm">{fe.trailerUrl[0]}</p>
+                ) : null}
+            </div>
+
+            {/* Image upload (optional) */}
+            <div className="space-y-1">
+                <div className="text-sm font-medium">Poster Image (Upload)</div>
+                <input name="image" type="file" accept="image/*" className="w-full border p-2" />
+                <p className="text-xs text-muted-foreground">
+                    Upload is preferred. If you don’t upload, the Image URL below will be used.
+                </p>
+            </div>
+
+            {/* Image URL fallback */}
             <div>
                 <input
                     name="imageUrl"
-                    defaultValue={movie.imageUrl}
+                    defaultValue={movie.imageUrl ?? ""}
+                    placeholder="Image URL (optional)"
                     className="w-full border p-2"
                 />
                 {fe?.imageUrl?.length ? (
@@ -177,7 +202,9 @@ export default function MovieEditForm({
                 </div>
             </div>
 
-            <button className="bg-black text-white px-4 py-2 rounded">Update Movie</button>
+            <button type="submit" className="bg-black text-white px-4 py-2 rounded">
+                Update Movie
+            </button>
         </form>
     );
 }

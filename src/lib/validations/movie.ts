@@ -7,8 +7,11 @@ export const movieSchema = z.object({
     releaseDate: z.coerce.date(),
     runtime: z.coerce.number().int().min(1, "Runtime must be at least 1 minute"),
 
-    imageUrl: z.string().optional().or(z.literal("")),
-    trailerUrl: z.string().optional().or(z.literal("")),
+    // fallback URL if no upload
+    imageUrl: z.string().url().optional().or(z.literal("")).optional(),
+
+    // stored in DB (optional)
+    trailerUrl: z.string().url().optional().or(z.literal("")).optional(),
 
     stock: z.coerce.number().int().min(0, "Stock cannot be negative"),
 });

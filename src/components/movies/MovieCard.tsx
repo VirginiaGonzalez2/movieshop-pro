@@ -2,17 +2,20 @@ import Link from "next/link";
 import { PriceTag } from "@/components/ui/PriceTag";
 import { RatingStars } from "@/components/ui/RatingStars";
 
-type Movie = {
+export type MovieCardItem = {
     id: number;
     title: string;
     price: string;
     stock: number;
     runtime: number;
-    rating: number;
     imageUrl?: string | null;
+
+    // real ratings
+    avgRating: number; // 0..5
+    ratingCount: number;
 };
 
-export default function MovieCard({ movie }: { movie: Movie }) {
+export default function MovieCard({ movie }: { movie: MovieCardItem }) {
     return (
         <Link
             href={`/movies/${movie.id}`}
@@ -21,10 +24,12 @@ export default function MovieCard({ movie }: { movie: Movie }) {
             {/* Poster */}
             <div className="aspect-[2/3] bg-muted flex items-center justify-center overflow-hidden">
                 {movie.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                         src={movie.imageUrl}
                         alt={movie.title}
                         className="h-full w-full object-cover"
+                        loading="lazy"
                     />
                 ) : (
                     <div className="text-sm text-muted-foreground">No image</div>
@@ -36,12 +41,10 @@ export default function MovieCard({ movie }: { movie: Movie }) {
                 <div className="font-semibold line-clamp-1">{movie.title}</div>
 
                 <div className="flex items-start justify-between">
-                    {/* Primary price */}
                     <div className="text-lg font-semibold">
                         <PriceTag amount={movie.price} />
                     </div>
 
-                    {/* Secondary metadata */}
                     <div className="text-xs text-muted-foreground text-right">
                         <div>{movie.runtime} min</div>
                         <div>
@@ -54,7 +57,14 @@ export default function MovieCard({ movie }: { movie: Movie }) {
                     </div>
                 </div>
 
-                <RatingStars value={movie.rating} />
+                <div className="flex items-center justify-between gap-2">
+                    <RatingStars value={Math.round(movie.avgRating)} />
+                    <span className="text-xs text-muted-foreground">
+                        {movie.ratingCount > 0
+                            ? `${movie.avgRating.toFixed(1)} (${movie.ratingCount})`
+                            : "No ratings"}
+                    </span>
+                </div>
             </div>
         </Link>
     );

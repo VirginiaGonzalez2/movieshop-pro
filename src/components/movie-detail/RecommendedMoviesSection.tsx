@@ -1,25 +1,16 @@
-import MovieCard from "@/components/movies/MovieCard";
-
-export type RecommendedMovieItem = {
-    id: number;
-    title: string;
-    price: string;
-    stock: number;
-    runtime: number;
-    rating: number;
-    imageUrl?: string | null;
-};
+import MovieCard, { type MovieCardItem } from "@/components/movies/MovieCard";
 
 type Props = {
-    items: RecommendedMovieItem[];
+    title: string;
+    items: MovieCardItem[];
 };
 
-export default function RecommendedMoviesSection({ items }: Props) {
-    if (items.length === 0) return null;
+export default function RecommendedMoviesSection({ title, items }: Props) {
+    if (!items.length) return null;
 
     return (
         <div className="border rounded p-6 space-y-4">
-            <h2 className="text-xl font-semibold">Recommended Movies</h2>
+            <h2 className="text-xl font-semibold">{title}</h2>
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {items.map((movie) => (

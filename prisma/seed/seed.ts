@@ -103,7 +103,6 @@ async function main() {
         }
 
         const price = new Prisma.Decimal((i + 1) * 50);
-        const rating = Number(((i % 5) + 1).toFixed(1));
         const createdAt = new Date(Date.now() - i * 1000 * 60 * 60 * 24);
 
         const movie = await prisma.movie.create({
@@ -113,7 +112,6 @@ async function main() {
                 price,
                 releaseDate: toReleaseDate(row.Year),
                 runtime: Number(row.Runtime ?? 90),
-                rating,
                 stock: 10,
                 imageUrl: toImagePath(title),
                 createdAt,

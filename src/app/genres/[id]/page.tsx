@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import GenreMoviesClient from "./genre-movies-client";
+import { MovieCardItem } from "@/components/movies/MovieCard";
 
 export default async function GenreDetailsPage({
     params,
@@ -46,17 +47,50 @@ export default async function GenreDetailsPage({
             },
         },
         orderBy: { createdAt: "desc" },
+        select: {
+            id: true,
+            title: true,
+            price: true,
+            stock: true,
+            runtime: true,
+            imageUrl: true,
+        },
     });
 
-    const items = movies.map((m) => ({
-        id: m.id,
-        title: m.title,
-        price: m.price.toString(),
-        stock: m.stock,
-        runtime: m.runtime,
-        rating: m.rating,
-        imageUrl: m.imageUrl ?? null,
-    }));
+    const movieIds = movies.map((m) => m.id);
+
+    const ratingAgg =
+        movieIds.length === 0
+            ? []
+            : await prisma.movieRating.groupBy({
+                  by: ["movieId"],
+                  where: { movieId: { in: movieIds } },
+                  _avg: { value: true },
+                  _count: { value: true },
+              });
+
+    const ratingMap = new Map<number, { avgRating: number; ratingCount: number }>();
+    for (const r of ratingAgg) {
+        ratingMap.set(r.movieId, {
+            avgRating: r._avg.value ?? 0,
+            ratingCount: r._count.value ?? 0,
+        });
+    }
+
+    const items: MovieCardItem[] = movies.map((m) => {
+        const rating = ratingMap.get(m.id) ?? { avgRating: 0, ratingCount: 0 };
+
+        return {
+            id: m.id,
+            title: m.title,
+            price: m.price.toString(),
+            stock: m.stock,
+            runtime: m.runtime,
+            imageUrl: m.imageUrl ?? null,
+            avgRating: rating.avgRating,
+            ratingCount: rating.ratingCount,
+        };
+    });
 
     return (
         <div className="p-8">

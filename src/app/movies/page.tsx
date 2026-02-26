@@ -20,19 +20,18 @@ export default async function MoviesPage({
         page?: string;
     }>;
 }) {
-    /**
-     * Await search params (Next.js 15+ requirement)
-     */
     const params = await searchParams;
 
     /**
      * ----------------------------------------
-     * 1️⃣ Parse Sorting Parameter
+     * 1️ Parse Sorting Parameter
      * ----------------------------------------
      */
     const sort = params?.sort ?? "new";
 
-    let orderBy: { createdAt: "desc" } | { title: "asc" } | { price: "asc" } | { rating: "desc" };
+    // NOTE: We cannot orderBy "avgRating" in Prisma directly because it's computed.
+    // For "popular", we sort in JS after we compute avgRating + ratingCount.
+    let orderBy: { createdAt: "desc" } | { title: "asc" } | { price: "asc" } | undefined;
 
     switch (sort) {
         case "az":
@@ -42,7 +41,7 @@ export default async function MoviesPage({
             orderBy = { price: "asc" };
             break;
         case "popular":
-            orderBy = { rating: "desc" };
+            orderBy = { createdAt: "desc" }; // stable fallback, then we sort by avgRating in JS
             break;
         case "new":
         default:
@@ -52,7 +51,7 @@ export default async function MoviesPage({
 
     /**
      * ----------------------------------------
-     * 2️⃣ Parse Filters
+     * 2️ Parse Filters
      * ----------------------------------------
      */
     const selectedGenres = Array.isArray(params.genres)
@@ -69,7 +68,7 @@ export default async function MoviesPage({
 
     /**
      * ----------------------------------------
-     * 3️⃣ Fetch Dropdown Data
+     * 3️ Fetch Dropdown Data
      * ----------------------------------------
      */
     const [genres, directors, actors] = await Promise.all([
@@ -80,7 +79,7 @@ export default async function MoviesPage({
 
     /**
      * ----------------------------------------
-     * 4️⃣ Build Prisma WHERE
+     * 4️ Build Prisma WHERE
      * ----------------------------------------
      */
     const where: Prisma.MovieWhereInput = {
@@ -121,12 +120,21 @@ export default async function MoviesPage({
 
     /**
      * ----------------------------------------
-     * 5️⃣ Fetch Movies
+     * 5️ Fetch Movies
      * ----------------------------------------
      */
     const movies = await prisma.movie.findMany({
         where,
         orderBy,
+        select: {
+            id: true,
+            title: true,
+            price: true,
+            stock: true,
+            runtime: true,
+            imageUrl: true,
+            createdAt: true,
+        },
     });
 
     /**
@@ -178,7 +186,7 @@ export default async function MoviesPage({
 
     /**
      * ----------------------------------------
-     * 6️⃣ Fetch Related People
+     * 6️ Fetch Related People
      * ----------------------------------------
      */
     const movieIds = movies.map((m) => m.id);
@@ -189,16 +197,10 @@ export default async function MoviesPage({
         orderBy: [{ movieId: "asc" }, { personId: "asc" }],
     });
 
-    /**
-     * Group actors and directors by movieId
-     */
     const byMovie = new Map<number, { actors: string[]; directors: string[] }>();
 
     for (const mp of moviePeople) {
-        const entry = byMovie.get(mp.movieId) ?? {
-            actors: [],
-            directors: [],
-        };
+        const entry = byMovie.get(mp.movieId) ?? { actors: [], directors: [] };
 
         if (mp.role === Role.ACTOR) entry.actors.push(mp.person.name);
         if (mp.role === Role.DIRECTOR) entry.directors.push(mp.person.name);
@@ -208,14 +210,35 @@ export default async function MoviesPage({
 
     /**
      * ----------------------------------------
-     * 7️⃣ Transform Data for MoviesClient
+     * 7️ Real ratings (avg + count)
      * ----------------------------------------
      */
-    const items = movies.map((m) => {
-        const info = byMovie.get(m.id) ?? {
-            actors: [],
-            directors: [],
-        };
+    const ratingAgg =
+        movieIds.length === 0
+            ? []
+            : await prisma.movieRating.groupBy({
+                  by: ["movieId"],
+                  where: { movieId: { in: movieIds } },
+                  _avg: { value: true },
+                  _count: { value: true },
+              });
+
+    const ratingMap = new Map<number, { avgRating: number; ratingCount: number }>();
+    for (const r of ratingAgg) {
+        ratingMap.set(r.movieId, {
+            avgRating: r._avg.value ?? 0,
+            ratingCount: r._count.value ?? 0,
+        });
+    }
+
+    /**
+     * ----------------------------------------
+     * 8️ Transform Data for MoviesClient
+     * ----------------------------------------
+     */
+    let items = movies.map((m) => {
+        const info = byMovie.get(m.id) ?? { actors: [], directors: [] };
+        const rating = ratingMap.get(m.id) ?? { avgRating: 0, ratingCount: 0 };
 
         return {
             id: m.id,
@@ -223,16 +246,27 @@ export default async function MoviesPage({
             price: m.price.toString(),
             stock: m.stock,
             runtime: m.runtime,
-            rating: m.rating,
+
+            avgRating: rating.avgRating,
+            ratingCount: rating.ratingCount,
+
             imageUrl: m.imageUrl ?? null,
             directors: info.directors,
             actors: info.actors,
         };
     });
 
+    // Popular = highest avgRating first, then highest ratingCount
+    if (sort === "popular") {
+        items = items.sort((a, b) => {
+            if (b.avgRating !== a.avgRating) return b.avgRating - a.avgRating;
+            return b.ratingCount - a.ratingCount;
+        });
+    }
+
     /**
      * ----------------------------------------
-     * 8️⃣ Responsive Layout
+     * 9️ Responsive Layout
      * ----------------------------------------
      */
     return (

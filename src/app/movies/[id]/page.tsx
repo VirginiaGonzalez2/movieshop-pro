@@ -11,6 +11,7 @@ import WishlistToggle from "@/components/movie-detail/WishlistToggle";
 import SocialShareActions from "@/components/movie-detail/SocialShareActions";
 
 import { getMovieRatingSummary } from "@/actions/movie-rating";
+import { type MovieCardItem } from "@/components/movies/MovieCard";
 
 export async function generateMetadata({
     params,
@@ -91,7 +92,7 @@ export default async function MovieDetailsPage({
     // Recommendations: same genre, exclude current
     const genreIds = movie.genres.map((mg) => mg.genreId);
 
-    const rec = genreIds.length
+    const recMovies = genreIds.length
         ? await prisma.movie.findMany({
               where: {
                   id: { not: movie.id },
@@ -99,18 +100,51 @@ export default async function MovieDetailsPage({
               },
               orderBy: { createdAt: "desc" },
               take: 6,
+              select: {
+                  id: true,
+                  title: true,
+                  price: true,
+                  stock: true,
+                  runtime: true,
+                  imageUrl: true,
+              },
           })
         : [];
 
-    const recItems = rec.map((m) => ({
-        id: m.id,
-        title: m.title,
-        price: m.price.toString(),
-        stock: m.stock,
-        runtime: m.runtime,
-        rating: Math.round((m as any).rating ?? 0),
-        imageUrl: m.imageUrl ?? null,
-    }));
+    const recIds = recMovies.map((m) => m.id);
+
+    const recRatingAgg =
+        recIds.length === 0
+            ? []
+            : await prisma.movieRating.groupBy({
+                  by: ["movieId"],
+                  where: { movieId: { in: recIds } },
+                  _avg: { value: true },
+                  _count: { value: true },
+              });
+
+    const recRatingMap = new Map<number, { avgRating: number; ratingCount: number }>();
+    for (const r of recRatingAgg) {
+        recRatingMap.set(r.movieId, {
+            avgRating: r._avg.value ?? 0,
+            ratingCount: r._count.value ?? 0,
+        });
+    }
+
+    const recItems: MovieCardItem[] = recMovies.map((m) => {
+        const r = recRatingMap.get(m.id) ?? { avgRating: 0, ratingCount: 0 };
+
+        return {
+            id: m.id,
+            title: m.title,
+            price: m.price.toString(),
+            stock: m.stock,
+            runtime: m.runtime,
+            imageUrl: m.imageUrl ?? null,
+            avgRating: r.avgRating,
+            ratingCount: r.ratingCount,
+        };
+    });
 
     return (
         <div className="p-8 max-w-4xl space-y-4">
@@ -123,7 +157,7 @@ export default async function MovieDetailsPage({
                 price={movie.price.toString()}
                 runtime={movie.runtime}
                 stock={movie.stock}
-                rating={Math.round(avgRating)} // display avg as stars
+                rating={Math.round(avgRating)}
                 imageUrl={movie.imageUrl ?? null}
                 trailerUrl={movie.trailerUrl ?? null}
             />

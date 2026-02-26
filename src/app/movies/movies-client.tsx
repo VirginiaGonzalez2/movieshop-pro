@@ -7,9 +7,7 @@ import MovieCard from "@/components/movies/MovieCard";
 
 /**
  * Local type definition.
- * We define it here to avoid depending on
- * internal exports from MovieCard.
- * This prevents breaking if teammates change that file.
+ * Keep it local so we don't depend on internals from MovieCard.
  */
 type MoviesClientItem = {
     id: number;
@@ -17,7 +15,11 @@ type MoviesClientItem = {
     price: string;
     stock: number;
     runtime: number;
-    rating: number;
+
+    //  real rating fields
+    avgRating: number;
+    ratingCount: number;
+
     imageUrl: string | null;
     directors: string[];
     actors: string[];
@@ -28,7 +30,6 @@ export default function MoviesClient({ items }: { items: MoviesClientItem[] }) {
 
     const filtered = useMemo(() => {
         const query = q.trim().toLowerCase();
-
         if (!query) return items;
 
         return items.filter((movie) => {
@@ -68,7 +69,8 @@ export default function MoviesClient({ items }: { items: MoviesClientItem[] }) {
                                 price: movie.price,
                                 stock: movie.stock,
                                 runtime: movie.runtime,
-                                rating: movie.rating,
+                                avgRating: movie.avgRating,
+                                ratingCount: movie.ratingCount,
                                 imageUrl: movie.imageUrl,
                             }}
                         />
