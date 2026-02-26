@@ -6,8 +6,15 @@ type Genre = { id: number; name: string };
 type Person = { id: number; name: string };
 
 export default function NewMovieForm({ genres, people }: { genres: Genre[]; people: Person[] }) {
+    // Band-aid solution kinda /Sabrina
+    async function onSubmitForm(data: FormData) {
+        // Where am I supposed to get prevState from? /Sabrina
+        const result = await createMovie(/*prevState: */ { ok: true }, data);
+        console.log("result", result);
+    }
+
     return (
-        <form action={createMovie} className="space-y-4">
+        <form action={onSubmitForm} className="space-y-4">
             <div>
                 <input name="title" placeholder="Title" className="w-full border p-2" />
             </div>

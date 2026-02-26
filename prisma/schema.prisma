@@ -6,6 +6,7 @@ datasource db {
   provider = "postgresql"
 }
 
+// better-auth
 model account {
   id                    String   @id
   accountId             String
@@ -25,6 +26,7 @@ model account {
   @@index([userId])
 }
 
+// better-auth
 model session {
   id        String   @id
   expiresAt DateTime
@@ -39,20 +41,24 @@ model session {
   @@index([userId])
 }
 
+// better-auth
 model user {
-  id            String         @id
+  id            String    @id
   name          String
-  email         String         @unique
-  emailVerified Boolean        @default(false)
+  email         String    @unique
+  emailVerified Boolean   @default(false)
   image         String?
-  createdAt     DateTime       @default(now())
+  createdAt     DateTime  @default(now())
   updatedAt     DateTime
-  movieRatings  MovieRating[]
-  WishlistItem  WishlistItem[]
   account       account[]
   session       session[]
+
+  // movie features
+  ratings  MovieRating[]
+  wishlist WishlistItem[]
 }
 
+// better-auth
 model verification {
   id         String   @id
   identifier String
@@ -65,43 +71,50 @@ model verification {
 }
 
 model Movie {
-  id           Int            @id @default(autoincrement())
-  title        String
-  description  String
-  price        Decimal
-  releaseDate  DateTime
-  runtime      Int
-  imageUrl     String?
-  stock        Int
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  trailerUrl   String?
-  genres       MovieGenre[]
-  people       MoviePerson[]
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  price       Decimal
+  releaseDate DateTime
+  runtime     Int
+  imageUrl    String?
+  trailerUrl  String?
+  stock       Int
+
+  genres     MovieGenre[]
+  people     MoviePerson[]
+  orderItems OrderItem[]
+
+  // movie features
   ratings      MovieRating[]
-  orderItems   OrderItem[]
-  WishlistItem WishlistItem[]
+  wishlistedBy WishlistItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Genre {
-  id          Int          @id @default(autoincrement())
-  name        String       @unique
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
   description String?
-  movies      MovieGenre[]
+
+  movies MovieGenre[]
 }
 
 model Person {
-  id     Int           @id @default(autoincrement())
-  name   String
-  bio    String?
+  id   Int     @id @default(autoincrement())
+  name String
+  bio  String?
+
   movies MoviePerson[]
 }
 
 model MovieGenre {
   movieId Int
   genreId Int
-  genre   Genre @relation(fields: [genreId], references: [id], onDelete: Cascade)
-  movie   Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  genre Genre @relation(fields: [genreId], references: [id], onDelete: Cascade)
 
   @@id([movieId, genreId])
 }
@@ -110,19 +123,26 @@ model MoviePerson {
   movieId  Int
   personId Int
   role     Role
-  movie    Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
-  person   Person  @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  movie  Movie  @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  person Person @relation(fields: [personId], references: [id], onDelete: Cascade)
 
   @@id([movieId, personId, role])
 }
 
+enum Role {
+  ACTOR
+  DIRECTOR
+}
+
 model Order {
-  id          Int         @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   userId      String
   totalAmount Decimal
   status      String
-  orderDate   DateTime    @default(now())
-  items       OrderItem[]
+  orderDate   DateTime @default(now())
+
+  items OrderItem[]
 }
 
 model OrderItem {
@@ -131,8 +151,41 @@ model OrderItem {
   movieId         Int
   quantity        Int
   priceAtPurchase Decimal
-  movie           Movie   @relation(fields: [movieId], references: [id], onDelete: Cascade)
-  order           Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+}
+
+model MovieRating {
+  id      Int    @id @default(autoincrement())
+  movieId Int
+  userId  String
+  value   Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  user  user  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([movieId, userId]) // one rating per user per movie
+  @@index([movieId])
+  @@index([userId])
+}
+
+model WishlistItem {
+  id      Int    @id @default(autoincrement())
+  movieId Int
+  userId  String
+
+  createdAt DateTime @default(now())
+
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  user  user  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([movieId, userId])
+  @@index([movieId])
+  @@index([userId])
 }
 
 model ContactMessage {
@@ -142,39 +195,6 @@ model ContactMessage {
   message   String
   createdAt DateTime @default(now())
 
-  @@index([createdAt])
   @@index([email])
-}
-
-model MovieRating {
-  id        Int      @id @default(autoincrement())
-  movieId   Int
-  userId    String
-  value     Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
-  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([movieId, userId])
-  @@index([movieId])
-  @@index([userId])
-}
-
-model WishlistItem {
-  id        Int      @id @default(autoincrement())
-  movieId   Int
-  userId    String
-  createdAt DateTime @default(now())
-  Movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade)
-  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([movieId, userId])
-  @@index([movieId])
-  @@index([userId])
-}
-
-enum Role {
-  ACTOR
-  DIRECTOR
+  @@index([createdAt])
 }

@@ -1,21 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import MovieCard from "@/components/movies/MovieCard";
-
-type Item = {
-    id: number;
-    title: string;
-    price: string;
-    stock: number;
-    runtime: number;
-    rating: number;
-    imageUrl?: string | null;
-};
+import MovieCard, { MovieCardItem } from "@/components/movies/MovieCard";
 
 type SortKey = "newest" | "rating-desc" | "price-asc" | "price-desc";
 
-export default function GenreMoviesClient({ items }: { items: Item[] }) {
+export default function GenreMoviesClient({ items }: { items: MovieCardItem[] }) {
     const [q, setQ] = useState("");
     const [sort, setSort] = useState<SortKey>("newest");
 
@@ -28,12 +18,10 @@ export default function GenreMoviesClient({ items }: { items: Item[] }) {
     const sorted = useMemo(() => {
         const copy = [...filtered];
 
-        if (sort === "newest") {
-            return copy;
-        }
+        if (sort === "newest") return copy;
 
         if (sort === "rating-desc") {
-            return copy.sort((a, b) => b.rating - a.rating);
+            return copy.sort((a, b) => b.avgRating - a.avgRating);
         }
 
         const toNumber = (p: string) => {
@@ -50,7 +38,6 @@ export default function GenreMoviesClient({ items }: { items: Item[] }) {
 
     return (
         <div className="space-y-4">
-            {/* Search + sort controls */}
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <input
                     value={q}
@@ -71,7 +58,6 @@ export default function GenreMoviesClient({ items }: { items: Item[] }) {
                 </select>
             </div>
 
-            {/* Results */}
             {sorted.length === 0 ? (
                 <div className="text-sm text-muted-foreground">No movies match “{q}”.</div>
             ) : (

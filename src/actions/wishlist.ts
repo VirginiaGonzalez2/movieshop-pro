@@ -4,17 +4,18 @@ import { prisma } from "@/lib/prisma";
 import { authClient } from "@/lib/auth-client";
 import { revalidatePath } from "next/cache";
 
-function getUserIdFromSession(sessionResult: any): string | null {
-    // Many auth clients return { data, error }.
-    // keep this minimal and safe without assuming too much.
-    const userId = sessionResult?.data?.user?.id;
-    return typeof userId === "string" && userId.length > 0 ? userId : null;
+async function getUserIdFromSession(): Promise<string | null> {
+    const result = await authClient.getSession();
+
+    // better-auth/react returns a wrapper like: { data: { user, session } | null, error? }
+    // We must read from result.data, not result.user.
+    const userId = result?.data?.user?.id ?? null;
+
+    return userId;
 }
 
 export async function getMyWishlistState(movieId: number): Promise<boolean> {
-    const session = await authClient.getSession();
-    const userId = getUserIdFromSession(session);
-
+    const userId = await getUserIdFromSession();
     if (!userId) return false;
 
     const row = await prisma.wishlistItem.findUnique({
@@ -26,9 +27,7 @@ export async function getMyWishlistState(movieId: number): Promise<boolean> {
 }
 
 export async function toggleWishlist(movieId: number): Promise<boolean> {
-    const session = await authClient.getSession();
-    const userId = getUserIdFromSession(session);
-
+    const userId = await getUserIdFromSession();
     if (!userId) throw new Error("Unauthorized");
 
     const existing = await prisma.wishlistItem.findUnique({
