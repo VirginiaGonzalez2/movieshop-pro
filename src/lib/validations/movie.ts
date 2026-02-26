@@ -12,3 +12,9 @@ export const movieSchema = z.object({
 
     stock: z.coerce.number().int().min(0, "Stock cannot be negative"),
 });
+
+// MovieRating table
+export const movieRatingSchema = z.object({
+    movieId: z.coerce.number().int().positive("Invalid movie id"),
+    value: z.coerce.number().int().min(1, "Min is 1").max(5, "Max is 5"),
+});
