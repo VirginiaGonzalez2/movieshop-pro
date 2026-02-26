@@ -32,8 +32,8 @@ function DirectorDropdownFilter({ directors, selected }: DirectorDropdownFilterP
     }
 
     return (
-        // <Accordion type="single" collapsible className="max-w-lg">
-            //✅ Changed value from "Genre" to "Directors"
+        <Accordion type="single" collapsible className="max-w-lg">
+            {/* //✅ Changed value from "Genre" to "Directors" */}
             <AccordionItem value="Directors" className="border-b px-4 last:border-b-0">
                 {/* ✅ Changed label from "Genre" to "Directors" */}
                 <AccordionTrigger>Directors</AccordionTrigger>
@@ -55,7 +55,7 @@ function DirectorDropdownFilter({ directors, selected }: DirectorDropdownFilterP
                     </ScrollArea>
                 </AccordionContent>
             </AccordionItem>
-        // </Accordion>
+        </Accordion>
     );
 }
 

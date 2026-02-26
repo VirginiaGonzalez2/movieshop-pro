@@ -28,11 +28,11 @@ export default function MovieFilterPanel({
   return (
     <div className="flex flex-col gap-6">
       {/* Accordion must be in this file if you want only one dropdown open at once */}
-      <Accordion type="multiple" className="max-w-lg"> 
+      {/* <Accordion type="multiple" className="max-w-lg">  */}
         <GenreDropdownFilter genres={genres} selected={selectedGenres} />
         <DirectorDropdownFilter directors={directors} selected={selectedDirectors} />
         <ActorDropdownFilter actors={actors} selected={selectedActors} />
-      </Accordion>
+      {/* </Accordion> */}
       {/* Render movies here if needed */}
     </div>
   );
