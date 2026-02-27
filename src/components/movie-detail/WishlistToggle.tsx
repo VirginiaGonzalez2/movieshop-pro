@@ -2,13 +2,14 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { Heart } from "lucide-react";
+import { toast } from "sonner";
+
 import { authClient } from "@/lib/auth-client";
 import { useOriginRouter } from "@/hooks/use-origin-router";
 import { getMyWishlistState, toggleWishlist } from "@/actions/wishlist";
 
-type Props = {
-    movieId: number;
-};
+type Props = { movieId: number };
 
 export default function WishlistToggle({ movieId }: Props) {
     const session = authClient.useSession();
@@ -41,35 +42,36 @@ export default function WishlistToggle({ movieId }: Props) {
     function onToggle() {
         if (!session.data) {
             originRouter.push("/login");
+            return;
         }
 
         startTransition(async () => {
-            const next = await toggleWishlist(movieId);
-            setIsWishlisted(next);
-            router.refresh();
+            try {
+                const next = await toggleWishlist(movieId);
+                setIsWishlisted(next);
+                toast.success(next ? "Added to wishlist" : "Removed from wishlist");
+                router.refresh();
+            } catch {
+                toast.error("Wishlist action failed");
+            }
         });
     }
 
+    const disabled = loading || isPending;
+
     return (
-        <div className="border rounded p-6 space-y-2">
-            <h2 className="text-xl font-semibold">Wishlist</h2>
-
-            <button
-                type="button"
-                disabled={loading || isPending}
-                onClick={onToggle}
-                className={`rounded px-4 py-2 text-sm border ${
-                    isWishlisted ? "bg-black text-white" : "bg-white"
-                }`}
-            >
-                {loading ? "Loading…" : isWishlisted ? "Remove from Wishlist" : "Add to Wishlist"}
-            </button>
-
-            {!session.data ? (
-                <p className="text-xs text-muted-foreground">
-                    You must be logged in. Clicking will take you to login.
-                </p>
-            ) : null}
-        </div>
+        <button
+            type="button"
+            onClick={onToggle}
+            disabled={disabled}
+            aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+            title={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+            className="h-11 w-11 rounded-full bg-white shadow-sm transition
+                       hover:shadow-md hover:scale-105 active:scale-95
+                       disabled:opacity-60 disabled:hover:scale-100
+                       flex items-center justify-center"
+        >
+            <Heart className={`h-5 w-5 ${isWishlisted ? "fill-current" : ""}`} />
+        </button>
     );
 }

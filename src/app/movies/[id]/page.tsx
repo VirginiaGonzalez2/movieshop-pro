@@ -2,13 +2,13 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
-import MovieHeroSection from "@/components/movie-detail/MovieHeroSection";
 import MovieDescription from "@/components/movie-detail/MovieDescription";
-import MovieTrailerSection from "@/components/movie-detail/MovieTrailerSection";
 import RecommendedMoviesSection from "@/components/movie-detail/RecommendedMoviesSection";
 import MovieRatingSection from "@/components/movie-detail/MovieRatingSection";
 import WishlistToggle from "@/components/movie-detail/WishlistToggle";
-import SocialShareActions from "@/components/movie-detail/SocialShareActions";
+
+import AddToCartButton from "@/components/movie-detail/AddToCartButton";
+import ShareIconButton from "@/components/movie-detail/ShareIconButton";
 
 import { getMovieRatingSummary } from "@/actions/movie-rating";
 import { type MovieCardItem } from "@/components/movies/MovieCard";
@@ -146,36 +146,104 @@ export default async function MovieDetailsPage({
         };
     });
 
+    const poster = (
+        <div className="relative overflow-hidden rounded-2xl bg-muted shadow-sm">
+            {movie.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                    src={movie.imageUrl}
+                    alt={movie.title}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                />
+            ) : (
+                <div className="aspect-[2/3] w-full flex items-center justify-center text-sm text-muted-foreground">
+                    No Image
+                </div>
+            )}
+        </div>
+    );
+
     return (
-        <div className="p-8 max-w-4xl space-y-4">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-6 sm:py-10">
             <Link className="text-blue-600" href="/movies">
                 ← Back to Movies
             </Link>
 
-            <MovieHeroSection
-                title={movie.title}
-                price={movie.price.toString()}
-                runtime={movie.runtime}
-                stock={movie.stock}
-                imageUrl={movie.imageUrl ?? null}
-                trailerUrl={movie.trailerUrl ?? null}
-            />
+            <div className="mt-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
+                {/* LEFT: Poster */}
+                <div className="lg:col-span-5">
+                    <div className="lg:sticky lg:top-6 space-y-3">
+                        {movie.trailerUrl ? (
+                            <Link href={movie.trailerUrl} target="_blank" rel="noreferrer">
+                                {poster}
+                            </Link>
+                        ) : (
+                            poster
+                        )}
 
-            <MovieTrailerSection trailerUrl={movie.trailerUrl ?? null} title={movie.title} />
+                        {movie.trailerUrl ? (
+                            <p className="text-xs text-muted-foreground">
+                                Tip: click poster to open trailer ↗
+                            </p>
+                        ) : null}
+                    </div>
+                </div>
 
-            <WishlistToggle movieId={movie.id} />
+                {/* RIGHT: Details */}
+                <div className="lg:col-span-7 space-y-6">
+                    <div className="space-y-2">
+                        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
+                            {movie.title}
+                        </h1>
 
-            <MovieRatingSection
-                movieId={movie.id}
-                avgRating={avgRating}
-                ratingCount={ratingCount}
-            />
+                        <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-3">
+                            <span className="font-medium text-foreground">
+                                ${movie.price.toString()}
+                            </span>
+                            <span>•</span>
+                            <span>{movie.runtime} min</span>
+                            <span>•</span>
+                            <span className={movie.stock > 0 ? "text-green-600" : "text-red-500"}>
+                                {movie.stock > 0 ? `In stock (${movie.stock})` : "Out of stock"}
+                            </span>
+                        </div>
+                    </div>
 
-            <SocialShareActions url={shareUrl} title={shareTitle} />
+                    {/* ACTION BAR */}
+                    <div className="flex flex-wrap items-center gap-3">
+                        <AddToCartButton movieId={movie.id} disabled={movie.stock <= 0} />
 
-            <MovieDescription description={movie.description} />
+                        <ShareIconButton url={shareUrl} title={shareTitle} />
 
-            <RecommendedMoviesSection title="More like this" items={recItems} />
+                        {/* Wishlist aligned next to icons */}
+                        <div className="transition-transform duration-200 hover:scale-105 active:scale-95">
+                            <WishlistToggle movieId={movie.id} />
+                        </div>
+                    </div>
+
+                    {/* ABOUT (move up, no border) */}
+                    <div className="space-y-2">
+                        <h2 className="text-lg font-semibold">About</h2>
+                        <MovieDescription description={movie.description} />
+                    </div>
+
+                    {/* RATING (no border) */}
+                    <div className="space-y-2">
+                        <h2 className="text-lg font-semibold">Rating</h2>
+                        <MovieRatingSection
+                            movieId={movie.id}
+                            avgRating={avgRating}
+                            ratingCount={ratingCount}
+                        />
+                    </div>
+
+                    {/* Recommendations */}
+                    <div className="pt-2">
+                        <RecommendedMoviesSection title="More like this" items={recItems} />
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }

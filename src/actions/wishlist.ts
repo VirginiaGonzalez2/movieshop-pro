@@ -1,21 +1,22 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { authClient } from "@/lib/auth-client";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 
-async function getUserIdFromSession(): Promise<string | null> {
-    const result = await authClient.getSession();
-
-    // better-auth/react returns a wrapper like: { data: { user, session } | null, error? }
-    // We must read from result.data, not result.user.
-    const userId = result?.data?.user?.id ?? null;
-
-    return userId;
-}
-
+/**
+ * Returns true if the current logged-in user has this movie wishlisted.
+ * If not logged in -> false (no throw).
+ */
 export async function getMyWishlistState(movieId: number): Promise<boolean> {
-    const userId = await getUserIdFromSession();
+    if (!Number.isInteger(movieId) || movieId <= 0) return false;
+
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    const userId = session?.user?.id;
     if (!userId) return false;
 
     const row = await prisma.wishlistItem.findUnique({
@@ -26,9 +27,23 @@ export async function getMyWishlistState(movieId: number): Promise<boolean> {
     return !!row;
 }
 
+/**
+ * Toggles wishlist for the current logged-in user.
+ * Returns the NEW state: true = wishlisted, false = removed.
+ */
 export async function toggleWishlist(movieId: number): Promise<boolean> {
-    const userId = await getUserIdFromSession();
-    if (!userId) throw new Error("Unauthorized");
+    if (!Number.isInteger(movieId) || movieId <= 0) {
+        throw new Error("Invalid movie id");
+    }
+
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    const userId = session?.user?.id;
+    if (!userId) {
+        throw new Error("Unauthorized");
+    }
 
     const existing = await prisma.wishlistItem.findUnique({
         where: { movieId_userId: { movieId, userId } },
@@ -37,7 +52,7 @@ export async function toggleWishlist(movieId: number): Promise<boolean> {
 
     if (existing) {
         await prisma.wishlistItem.delete({
-            where: { movieId_userId: { movieId, userId } },
+            where: { id: existing.id },
         });
 
         revalidatePath(`/movies/${movieId}`);

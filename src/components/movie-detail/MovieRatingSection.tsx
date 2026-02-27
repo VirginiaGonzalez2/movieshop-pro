@@ -2,8 +2,6 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Star } from "lucide-react";
-
 import { authClient } from "@/lib/auth-client";
 import { useOriginRouter } from "@/hooks/use-origin-router";
 import { getMyMovieRating, setMovieRating } from "@/actions/movie-rating";
@@ -22,9 +20,6 @@ export default function MovieRatingSection({ movieId, avgRating, ratingCount }: 
 
     const [userRating, setUserRating] = useState<number>(0);
     const [loadingMine, setLoadingMine] = useState<boolean>(true);
-
-    // hover preview (optional nice UX)
-    const [hover, setHover] = useState<number | null>(null);
 
     useEffect(() => {
         let alive = true;
@@ -45,12 +40,10 @@ export default function MovieRatingSection({ movieId, avgRating, ratingCount }: 
         };
     }, [movieId]);
 
-    const summaryLabel = useMemo(() => {
+    const avgLabel = useMemo(() => {
         if (!ratingCount) return "No ratings yet";
         return `${avgRating.toFixed(1)} / 5 (${ratingCount})`;
     }, [avgRating, ratingCount]);
-
-    const shown = hover ?? userRating; // what stars should look like right now
 
     function onRate(value: number) {
         if (!session.data) {
@@ -59,33 +52,27 @@ export default function MovieRatingSection({ movieId, avgRating, ratingCount }: 
         }
 
         startTransition(async () => {
-            await setMovieRating(movieId, value); // upsert (one per user)
-            setUserRating(value);
-            router.refresh();
+            try {
+                await setMovieRating(movieId, value);
+                setUserRating(value);
+                router.refresh();
+            } catch {
+                // keep silent or add toast
+            }
         });
     }
 
     const disabled = isPending || loadingMine;
 
     return (
-        <div className="border rounded p-6 space-y-3">
-            <div className="flex items-start justify-between gap-3">
-                <div>
-                    <h2 className="text-xl font-semibold">Rating</h2>
-                    <div className="text-sm text-muted-foreground">{summaryLabel}</div>
-                </div>
+        <div className="space-y-2">
+            {/* avg label */}
+            <div className="text-sm text-muted-foreground">{avgLabel}</div>
 
-                {disabled ? (
-                    <span className="text-xs text-muted-foreground">
-                        {loadingMine ? "Loading…" : "Saving…"}
-                    </span>
-                ) : null}
-            </div>
-
-            {/* ONE rating field: clickable stars (this is the only input) */}
-            <div className="flex items-center gap-1">
+            {/* stars */}
+            <div className="flex items-center gap-2">
                 {[1, 2, 3, 4, 5].map((v) => {
-                    const active = shown >= v;
+                    const active = userRating >= v;
 
                     return (
                         <button
@@ -93,28 +80,36 @@ export default function MovieRatingSection({ movieId, avgRating, ratingCount }: 
                             type="button"
                             disabled={disabled}
                             onClick={() => onRate(v)}
-                            onMouseEnter={() => setHover(v)}
-                            onMouseLeave={() => setHover(null)}
-                            aria-label={`Rate ${v} star${v === 1 ? "" : "s"}`}
-                            className="rounded p-1 hover:bg-muted disabled:opacity-60"
+                            aria-label={`Rate ${v} out of 5`}
+                            title={`Rate ${v}`}
+                            className={[
+                                "h-11 w-11 rounded-full bg-white shadow-sm",
+                                "transition-transform duration-200 hover:shadow-md hover:scale-105 active:scale-95",
+                                "disabled:opacity-60 disabled:hover:scale-100",
+                                "flex items-center justify-center text-lg",
+                                active ? "text-black" : "text-muted-foreground",
+                            ].join(" ")}
                         >
-                            <Star className={`h-6 w-6 ${active ? "fill-black" : ""}`} />
+                            ★
                         </button>
                     );
                 })}
 
-                <span className="ml-3 text-sm">
-                    {userRating > 0 ? (
-                        <span className="font-medium">Your rating: {userRating}/5</span>
-                    ) : (
-                        <span className="text-muted-foreground">Click to rate</span>
-                    )}
-                </span>
+                <div className="ml-2 text-sm">
+                    <div className="font-medium">
+                        Your rating: {userRating ? `${userRating}/5` : "-"}
+                    </div>
+                    {loadingMine ? (
+                        <div className="text-xs text-muted-foreground">Loading…</div>
+                    ) : isPending ? (
+                        <div className="text-xs text-muted-foreground">Saving…</div>
+                    ) : null}
+                </div>
             </div>
 
             {!session.data ? (
                 <p className="text-xs text-muted-foreground">
-                    You must be logged in to rate. Clicking a star will take you to login.
+                    Log in to rate. Clicking a star will take you to login.
                 </p>
             ) : null}
         </div>
