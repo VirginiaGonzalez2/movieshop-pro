@@ -3,13 +3,11 @@
  * @ Create Time: 2026-02-25 08:56:58
  * @ Modified by: Sabrina Bjurman
  * @ Modified time: 2026-02-25 08:58:54
- * @ Description:
+ * @ Description: Shipping address and method form schemas.
  */
 
 import z from "zod";
 import isoCountryCodes from "@/static/iso-country-codes.json";
-
-const development = process.env.NODE_ENV === "development";
 
 // Shipping Address
 

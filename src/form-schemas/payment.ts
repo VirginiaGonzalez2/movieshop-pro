@@ -3,11 +3,10 @@
  * @ Create Time: 2026-02-25 08:57:19
  * @ Modified by: Sabrina Bjurman
  * @ Modified time: 2026-02-25 08:58:17
- * @ Description:
+ * @ Description: Payment method form schemas.
  */
 
 import z from "zod";
-import { shippingAddressSchema, shippingMethodSchema } from "./shipping";
 
 const development = process.env.NODE_ENV === "development";
 

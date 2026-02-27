@@ -3,16 +3,12 @@
  * @ Create Time: 2026-02-19 14:44:32
  * @ Modified by: Sabrina Bjurman
  * @ Modified time: 2026-02-25 08:51:12
- * @ Description:
+ * @ Description: Checkout schema (Combines shipping address + method, payment method, and shopping cart)
  */
 
 import z from "zod";
 import { paymentCardSchema, PaymentMethod, paymentPayPalSchema, PaymentSchemaKey } from "./payment";
 import { shippingAddressSchema, shippingMethodSchema } from "./shipping";
-
-const development = process.env.NODE_ENV === "development";
-
-// Checkout Schema (Combines shipping address + method, payment method, and shopping cart)
 
 export const checkoutSchema = z.object({
     ...z.object({
