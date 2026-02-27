@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-24 14:33:17
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-27 09:52:42
+ *   Modified time: 2026-02-27 09:58:58
  *   Description: Final step in checkout process.
  */
 
@@ -23,7 +23,6 @@ import { redirect, RedirectType } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 type Props = {
-    enabled: boolean;
     cart: OrderItemsFormValues;
     shippingAddress: ShippingAddressFormValues;
     shippingMethod: ShippingMethodFormValues;
@@ -58,7 +57,7 @@ export function PlaceOrder(props: Props) {
         <form onSubmit={form.handleSubmit(handleSubmit)}>
             <FieldGroup>
                 <FieldContent>Click here to place your order.</FieldContent>
-                <Button className="w-fit self-center" type="submit" disabled={!props.enabled}>
+                <Button className="w-fit self-center" type="submit">
                     Place Order
                 </Button>
             </FieldGroup>
