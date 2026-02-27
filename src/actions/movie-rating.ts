@@ -6,7 +6,7 @@ import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 
 /**
- * Returns avg + count for a movie.
+ * Avg + count for a movie.
  */
 export async function getMovieRatingSummary(movieId: number): Promise<{
     avgRating: number;
@@ -28,11 +28,11 @@ export async function getMovieRatingSummary(movieId: number): Promise<{
     };
 }
 
-
+/**
+ * My rating (0 if not logged in or not rated yet).
+ */
 export async function getMyMovieRating(movieId: number): Promise<number> {
-    if (!Number.isInteger(movieId) || movieId <= 0) {
-        return 0;
-    }
+    if (!Number.isInteger(movieId) || movieId <= 0) return 0;
 
     const session = await auth.api.getSession({
         headers: await headers(),
@@ -49,6 +49,9 @@ export async function getMyMovieRating(movieId: number): Promise<number> {
     return row?.value ?? 0;
 }
 
+/**
+ * Set/update my rating (upsert). Still one rating per user per movie.
+ */
 export async function setMovieRating(movieId: number, value: number): Promise<void> {
     if (!Number.isInteger(movieId) || movieId <= 0) {
         throw new Error("Invalid movie id");
@@ -63,9 +66,7 @@ export async function setMovieRating(movieId: number, value: number): Promise<vo
     });
 
     const userId = session?.user?.id;
-    if (!userId) {
-        throw new Error("Unauthorized");
-    }
+    if (!userId) throw new Error("Unauthorized");
 
     await prisma.movieRating.upsert({
         where: { movieId_userId: { movieId, userId } },
