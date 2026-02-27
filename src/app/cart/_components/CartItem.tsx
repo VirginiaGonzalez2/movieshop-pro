@@ -2,8 +2,8 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-18 13:18:06
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-18 15:36:43
- *   Description:
+ *   Modified time: 2026-02-27 13:34:03
+ *   Description: Cart item.
  */
 
 "use server";
@@ -18,7 +18,7 @@ import {
     ItemSeparator,
 } from "@/components/ui/item";
 import Image from "next/image";
-import { CartItemControls } from "./CartItemControls";
+import { CartItemControls } from "@/components/cart/CartItemControls";
 
 type Props = {
     item: ShoppingCartItemInfo;
@@ -30,11 +30,12 @@ export default async function CartItem({ item }: Props) {
     return (
         <Item asChild className="p-4 border-2 w-full rounded-xl">
             <li className="flex items-center">
-                <ItemMedia className="flex-0 min-w-25 h-30 rounded-sm bg-black text-white">
+                <ItemMedia className="flex-0 w-30 h-40 rounded-sm bg-black text-white">
                     <Image
+                        className="max-w-30 max-h-40 rounded-sm"
                         src={item.imageUrl || `/movies/${item.itemId}`}
-                        width={80}
-                        height={120}
+                        width={120}
+                        height={160}
                         alt={`Cover for ${item.title}`}
                     />
                 </ItemMedia>
@@ -45,11 +46,14 @@ export default async function CartItem({ item }: Props) {
                 <div className="flex-1 flex justify-end">
                     <CartItemControls
                         itemId={item.itemId}
+                        title={item.title}
                         quantity={item.quantity}
                         stock={item.stock}
                     />
                 </div>
-                <ItemContent className="flex-0">{formatter.format(Number(item.price))}</ItemContent>
+                <ItemContent className="min-w-14 flex-0 text-center">
+                    {formatter.format(Number(item.price * item.quantity))}
+                </ItemContent>
             </li>
         </Item>
     );

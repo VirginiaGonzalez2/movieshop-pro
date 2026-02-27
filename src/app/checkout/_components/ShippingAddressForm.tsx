@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-19 17:05:36
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-23 16:33:05
+ *   Modified time: 2026-02-26 10:56:33
  *   Description: Shipping address form.
  */
 
@@ -24,17 +24,20 @@ import {
     ShippingAddressFormValues,
     shippingAddressSchema,
     shippingCountries,
-} from "@/form-schemas/checkout";
+} from "@/form-schemas/shipping";
+import { buildInputFilter } from "@/utils/input-event-filters";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 
 type Props = {
-    active: boolean;
     nextStep: string;
     savedValues: ShippingAddressFormValues | null;
     onSubmit: (values: ShippingAddressFormValues) => void;
 };
+
+// TODO: This will need to be adjusted or removed, but for now only allow swedish post code format.
+const postalCodeInputFilter = buildInputFilter({ numericsOnly: true, maxLength: 5 });
 
 export function ShippingAddressForm(props: Props) {
     const isMobile = useIsMobile();
@@ -51,13 +54,8 @@ export function ShippingAddressForm(props: Props) {
         },
     });
 
-    const Form = props.active ? "form" : "div";
-
     return (
-        <Form
-            id="shippingAddress"
-            onSubmit={props.active ? form.handleSubmit(props.onSubmit) : undefined}
-        >
+        <form id="shippingAddress" onSubmit={form.handleSubmit(props.onSubmit)}>
             <FieldGroup className="text-nowrap">
                 <FieldSet className={isMobile ? "flex-col" : "flex-row"}>
                     <Controller
@@ -101,7 +99,12 @@ export function ShippingAddressForm(props: Props) {
                     render={({ field, fieldState }) => (
                         <Field>
                             <FieldLabel htmlFor={field.name}>Postal Code</FieldLabel>
-                            <Input {...field} id={field.name} autoComplete="postal-code" />
+                            <Input
+                                {...field}
+                                id={field.name}
+                                autoComplete="postal-code"
+                                onBeforeInput={postalCodeInputFilter}
+                            />
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
                     )}
@@ -132,7 +135,7 @@ export function ShippingAddressForm(props: Props) {
                     Continue to {props.nextStep}
                 </Button>
             </FieldGroup>
-        </Form>
+        </form>
     );
 }
 

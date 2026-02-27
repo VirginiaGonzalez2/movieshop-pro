@@ -1,8 +1,8 @@
 /**
  * @ Author: Sabrina Bjurman
- * @ Create Time: 2026-02-??
+ * @ Create Time: 2026-02-12 08:45:41
  * @ Modified by: Sabrina Bjurman
- * @ Modified time: 2026-02-13 13:23:35
+ * @ Modified time: 2026-02-25 16:52:10
  * @ Description: Shopping cart actions.
  */
 
@@ -155,7 +155,7 @@ async function removeShoppingCartItem(
             }
 
             if (item.qty <= 0) {
-                shoppingCart.copyWithin(i - 1, i);
+                shoppingCart.copyWithin(i, i + 1);
                 shoppingCart.pop();
             }
 

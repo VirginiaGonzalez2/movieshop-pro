@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-19 16:57:39
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-23 16:32:52
+ *   Modified time: 2026-02-25 09:20:26
  *   Description: Payment method selection.
  */
 
@@ -19,12 +19,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { FullPaymentMethodFormValues } from "@/form-schemas/checkout";
 import {
-    FullPaymentMethodFormValues,
     PaymentMethod,
     PaymentMethodFormValues,
     paymentMethodSchema,
-} from "@/form-schemas/checkout";
+} from "@/form-schemas/payment";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -32,7 +32,6 @@ import { PayByCardForm } from "./PayByCardForm";
 import { PayPalForm } from "./PayPalForm";
 
 type Props = {
-    active: boolean;
     nextStep: string;
     savedValues: FullPaymentMethodFormValues | null;
     onSubmit: (values: PaymentMethodFormValues) => void;
@@ -61,13 +60,8 @@ export function PaymentMethodSelect(props: Props) {
         },
     });
 
-    const Form = props.active ? "form" : "div";
-
     return (
-        <Form
-            id="paymentMethod"
-            onSubmit={props.active ? form.handleSubmit(props.onSubmit) : undefined}
-        >
+        <form onSubmit={form.handleSubmit(props.onSubmit)}>
             <FieldGroup>
                 <Controller
                     control={form.control}
@@ -81,7 +75,7 @@ export function PaymentMethodSelect(props: Props) {
                                 }}
                                 defaultValue={paymentMethod ?? ""}
                             >
-                                <SelectTrigger id={"paymentMethod"} className="w-full max-w-48">
+                                <SelectTrigger className="w-full max-w-48">
                                     <SelectValue placeholder="Payment Options" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -110,6 +104,6 @@ export function PaymentMethodSelect(props: Props) {
                     Continue to {props.nextStep}
                 </Button>
             </FieldGroup>
-        </Form>
+        </form>
     );
 }

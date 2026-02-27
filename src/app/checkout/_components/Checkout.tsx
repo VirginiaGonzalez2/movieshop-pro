@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-19 14:17:47
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-23 16:33:19
+ *   Modified time: 2026-02-25 09:21:49
  *   Description: Main checkout form.
  */
 
@@ -15,21 +15,27 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { FieldGroup } from "@/components/ui/field";
+import { FullPaymentMethodFormValues, OrderItemsFormValues } from "@/form-schemas/checkout";
+import { PaymentMethodFormValues, paymentMethodSchema } from "@/form-schemas/payment";
 import {
-    FullPaymentMethodFormValues,
-    PaymentMethodFormValues,
     ShippingAddressFormValues,
     shippingAddressSchema,
     ShippingMethodFormValues,
-} from "@/form-schemas/checkout";
+    shippingMethodSchema,
+} from "@/form-schemas/shipping";
 import { ReactNode, useState } from "react";
 import { PaymentMethodSelect } from "./PaymentMethodSelect";
+import { PlaceOrder } from "./PlaceOrder";
 import { ShippingAddressForm } from "./ShippingAddressForm";
 import { ShippingMethodSelect } from "./ShippingMethodSelect";
 
 type CheckoutStep = "shippingAddress" | "shippingMethod" | "paymentMethod" | "confirmation";
 
-export function Checkout() {
+type Props = {
+    cart: OrderItemsFormValues;
+};
+
+export function Checkout(props: Props) {
     const [shippingAddressInfo, setShippingAddressInfo] =
         useState<ShippingAddressFormValues | null>(null);
     const [shippingMethodInfo, setShippingMethodInfo] = useState<ShippingMethodFormValues | null>(
@@ -43,6 +49,7 @@ export function Checkout() {
     const [paymentMethodSubmitted, setPaymentMethodSubmitted] = useState(false);
     const [currentStep, setCurrentStep] = useState<CheckoutStep>("shippingAddress");
 
+    // Allow manual control of accordion.
     function onClickHandler(step: CheckoutStep) {
         setCurrentStep(step);
     }
@@ -54,11 +61,13 @@ export function Checkout() {
     }
 
     function isShippingMethodFinalized() {
-        return shippingMethodSubmitted;
+        return (
+            shippingMethodSubmitted && shippingMethodSchema.safeParse(shippingMethodInfo).success
+        );
     }
 
     function isPaymentMethodFinalized() {
-        return paymentMethodSubmitted;
+        return paymentMethodSubmitted && paymentMethodSchema.safeParse(paymentMethodInfo).success;
     }
 
     const enableShipping = isShippingAddressFinalized();
@@ -83,62 +92,60 @@ export function Checkout() {
         setCurrentStep("confirmation");
     }
 
-    async function handleConfirmSubmit() {}
-
-    const Form = currentStep === "confirmation" ? "form" : "div";
-
     return (
-        <Form onSubmit={currentStep === "confirmation" ? handleConfirmSubmit : undefined}>
-            <Accordion type="single" value={currentStep}>
-                <CheckoutStepComponent
-                    title="Address"
-                    step={"shippingAddress"}
-                    enabled={true}
-                    onClickHandler={onClickHandler}
-                >
-                    <ShippingAddressForm
-                        active={currentStep === "shippingAddress"}
-                        nextStep="Shipping"
-                        savedValues={shippingAddressInfo}
-                        onSubmit={handleShippingAddressSubmit}
+        <Accordion type="single" value={currentStep}>
+            <CheckoutStepComponent
+                title="Address"
+                step={"shippingAddress"}
+                enabled={true}
+                onClickHandler={onClickHandler}
+            >
+                <ShippingAddressForm
+                    nextStep="Shipping"
+                    savedValues={shippingAddressInfo}
+                    onSubmit={handleShippingAddressSubmit}
+                />
+            </CheckoutStepComponent>
+            <CheckoutStepComponent
+                title="Shipping"
+                step={"shippingMethod"}
+                enabled={enableShipping}
+                onClickHandler={onClickHandler}
+            >
+                <ShippingMethodSelect
+                    nextStep="Payment"
+                    savedValues={shippingMethodInfo}
+                    onSubmit={handleShippingMethodSubmit}
+                />
+            </CheckoutStepComponent>
+            <CheckoutStepComponent
+                title="Payment"
+                step={"paymentMethod"}
+                enabled={enablePayment}
+                onClickHandler={onClickHandler}
+            >
+                <PaymentMethodSelect
+                    nextStep="Confirmation"
+                    savedValues={paymentMethodInfo}
+                    onSubmit={handlePaymentMethodSubmit}
+                />
+            </CheckoutStepComponent>
+            <CheckoutStepComponent
+                title="Confirmation"
+                step={"confirmation"}
+                enabled={enableConfirmation}
+                onClickHandler={onClickHandler}
+            >
+                {shippingAddressInfo && shippingMethodInfo && paymentMethodInfo && (
+                    <PlaceOrder
+                        cart={props.cart}
+                        shippingAddress={shippingAddressInfo}
+                        shippingMethod={shippingMethodInfo}
+                        paymentMethod={paymentMethodInfo}
                     />
-                </CheckoutStepComponent>
-                <CheckoutStepComponent
-                    title="Shipping"
-                    step={"shippingMethod"}
-                    enabled={enableShipping}
-                    onClickHandler={onClickHandler}
-                >
-                    <ShippingMethodSelect
-                        active={currentStep === "shippingMethod"}
-                        nextStep="Payment"
-                        savedValues={shippingMethodInfo}
-                        onSubmit={handleShippingMethodSubmit}
-                    />
-                </CheckoutStepComponent>
-                <CheckoutStepComponent
-                    title="Payment"
-                    step={"paymentMethod"}
-                    enabled={enablePayment}
-                    onClickHandler={onClickHandler}
-                >
-                    <PaymentMethodSelect
-                        active={currentStep === "paymentMethod"}
-                        nextStep="Confirmation"
-                        savedValues={paymentMethodInfo}
-                        onSubmit={handlePaymentMethodSubmit}
-                    />
-                </CheckoutStepComponent>
-                <CheckoutStepComponent
-                    title="Confirmation"
-                    step={"confirmation"}
-                    enabled={enableConfirmation}
-                    onClickHandler={onClickHandler}
-                >
-                    FINAL PREVIEW HERE AND FINALIZE ORDER BUTTON
-                </CheckoutStepComponent>
-            </Accordion>
-        </Form>
+                )}
+            </CheckoutStepComponent>
+        </Accordion>
     );
 }
 

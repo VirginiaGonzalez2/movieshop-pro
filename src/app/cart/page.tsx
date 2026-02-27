@@ -2,27 +2,14 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-12 08:45:41
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-18 15:01:15
+ *   Modified time: 2026-02-27 09:44:44
  *   Description: Cart page.
  */
 
 "use server";
 
-import { getShoppingCart, getShoppingCartInfo } from "@/actions/shopping-cart";
+import { getShoppingCartInfo } from "@/actions/shopping-cart";
 import { LinkButton } from "@/components/ui-custom-shadcn/LinkButton";
-import { TestCart } from "./_components/TestCart";
-import { prisma } from "@/lib/prisma";
-import {
-    Item,
-    ItemContent,
-    ItemGroup,
-    ItemHeader,
-    ItemMedia,
-    ItemSeparator,
-} from "@/components/ui/item";
-import Image from "next/image";
-import { Genre } from "@prisma/client";
-import { CartItemControls } from "./_components/CartItemControls";
 import CartItem from "./_components/CartItem";
 
 export default async function CartPage() {
@@ -30,16 +17,14 @@ export default async function CartPage() {
 
     let totalPrice = 0;
     if (shoppingCartInfo) {
-        shoppingCartInfo.forEach((value) => {
-            totalPrice += value.price * value.quantity;
-        });
+        for (const item of shoppingCartInfo) {
+            totalPrice += item.price * item.quantity;
+        }
     }
 
     return (
         <div className="mx-auto max-w-2xl py-10 px-4 gap-4 flex flex-col items-end">
             <h1 className="text-2xl font-bold mb-4 flex-1">Shopping Cart</h1>
-            <TestCart />
-
             <div className="w-full content-end">
                 {shoppingCartInfo ? (
                     // NOT EMPTY

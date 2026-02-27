@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-23 09:30:23
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-23 16:33:29
+ *   Modified time: 2026-02-25 16:19:00
  *   Description: Card payment form.
  */
 
@@ -10,12 +10,16 @@
 
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { PaymentMethodFormValues } from "@/form-schemas/checkout";
+import { PaymentMethodFormValues } from "@/form-schemas/payment";
+import { buildInputFilter } from "@/utils/input-event-filters";
 import { Controller, UseFormReturn } from "react-hook-form";
 
 type Props = {
     form: UseFormReturn<PaymentMethodFormValues>;
 };
+
+const numberInputFilter = buildInputFilter({ numericsOnly: true, maxLength: 16 });
+const securityCodeInputFilter = buildInputFilter({ numericsOnly: true, maxLength: 3 });
 
 export function PayByCardForm({ form }: Props) {
     return (
@@ -23,13 +27,28 @@ export function PayByCardForm({ form }: Props) {
             <Controller
                 control={form.control}
                 name="paymentCardInfo.cardName"
-                render={({ field, fieldState }) => (
-                    <Field>
-                        <FieldLabel htmlFor={field.name}>Name on Card</FieldLabel>
-                        <Input {...field} id={field.name} autoComplete="cc-name" />
-                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                    </Field>
-                )}
+                render={({ field, fieldState }) => {
+                    // const fieldOnChange = field.onChange;
+                    // field.onChange = (e: ChangeEvent<HTMLInputElement>) => {
+                    //     numberFormatter(e);
+                    //     fieldOnChange(e.currentTarget.value.replaceAll("-", ""));
+                    // };
+                    return (
+                        <Field>
+                            <FieldLabel htmlFor={field.name}>Name on Card</FieldLabel>
+                            <Input
+                                {...field}
+                                id={field.name}
+                                pattern="\d{4}-\d{4}-\d{4}-\d{4}"
+                                onChange={(e) =>
+                                    field.onChange(e.currentTarget.value.replaceAll("-", ""))
+                                }
+                                autoComplete="cc-name"
+                            />
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                    );
+                }}
             />
             <Controller
                 control={form.control}
@@ -37,7 +56,12 @@ export function PayByCardForm({ form }: Props) {
                 render={({ field, fieldState }) => (
                     <Field>
                         <FieldLabel htmlFor={field.name}>16-digit Card Number</FieldLabel>
-                        <Input {...field} id={field.name} autoComplete="cc-number" />
+                        <Input
+                            {...field}
+                            id={field.name}
+                            autoComplete="cc-number"
+                            onBeforeInput={numberInputFilter}
+                        />
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                 )}
@@ -48,7 +72,12 @@ export function PayByCardForm({ form }: Props) {
                 render={({ field, fieldState }) => (
                     <Field>
                         <FieldLabel htmlFor={field.name}>3-digit Security Code</FieldLabel>
-                        <Input {...field} id={field.name} autoComplete="cc-csc" />
+                        <Input
+                            {...field}
+                            id={field.name}
+                            autoComplete="cc-csc"
+                            onBeforeInput={securityCodeInputFilter}
+                        />
                         {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                 )}

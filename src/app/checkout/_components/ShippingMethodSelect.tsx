@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-19 16:58:17
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-23 16:33:11
+ *   Modified time: 2026-02-25 16:19:17
  *   Description: Shipping method selection.
  */
 
@@ -19,12 +19,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
-import { ShippingMethodFormValues, shippingMethodSchema } from "@/form-schemas/checkout";
+import { ShippingMethodFormValues, shippingMethodSchema } from "@/form-schemas/shipping";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 
 type Props = {
-    active: boolean;
     nextStep: string;
     savedValues: ShippingMethodFormValues | null;
     onSubmit: (values: ShippingMethodFormValues) => void;
@@ -38,13 +37,8 @@ export function ShippingMethodSelect(props: Props) {
         },
     });
 
-    const Form = props.active ? "form" : "div";
-
     return (
-        <Form
-            id="shippingMethod"
-            onSubmit={props.active ? form.handleSubmit(props.onSubmit) : undefined}
-        >
+        <form onSubmit={form.handleSubmit(props.onSubmit)}>
             <FieldGroup>
                 <Controller
                     control={form.control}
@@ -83,6 +77,6 @@ export function ShippingMethodSelect(props: Props) {
                     Continue to {props.nextStep}
                 </Button>
             </FieldGroup>
-        </Form>
+        </form>
     );
 }

@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-23 10:47:06
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-23 16:33:00
+ *   Modified time: 2026-02-25 09:20:41
  *   Description: PayPal form.
  */
 
@@ -10,7 +10,7 @@
 
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { PaymentMethodFormValues } from "@/form-schemas/checkout";
+import { PaymentMethodFormValues } from "@/form-schemas/payment";
 import { Controller, UseFormReturn } from "react-hook-form";
 
 type Props = {
