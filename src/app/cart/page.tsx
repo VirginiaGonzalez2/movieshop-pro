@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-12 08:45:41
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-24 12:01:48
+ *   Modified time: 2026-02-27 09:44:44
  *   Description: Cart page.
  */
 
@@ -11,7 +11,6 @@
 import { getShoppingCartInfo } from "@/actions/shopping-cart";
 import { LinkButton } from "@/components/ui-custom-shadcn/LinkButton";
 import CartItem from "./_components/CartItem";
-import { TestCart } from "./_components/TestCart";
 
 export default async function CartPage() {
     const shoppingCartInfo = await getShoppingCartInfo();
@@ -26,8 +25,6 @@ export default async function CartPage() {
     return (
         <div className="mx-auto max-w-2xl py-10 px-4 gap-4 flex flex-col items-end">
             <h1 className="text-2xl font-bold mb-4 flex-1">Shopping Cart</h1>
-            <TestCart />
-
             <div className="w-full content-end">
                 {shoppingCartInfo ? (
                     // NOT EMPTY
