@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { PriceTag } from "@/components/ui/PriceTag";
-import { RatingStars } from "@/components/ui/RatingStars";
 
 type Props = {
     title: string;
     price: string;
     runtime: number;
     stock: number;
-    rating: number;
     imageUrl?: string | null;
     trailerUrl?: string | null;
 };
@@ -17,7 +15,6 @@ export default function MovieHeroSection({
     price,
     runtime,
     stock,
-    rating,
     imageUrl,
     trailerUrl,
 }: Props) {
@@ -78,8 +75,6 @@ export default function MovieHeroSection({
                 <span>•</span>
                 <span>Stock: {stock}</span>
             </div>
-
-            <RatingStars value={rating} />
         </div>
     );
 }

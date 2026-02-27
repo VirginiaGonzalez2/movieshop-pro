@@ -157,7 +157,6 @@ export default async function MovieDetailsPage({
                 price={movie.price.toString()}
                 runtime={movie.runtime}
                 stock={movie.stock}
-                rating={Math.round(avgRating)}
                 imageUrl={movie.imageUrl ?? null}
                 trailerUrl={movie.trailerUrl ?? null}
             />

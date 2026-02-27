@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import MoviesSearchBar from "./search-bar";
 import MoviesSortBar from "./MoviesSortBar";
 import MovieCard from "@/components/movies/MovieCard";
@@ -53,7 +53,9 @@ export default function MoviesClient({ items }: { items: MoviesClientItem[] }) {
             </div>
 
             <div className="mb-6">
-                <MoviesSortBar />
+                <Suspense fallback={null}>
+                    <MoviesSortBar />
+                </Suspense>
             </div>
 
             {filtered.length === 0 ? (

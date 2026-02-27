@@ -4,9 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import dynamic from "next/dynamic";
 
-import UserMenuDropdown from "@/components/auth/UserMenuDropdown";
 import NavSearch from "@/components/nav/NavSearch";
+
+//  Client-only to avoid Radix hydration mismatch
+const UserMenuDropdown = dynamic(() => import("@/components/auth/UserMenuDropdown"), {
+    ssr: false,
+});
 
 /**
  * Responsive Application Header
@@ -18,7 +23,6 @@ import NavSearch from "@/components/nav/NavSearch";
  * - Keeps NavSearch + UserMenuDropdown
  * - Professional responsive layout
  */
-
 export default function AppHeader() {
     const [isOpen, setIsOpen] = useState(false);
 
