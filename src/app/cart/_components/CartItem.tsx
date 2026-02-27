@@ -2,8 +2,8 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-18 13:18:06
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-18 15:36:43
- *   Description:
+ *   Modified time: 2026-02-27 09:32:35
+ *   Description: Cart item.
  */
 
 "use server";
@@ -18,7 +18,7 @@ import {
     ItemSeparator,
 } from "@/components/ui/item";
 import Image from "next/image";
-import { CartItemControls } from "./CartItemControls";
+import { CartItemControls } from "@/components/cart/CartItemControls";
 
 type Props = {
     item: ShoppingCartItemInfo;
@@ -45,6 +45,7 @@ export default async function CartItem({ item }: Props) {
                 <div className="flex-1 flex justify-end">
                     <CartItemControls
                         itemId={item.itemId}
+                        title={item.title}
                         quantity={item.quantity}
                         stock={item.stock}
                     />
