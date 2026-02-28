@@ -46,7 +46,7 @@ export default function MoviesClient({ items }: { items: MoviesClientItem[] }) {
     }, [q, items]);
 
     return (
-        <div className="p-8">
+        <div className="px-6 sm:px-8 py-8">
             <div className="flex items-start justify-between gap-4 mb-6">
                 <h1 className="text-2xl font-bold">Movies</h1>
                 <MoviesSearchBar onSearch={setQ} />
@@ -61,7 +61,7 @@ export default function MoviesClient({ items }: { items: MoviesClientItem[] }) {
             {filtered.length === 0 ? (
                 <div className="text-sm text-muted-foreground">No movies match “{q}”.</div>
             ) : (
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     {filtered.map((movie) => (
                         <MovieCard
                             key={movie.id}

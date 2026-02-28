@@ -1,6 +1,5 @@
 "use client";
 
-import { toggleGenre } from "@/actions/genreDropdown";
 import {
     Accordion,
     AccordionContent,
@@ -8,7 +7,7 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 
 type GenreDropdownFilterProps = {
@@ -23,10 +22,22 @@ type GenreDropdownFilterProps = {
 function GenreDropdownFilter({ genres, selected }: GenreDropdownFilterProps) {
     const [, startTransition] = useTransition();
     const pathname = usePathname();
+    const router = useRouter();
+    const searchParams = useSearchParams();
 
     function onToggle(id: string) {
         startTransition(() => {
-            toggleGenre(id, selected, pathname);
+            const set = new Set(selected);
+
+            if (set.has(id)) set.delete(id);
+            else set.add(id);
+
+            const params = new URLSearchParams(searchParams.toString());
+
+            if (set.size > 0) params.set("genre", Array.from(set).join(","));
+            else params.delete("genre");
+
+            router.push(`${pathname}?${params.toString()}`);
         });
     }
 

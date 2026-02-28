@@ -19,7 +19,7 @@ export default function MovieCard({ movie }: { movie: MovieCardItem }) {
     return (
         <Link
             href={`/movies/${movie.id}`}
-            className="block border rounded-lg overflow-hidden hover:shadow-md transition"
+            className="block border rounded-lg overflow-hidden transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg"
         >
             {/* Poster */}
             <div className="aspect-[2/3] bg-muted flex items-center justify-center overflow-hidden">

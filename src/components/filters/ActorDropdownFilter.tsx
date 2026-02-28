@@ -1,6 +1,5 @@
 "use client";
 
-import { toggleActor } from "@/actions/actorDropdown";
 import {
     Accordion,
     AccordionContent,
@@ -8,7 +7,7 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 
 type ActorDropdownFilterProps = {
@@ -23,11 +22,23 @@ type ActorDropdownFilterProps = {
 function ActorDropdownFilter({ actors, selected }: ActorDropdownFilterProps) {
     const [, startTransition] = useTransition();
     const pathname = usePathname();
+    const router = useRouter();
+    const searchParams = useSearchParams();
 
-    // Handles toggling an actor filter
+    // Handles toggling an actor filter (client-side: update query params)
     function onToggle(id: string) {
         startTransition(() => {
-            toggleActor(id, selected, pathname);
+            const set = new Set(selected);
+
+            if (set.has(id)) set.delete(id);
+            else set.add(id);
+
+            const params = new URLSearchParams(searchParams.toString());
+
+            if (set.size > 0) params.set("actor", Array.from(set).join(","));
+            else params.delete("actor");
+
+            router.push(`${pathname}?${params.toString()}`);
         });
     }
 

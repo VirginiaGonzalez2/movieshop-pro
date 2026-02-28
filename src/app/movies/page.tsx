@@ -14,9 +14,9 @@ export default async function MoviesPage({
 }: {
     searchParams: Promise<{
         sort?: string;
-        genres?: string | string[];
-        directors?: string | string[];
-        actors?: string | string[];
+        genre?: string | string[];
+        director?: string | string[];
+        actor?: string | string[];
         page?: string;
     }>;
 }) {
@@ -54,17 +54,17 @@ export default async function MoviesPage({
      * 2️ Parse Filters
      * ----------------------------------------
      */
-    const selectedGenres = Array.isArray(params.genres)
-        ? params.genres
-        : (params.genres?.split(",") ?? []);
+    const selectedGenres = Array.isArray(params.genre)
+        ? params.genre
+        : (params.genre?.split(",") ?? []);
 
-    const selectedDirectors = Array.isArray(params.directors)
-        ? params.directors
-        : (params.directors?.split(",") ?? []);
+    const selectedDirectors = Array.isArray(params.director)
+        ? params.director
+        : (params.director?.split(",") ?? []);
 
-    const selectedActors = Array.isArray(params.actors)
-        ? params.actors
-        : (params.actors?.split(",") ?? []);
+    const selectedActors = Array.isArray(params.actor)
+        ? params.actor
+        : (params.actor?.split(",") ?? []);
 
     /**
      * ----------------------------------------
