@@ -140,7 +140,7 @@ export default async function MoviesPage({
 
     /**
      * ----------------------------------------
-     * 5️ Fetch Movies
+     * 5️ Fetch Movies (show all — same behaviour as Home)
      * ----------------------------------------
      */
     const movies = await prisma.movie.findMany({

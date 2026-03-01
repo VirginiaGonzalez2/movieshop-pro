@@ -52,20 +52,20 @@ export default function HomeQuickFilters() {
                     </nav>
                 </div>
 
-                <div className="mt-6 flex justify-center gap-4">
-                    <button
-                        onClick={goToAdvancedFilters}
-                        className="text-blue-600 hover:underline font-medium"
-                    >
-                        Explore Advanced Filters →
-                    </button>
-
+                <div className="mt-6 flex flex-col items-center gap-2">
                     <button
                         onClick={clearFilters}
                         className="text-sm text-gray-600 hover:underline"
                         aria-label="Clear filters"
                     >
                         Clear filters
+                    </button>
+
+                    <button
+                        onClick={goToAdvancedFilters}
+                        className="text-blue-600 hover:underline font-medium"
+                    >
+                        Explore Advanced Filters →
                     </button>
                 </div>
             </div>

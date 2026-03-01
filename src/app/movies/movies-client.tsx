@@ -25,7 +25,17 @@ type MoviesClientItem = {
     actors: string[];
 };
 
-export default function MoviesClient({ items }: { items: MoviesClientItem[] }) {
+export default function MoviesClient({
+    items,
+    hasMore = false,
+    nextPageHref = "/movies?page=2",
+    currentPage = 1,
+}: {
+    items: MoviesClientItem[];
+    hasMore?: boolean;
+    nextPageHref?: string;
+    currentPage?: number;
+}) {
     const [q, setQ] = useState("");
 
     const filtered = useMemo(() => {
@@ -61,22 +71,35 @@ export default function MoviesClient({ items }: { items: MoviesClientItem[] }) {
             {filtered.length === 0 ? (
                 <div className="text-sm text-muted-foreground">No movies match “{q}”.</div>
             ) : (
-                <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {filtered.map((movie) => (
-                        <MovieCard
-                            key={movie.id}
-                            movie={{
-                                id: movie.id,
-                                title: movie.title,
-                                price: movie.price,
-                                stock: movie.stock,
-                                runtime: movie.runtime,
-                                avgRating: movie.avgRating,
-                                ratingCount: movie.ratingCount,
-                                imageUrl: movie.imageUrl,
-                            }}
-                        />
-                    ))}
+                <div>
+                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                        {filtered.map((movie) => (
+                            <MovieCard
+                                key={movie.id}
+                                movie={{
+                                    id: movie.id,
+                                    title: movie.title,
+                                    price: movie.price,
+                                    stock: movie.stock,
+                                    runtime: movie.runtime,
+                                    avgRating: movie.avgRating,
+                                    ratingCount: movie.ratingCount,
+                                    imageUrl: movie.imageUrl,
+                                }}
+                            />
+                        ))}
+                    </div>
+
+                    {hasMore && (
+                        <div className="mt-8 flex justify-center">
+                            <a
+                                href={nextPageHref}
+                                className="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-sm font-medium"
+                            >
+                                Ver más
+                            </a>
+                        </div>
+                    )}
                 </div>
             )}
         </div>

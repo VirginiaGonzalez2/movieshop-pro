@@ -14,6 +14,7 @@ export default async function TopCheapestMoviesSection({ genre }: { genre?: stri
           }
         : {};
 
+        
     // Debug: log the computed where condition
     console.log("WHERE CONDITION (TopCheapest):", whereCondition);
 
