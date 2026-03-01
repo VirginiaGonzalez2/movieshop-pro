@@ -27,13 +27,17 @@ export default function MovieFilterPanel({
 }: Props) {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const [openSection, setOpenSection] = useState<string | null>("genres");
+    const [openSection, setOpenSection] = useState<string | null>("genre");
 
-    const toggleSection = (key: string) => {
+    const hasGenreFilter = selectedGenres.length > 0;
+    const hasDirectorFilter = selectedDirectors.length > 0;
+    const hasActorFilter = selectedActors.length > 0;
+
+    function toggleSection(key: string) {
         setOpenSection((prev) => (prev === key ? null : key));
-    };
+    }
 
-    const updateParam = (key: string, values: string[]) => {
+    function updateParam(key: string, values: string[]) {
         const params = new URLSearchParams(searchParams.toString());
 
         if (values.length === 0) {
@@ -43,119 +47,155 @@ export default function MovieFilterPanel({
         }
 
         router.push(`/movies?${params.toString()}`);
-    };
+    }
 
-    const toggleValue = (value: string, selectedValues: string[], key: string) => {
+    function toggleValue(value: string, selectedValues: string[], key: string) {
         const newValues = selectedValues.includes(value)
             ? selectedValues.filter((v) => v !== value)
             : [...selectedValues, value];
 
         updateParam(key, newValues);
-    };
+    }
 
-    const clearFilters = () => {
-        router.push("/movies");
-    };
+    function clearFilters() {
+        const params = new URLSearchParams(searchParams.toString());
+
+        params.delete("genre");
+        params.delete("director");
+        params.delete("actor");
+        params.delete("page");
+
+        router.push(`/movies?${params.toString()}`);
+    }
 
     const hasFilters =
-        selectedGenres.length > 0 || selectedDirectors.length > 0 || selectedActors.length > 0;
+        selectedGenres.length > 0 ||
+        selectedDirectors.length > 0 ||
+        selectedActors.length > 0;
 
     return (
-        <div className="bg-white border rounded-2xl p-6 shadow-md space-y-6">
-            <div>
-                <h2 className="text-xl font-semibold">Find Your Favorite Movie 🎬</h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                    Use the filters below to discover movies by genre, director or actor.
-                </p>
-            </div>
+        <div className="sticky top-24">
+            <div className="bg-gray-50 border rounded-xl shadow-sm p-6 max-h-[75vh] overflow-y-auto space-y-6">
+                // Filter panel header section
+                // This provides a short title and subtitle to explain the purpose of the filters.
+                <div className="border-b pb-4 mb-6">
+                    <h2 className="text-lg font-semibold">Find your perfect movie</h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                        Refine your results by genre, director, or actor.
+                    </p>
+                </div>
 
-            {hasFilters && (
-                <button
-                    onClick={clearFilters}
-                    className="w-full bg-gray-100 hover:bg-gray-200 transition rounded-lg py-2 text-sm"
-                >
-                    Clear All Filters
-                </button>
-            )}
+                <div>
+                    <h1 className="text-2xl font-bold mb-2">Filter Movies</h1>
+                    <p className="text-sm text-muted-foreground">
+                        Use the filters below to discover movies by genre, director or actor.
+                    </p>
+                </div>
 
-            {/* GENRE */}
-            <div className="border-b pb-3">
-                <button
-                    onClick={() => toggleSection("genres")}
-                    className="w-full flex justify-between items-center font-medium text-left"
-                >
-                    Genre
-                    <span>{openSection === "genres" ? "−" : "+"}</span>
-                </button>
-
-                {openSection === "genres" && (
-                    <div className="mt-3 max-h-56 overflow-y-auto pr-2 space-y-2 text-sm">
-                        {genres.map((genre) => (
-                            <label key={genre.id} className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    checked={selectedGenres.includes(genre.id)}
-                                    onChange={() => toggleValue(genre.id, selectedGenres, "genres")}
-                                />
-                                {genre.name}
-                            </label>
-                        ))}
-                    </div>
+                {hasFilters && (
+                    <button
+                        onClick={clearFilters}
+                        className="w-full bg-white hover:bg-gray-100 transition rounded-lg py-2 text-sm border"
+                    >
+                        Clear All Filters
+                    </button>
                 )}
-            </div>
 
-            {/* DIRECTORS */}
-            <div className="border-b pb-3">
-                <button
-                    onClick={() => toggleSection("directors")}
-                    className="w-full flex justify-between items-center font-medium text-left"
-                >
-                    Directors
-                    <span>{openSection === "directors" ? "−" : "+"}</span>
-                </button>
+                {/* GENRE */}
+                <div className="pb-3">
+                    <button
+                        onClick={() => toggleSection("genre")}
+                        className="w-full flex items-center justify-between text-lg font-semibold text-left py-2 border-b"
+                    >
+                        <div className="flex items-center gap-2">
+                            {hasGenreFilter && <span className="inline-block w-2 h-2 rounded-full bg-blue-500" />}
+                            <span>Genre</span>
+                        </div>
+                        <span className="text-sm">{openSection === "genre" ? "−" : "+"}</span>
+                    </button>
 
-                {openSection === "directors" && (
-                    <div className="mt-3 max-h-56 overflow-y-auto pr-2 space-y-2 text-sm">
-                        {directors.map((director) => (
-                            <label key={director.id} className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    checked={selectedDirectors.includes(director.id)}
-                                    onChange={() =>
-                                        toggleValue(director.id, selectedDirectors, "directors")
-                                    }
-                                />
-                                {director.name}
-                            </label>
-                        ))}
-                    </div>
-                )}
-            </div>
+                    {openSection === "genre" && (
+                        <div className="mt-3 max-h-56 overflow-y-auto pr-2 space-y-2 text-sm">
+                            {genres.map((genre) => (
+                                <label key={genre.id} className="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 cursor-pointer">
+                                    <input
+                                        className="h-4 w-4"
+                                        type="checkbox"
+                                        checked={selectedGenres.includes(genre.id)}
+                                        onChange={() =>
+                                            toggleValue(genre.id, selectedGenres, "genre")
+                                        }
+                                    />
+                                    {genre.name}
+                                </label>
+                            ))}
+                        </div>
+                    )}
+                </div>
 
-            {/* ACTORS */}
-            <div>
-                <button
-                    onClick={() => toggleSection("actors")}
-                    className="w-full flex justify-between items-center font-medium text-left"
-                >
-                    Actors
-                    <span>{openSection === "actors" ? "−" : "+"}</span>
-                </button>
+                {/* DIRECTOR */}
+                <div className="pb-3">
+                    <button
+                        onClick={() => toggleSection("director")}
+                        className="w-full flex items-center justify-between text-lg font-semibold text-left py-2 border-b"
+                    >
+                        <div className="flex items-center gap-2">
+                            {hasDirectorFilter && <span className="inline-block w-2 h-2 rounded-full bg-blue-500" />}
+                            <span>Director</span>
+                        </div>
+                        <span className="text-sm">{openSection === "director" ? "−" : "+"}</span>
+                    </button>
 
-                {openSection === "actors" && (
-                    <div className="mt-3 max-h-56 overflow-y-auto pr-2 space-y-2 text-sm">
-                        {actors.map((actor) => (
-                            <label key={actor.id} className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    checked={selectedActors.includes(actor.id)}
-                                    onChange={() => toggleValue(actor.id, selectedActors, "actors")}
-                                />
-                                {actor.name}
-                            </label>
-                        ))}
-                    </div>
-                )}
+                    {openSection === "director" && (
+                        <div className="mt-3 max-h-56 overflow-y-auto pr-2 space-y-2 text-sm">
+                            {directors.map((director) => (
+                                <label key={director.id} className="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 cursor-pointer">
+                                    <input
+                                        className="h-4 w-4"
+                                        type="checkbox"
+                                        checked={selectedDirectors.includes(director.id)}
+                                        onChange={() =>
+                                            toggleValue(director.id, selectedDirectors, "director")
+                                        }
+                                    />
+                                    {director.name}
+                                </label>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* ACTOR */}
+                <div>
+                    <button
+                        onClick={() => toggleSection("actor")}
+                        className="w-full flex items-center justify-between text-lg font-semibold text-left py-2 border-b"
+                    >
+                        <div className="flex items-center gap-2">
+                            {hasActorFilter && <span className="inline-block w-2 h-2 rounded-full bg-blue-500" />}
+                            <span>Actor</span>
+                        </div>
+                        <span className="text-sm">{openSection === "actor" ? "−" : "+"}</span>
+                    </button>
+
+                    {openSection === "actor" && (
+                        <div className="mt-3 max-h-56 overflow-y-auto pr-2 space-y-2 text-sm">
+                            {actors.map((actor) => (
+                                <label key={actor.id} className="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 cursor-pointer">
+                                    <input
+                                        className="h-4 w-4"
+                                        type="checkbox"
+                                        checked={selectedActors.includes(actor.id)}
+                                        onChange={() =>
+                                            toggleValue(actor.id, selectedActors, "actor")
+                                        }
+                                    />
+                                    {actor.name}
+                                </label>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

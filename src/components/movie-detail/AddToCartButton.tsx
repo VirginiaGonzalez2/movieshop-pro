@@ -36,10 +36,10 @@ export default function AddToCartButton({ movieId, disabled }: Props) {
             disabled={isDisabled}
             aria-label="Add to cart"
             title="Add to cart"
-            className="h-11 px-5 rounded-full bg-black text-white shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60"
+            className="h-7 px-2 rounded-md bg-slate-800 text-white text-xs shadow-sm transition-all duration-150 hover:shadow-sm active:scale-[0.98] disabled:opacity-60 w-full sm:w-auto"
         >
-            <ShoppingCart className="h-5 w-5 mr-2" />
-            {isPending ? "Adding..." : "Add to cart"}
+            <ShoppingCart className="h-3 w-3 mr-2" />
+            {isPending ? "Adding" : "Add"}
         </Button>
     );
 }

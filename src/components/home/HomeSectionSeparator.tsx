@@ -1,12 +1,14 @@
 import { Suspense } from "react";
-import MoviesSortBar from "../filters/MoviesSortbar";
 import HomeHero from "./HomeHero";
+import HomeQuickFilters from "./HomeQuickFilters";
 import TopCheapestMoviesSection from "./TopCheapestMoviesSection";
 import TopOldestMoviesSection from "./TopOldestMoviesSection";
 import TopPurchasedMoviesSection from "./TopPurchasedMoviesSection";
 import TopRecentMoviesSection from "./TopRecentMoviesSection";
 
-export default function HomeSectionSeparator() {
+export default function HomeSectionSeparator({ genre }: { genre?: string | null }) {
+    // Log selected genre on server for debugging (helps verify searchParams reach server)
+    console.log("HomeSectionSeparator - selected genre:", genre);
     return (
         <div>
             <div className="mx-auto max-w-2xl py-8 px-4">
@@ -15,41 +17,34 @@ export default function HomeSectionSeparator() {
                 <HomeHero />
             </div>
 
-            <div className="mb-5">
-                <Suspense fallback={null}>
-                    <MoviesSortBar />
-                </Suspense>
-            </div>
+            
+
+            
+
+            {/* Home quick category navigation section */}
+            <HomeQuickFilters />
 
             <div className="mb-8">
                 <h1 className="text-left text-2xl font-bold mb-4">Top 5 most recent</h1>
-                <TopRecentMoviesSection />
+                <TopRecentMoviesSection genre={genre} />
             </div>
 
             <div className="mb-8">
                 <h1 className="text-left text-2xl font-bold mb-4">Top 5 most purchased</h1>
-                <TopPurchasedMoviesSection />
+                <TopPurchasedMoviesSection genre={genre} />
             </div>
 
             <div className="mb-8">
                 <h1 className="text-left text-2xl font-bold mb-4">Top 5 oldest</h1>
-                <TopOldestMoviesSection />
+                <TopOldestMoviesSection genre={genre} />
             </div>
 
             <div className="mb-8">
                 <h1 className="text-left text-2xl font-bold mb-4">Top 5 cheapest</h1>
-                <TopCheapestMoviesSection />
+                <TopCheapestMoviesSection genre={genre} />
             </div>
 
-            <div className="columns-2 border">
-                <div>
-                    <h1 className="text-2xl font-bold mb-4">Deal of the day</h1>
-                    {/* <Deal_of_the_day /> */}
-                </div>
-                <div>
-                    <h1 className="text-2xl font-bold mb-4">Browse by genre</h1>
-                </div>
-            </div>
+            
         </div>
     );
 }
