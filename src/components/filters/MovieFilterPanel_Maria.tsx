@@ -76,6 +76,15 @@ export default function MovieFilterPanel({
     return (
         <div className="sticky top-24">
             <div className="bg-gray-50 border rounded-xl shadow-sm p-6 max-h-[75vh] overflow-y-auto space-y-6">
+                // Filter panel header section
+                // This provides a short title and subtitle to explain the purpose of the filters.
+                <div className="border-b pb-4 mb-6">
+                    <h2 className="text-lg font-semibold">Find your perfect movie</h2>
+                    <p className="text-sm text-muted-foreground mt-1">
+                        Refine your results by genre, director, or actor.
+                    </p>
+                </div>
+
                 <div>
                     <h1 className="text-2xl font-bold mb-2">Filter Movies</h1>
                     <p className="text-sm text-muted-foreground">

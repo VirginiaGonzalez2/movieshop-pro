@@ -58,6 +58,10 @@ export default async function MoviesPage({
         ? params.genre
         : (params.genre?.split(",") ?? []);
 
+    // Support both numeric genre IDs and string names (Home quick filters send names)
+    const numericGenreIds = selectedGenres.map((s) => Number(s)).filter((n) => Number.isFinite(n));
+    const genreNames = selectedGenres.filter((s) => isNaN(Number(s)) && s.trim() !== "");
+
     const selectedDirectors = Array.isArray(params.director)
         ? params.director
         : (params.director?.split(",") ?? []);
@@ -84,14 +88,30 @@ export default async function MoviesPage({
      */
     const where: Prisma.MovieWhereInput = {
         AND: [
+            // Build genre filter that accepts either numeric IDs or genre names
             selectedGenres.length > 0
-                ? {
-                      genres: {
-                          some: {
-                              genreId: { in: selectedGenres.map(Number) },
-                          },
-                      },
-                  }
+                ? (numericGenreIds.length > 0 && genreNames.length > 0
+                      ? {
+                            genres: {
+                                some: {
+                                    OR: [
+                                        { genreId: { in: numericGenreIds } },
+                                        { genre: { name: { in: genreNames } } },
+                                    ],
+                                },
+                            },
+                        }
+                      : numericGenreIds.length > 0
+                      ? {
+                            genres: {
+                                some: { genreId: { in: numericGenreIds } },
+                            },
+                        }
+                      : {
+                            genres: {
+                                some: { genre: { name: { in: genreNames } } },
+                            },
+                        })
                 : {},
 
             selectedDirectors.length > 0
@@ -270,8 +290,9 @@ export default async function MoviesPage({
      * ----------------------------------------
      */
     return (
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-8">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8">
+        // Main page container: constrains width and adds outer padding
+        <main className="max-w-7xl mx-auto px-6 py-10">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
                 {/* Mobile Filters (accordion style) */}
                 <div className="md:hidden mb-4">
                     <details className="bg-white rounded-xl shadow-sm border">
@@ -292,23 +313,40 @@ export default async function MoviesPage({
                     </details>
                 </div>
 
-                {/* Desktop Sidebar */}
+                {/*
+                    Filter sidebar container (visual wrapper only):
+                    - Keeps the sidebar visually distinct from the grid
+                    - Sticky so it stays visible when scrolling
+                */}
                 <aside className="hidden md:block md:col-span-3">
-                    <MoviePanel
+                    <div className="bg-white border rounded-2xl shadow-sm p-6 sticky top-24 h-fit">
+                        <MoviePanel
                         genres={genres.map((g) => ({ id: g.id.toString(), name: g.name }))}
                         selectedGenres={selectedGenres}
                         directors={directors.map((d) => ({ id: d.id.toString(), name: d.name }))}
                         selectedDirectors={selectedDirectors}
                         actors={actors.map((a) => ({ id: a.id.toString(), name: a.name }))}
                         selectedActors={selectedActors}
-                    />
+                        />
+                    </div>
                 </aside>
 
-                {/* Movies Grid */}
+                {/*
+                    Movies area: contains header (title/search/sort) and the movies grid.
+                    The header/controls are inside `MoviesClient`—we wrap this area so
+                    we can apply page-level spacing between header and the grid.
+                */}
                 <div className="col-span-1 md:col-span-9">
-                    <MoviesClient items={items} />
+                    {/* Page header section (title + search + sort) spacing */}
+                    <div className="mb-10 flex flex-col gap-6">
+                        <MoviesClient items={items} />
+                    </div>
+                    {/*
+                        Movies grid spacing: controls spacing between individual
+                        movie cards (see MoviesClient grid config for per-card styling).
+                    */}
                 </div>
             </div>
-        </div>
+        </main>
     );
 }

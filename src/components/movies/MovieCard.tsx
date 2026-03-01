@@ -1,6 +1,12 @@
+"use client";
+
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 import { PriceTag } from "@/components/ui/PriceTag";
 import { RatingStars } from "@/components/ui/RatingStars";
+import AddToCartButton from "@/components/movie-detail/AddToCartButton";
+import { addShoppingCartItem } from "@/actions/shopping-cart";
 
 export type MovieCardItem = {
     id: number;
@@ -9,6 +15,8 @@ export type MovieCardItem = {
     stock: number;
     runtime: number;
     imageUrl?: string | null;
+    // optional release year to show in certain lists (e.g., oldest section)
+    releaseYear?: number | null;
 
     // real ratings
     avgRating: number; // 0..5
@@ -16,29 +24,49 @@ export type MovieCardItem = {
 };
 
 export default function MovieCard({ movie }: { movie: MovieCardItem }) {
+    const [isPending, startTransition] = useTransition();
+    const router = useRouter();
+
+    async function onBuyNow() {
+        startTransition(async () => {
+            try {
+                await addShoppingCartItem(movie.id, 1);
+                router.push("/checkout");
+            } catch (e) {
+                // ignore; toast handled elsewhere if desired
+            }
+        });
+    }
+
     return (
-        <Link
-            href={`/movies/${movie.id}`}
-            className="block border rounded-lg overflow-hidden transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg"
-        >
-            {/* Poster */}
-            <div className="aspect-[2/3] bg-muted flex items-center justify-center overflow-hidden">
-                {movie.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                        src={movie.imageUrl}
-                        alt={movie.title}
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                    />
-                ) : (
-                    <div className="text-sm text-muted-foreground">No image</div>
-                )}
-            </div>
+        <div className="block border rounded-lg overflow-hidden transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg">
+            {/* Poster (clickable) */}
+            <Link href={`/movies/${movie.id}`} className="block">
+                <div className="aspect-[2/3] bg-muted flex items-center justify-center overflow-hidden">
+                    {movie.imageUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                            src={movie.imageUrl}
+                            alt={movie.title}
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                        />
+                    ) : (
+                        <div className="text-sm text-muted-foreground">No image</div>
+                    )}
+                </div>
+            </Link>
 
             {/* Content */}
             <div className="p-3 space-y-2">
-                <div className="font-semibold line-clamp-1">{movie.title}</div>
+                <Link href={`/movies/${movie.id}`} className="block">
+                    <div className="font-semibold line-clamp-1 flex items-baseline gap-2">
+                        <span className="truncate">{movie.title}</span>
+                        {movie.releaseYear ? (
+                            <span className="text-xs text-muted-foreground">{movie.releaseYear}</span>
+                        ) : null}
+                    </div>
+                </Link>
 
                 <div className="flex items-start justify-between">
                     <div className="text-lg font-semibold">
@@ -65,7 +93,24 @@ export default function MovieCard({ movie }: { movie: MovieCardItem }) {
                             : "No ratings"}
                     </span>
                 </div>
+
+                <div className="flex flex-col sm:flex-row gap-1 mt-2 items-stretch">
+                    <div className="w-full sm:w-auto">
+                        <AddToCartButton movieId={movie.id} disabled={movie.stock <= 0} />
+                    </div>
+
+                    <div className="w-full sm:w-auto">
+                        <button
+                            type="button"
+                            onClick={onBuyNow}
+                            disabled={isPending || movie.stock <= 0}
+                            className="h-7 px-2 rounded-md bg-blue-600 text-white text-xs shadow-sm transition-all duration-150 hover:shadow-sm active:scale-[0.98] disabled:opacity-60 w-full sm:w-auto"
+                        >
+                            {isPending ? "Buying" : "Buy"}
+                        </button>
+                    </div>
+                </div>
             </div>
-        </Link>
+        </div>
     );
 }

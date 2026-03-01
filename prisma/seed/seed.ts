@@ -101,7 +101,9 @@ async function main() {
             continue;
         }
 
-        const price = new Prisma.Decimal((i + 1) * 50);
+        // Prefer explicit Price from spreadsheet, otherwise generate a varied price
+        const priceValue = typeof row.Price === "number" && Number.isFinite(row.Price) ? row.Price : ((i % 10) + 1) * 2;
+        const price = new Prisma.Decimal(priceValue);
         const createdAt = new Date(Date.now() - i * 1000 * 60 * 60 * 24);
 
         const movie = await prisma.movie.create({
@@ -138,6 +140,90 @@ async function main() {
     const movies = await prisma.movie.findMany({
         select: { id: true },
     });
+
+    /**
+     * ----------------------------------------
+     * USERS + ORDERS (simulate purchases)
+     * ----------------------------------------
+     * Create a small set of users and generate one order per movie with
+     * variable quantities so `TopPurchasedMoviesSection` can surface true
+     * "most purchased" items in the seeded DB.
+     */
+
+    const existingUsers = await prisma.user.count();
+    if (existingUsers === 0) {
+        const now = new Date();
+        await prisma.user.createMany({
+            data: [
+                { id: "user-1", name: "Seed User 1", email: "seed1@example.com", emailVerified: false, createdAt: now, updatedAt: now },
+                { id: "user-2", name: "Seed User 2", email: "seed2@example.com", emailVerified: false, createdAt: now, updatedAt: now },
+                { id: "user-3", name: "Seed User 3", email: "seed3@example.com", emailVerified: false, createdAt: now, updatedAt: now },
+            ],
+            skipDuplicates: true,
+        });
+    }
+
+    const seedUsers = await prisma.user.findMany({ where: { id: { in: ["user-1", "user-2", "user-3"] } }, select: { id: true } });
+    const userIds = seedUsers.map((u) => u.id);
+
+    // Create orders: assign a deterministic quantity pattern so top-sellers exist
+    for (let i = 0; i < movies.length; i++) {
+        const movie = movies[i];
+
+        // purchases: more for lower index movies to create a "top sold" ordering
+        const purchases = ((movies.length - i) % 7) + 1; // 1..7
+
+        const userId = userIds[i % userIds.length] ?? "user-1";
+
+        const movieRecord = await prisma.movie.findUnique({ where: { id: movie.id }, select: { price: true } });
+        const priceAtPurchase = movieRecord?.price ?? new Prisma.Decimal(10);
+
+        const totalAmount = priceAtPurchase.mul(new Prisma.Decimal(purchases));
+
+        await prisma.order.create({
+            data: {
+                userId,
+                totalAmount,
+                status: "COMPLETED",
+                orderDate: new Date(Date.now() - i * 1000 * 60 * 60 * 24),
+                items: {
+                    create: {
+                        movieId: movie.id,
+                        quantity: purchases,
+                        priceAtPurchase: priceAtPurchase,
+                    },
+                },
+            },
+        });
+    }
+
+    /**
+     * ----------------------------------------
+     * RATINGS (simulate user ratings)
+     * ----------------------------------------
+     * Create ratings for each movie from the seeded users so the
+     * "most popular" logic (based on ratings) has meaningful data.
+     */
+    for (let i = 0; i < movies.length; i++) {
+        const movie = movies[i];
+
+        for (let u = 0; u < userIds.length; u++) {
+            const userId = userIds[u] ?? "user-1";
+            const value = ((i + u) % 5) + 1; // ratings 1..5 distributed deterministically
+
+            try {
+                await prisma.movieRating.create({
+                    data: {
+                        movieId: movie.id,
+                        userId,
+                        value,
+                    },
+                });
+            } catch (e) {
+                // ignore duplicates or errors to keep seed idempotent
+            }
+        }
+    }
 
     const directorNames = [
         "Christopher Nolan",
