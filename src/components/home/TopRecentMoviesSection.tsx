@@ -6,23 +6,34 @@ export default async function TopRecentMoviesSection({ genre }: { genre?: string
     console.log("TopRecentMoviesSection - genre:", genre);
 
     // Build a where condition to filter by genre name when provided
-    const whereCondition = genre
-        ? {
-              // genres is a join table; filter via the related Genre.name
-              genres: {
-                  some: {
-                      // case-insensitive match on Genre.name to be tolerant of capitalization
-                      genre: { name: { equals: genre, mode: "insensitive" } },
-                  },
-              },
-          }
-        : {};
+    // const whereCondition = genre
+    // ? {
+    //     // genres is a join table; filter via the related Genre.name
+    //     genres: {
+    //         some: {
+    //             // case-insensitive match on Genre.name to be tolerant of capitalization
+    //             genre: { name: { equals: genre, mode: "insensitive" } },
+    //         },
+    //     },
+    // }
+    // : {};
 
-    // Debug: log the computed where condition
-    console.log("WHERE CONDITION (TopRecent):", whereCondition);
+    // // Debug: log the computed where condition
+    // console.log("WHERE CONDITION (TopRecent):", whereCondition);
 
     const movies = await prisma.movie.findMany({
-        where: whereCondition,
+        // Build a where condition to filter by genre name when provided
+        where: genre
+            ? {
+                  // genres is a join table; filter via the related Genre.name
+                  genres: {
+                      some: {
+                          // case-insensitive match on Genre.name to be tolerant of capitalization
+                          genre: { name: { equals: genre, mode: "insensitive" } },
+                      },
+                  },
+              }
+            : undefined,
         orderBy: { releaseDate: "desc" },
         take: 5,
     });
@@ -41,7 +52,10 @@ export default async function TopRecentMoviesSection({ genre }: { genre?: string
 
     const ratingMap = new Map<number, { avgRating: number; ratingCount: number }>();
     for (const r of ratingAgg) {
-        ratingMap.set(r.movieId, { avgRating: r._avg.value ?? 0, ratingCount: r._count.value ?? 0 });
+        ratingMap.set(r.movieId, {
+            avgRating: r._avg.value ?? 0,
+            ratingCount: r._count.value ?? 0,
+        });
     }
 
     return (
@@ -50,11 +64,17 @@ export default async function TopRecentMoviesSection({ genre }: { genre?: string
                 movies.map((movie) => {
                     const rating = ratingMap.get(movie.id) ?? { avgRating: 0, ratingCount: 0 };
                     try {
-                        console.log(`TopRecent - movie.id=${movie.id} releaseDate=${movie.releaseDate} year=${
-                            movie.releaseDate ? movie.releaseDate.getFullYear() : "(no date)"
-                        }`);
+                        console.log(
+                            `TopRecent - movie.id=${movie.id} releaseDate=${movie.releaseDate} year=${
+                                movie.releaseDate ? movie.releaseDate.getFullYear() : "(no date)"
+                            }`,
+                        );
                     } catch (e) {
-                        console.log("TopRecent - could not read releaseDate for movie", movie.id, e);
+                        console.log(
+                            "TopRecent - could not read releaseDate for movie",
+                            movie.id,
+                            e,
+                        );
                     }
 
                     return (
@@ -68,7 +88,9 @@ export default async function TopRecentMoviesSection({ genre }: { genre?: string
                                 runtime: movie.runtime,
                                 imageUrl: movie.imageUrl,
                                 // include release year for recent movies as well
-                                releaseYear: movie.releaseDate ? movie.releaseDate.getFullYear() : undefined,
+                                releaseYear: movie.releaseDate
+                                    ? movie.releaseDate.getFullYear()
+                                    : undefined,
 
                                 avgRating: rating.avgRating,
                                 ratingCount: rating.ratingCount,
