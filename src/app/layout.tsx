@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import AppHeader from "@/components/layout/AppHeader";
 import AppFooter from "@/components/layout/AppFooter";
+import DealOfTheDayWidget from "@/components/deal-of-the-day/DealOfTheDayWidget";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -32,6 +33,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     {children}
                     <Toaster richColors />
                 </main>
+
+                {/* Deal of the Day floating widget (all pages) */}
+                <DealOfTheDayWidget />
 
                 <AppFooter />
             </body>
