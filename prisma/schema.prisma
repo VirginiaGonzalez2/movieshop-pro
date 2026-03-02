@@ -28,15 +28,19 @@ model account {
 
 // better-auth
 model session {
-  id        String   @id
+  id                String   @id
   expiresAt DateTime
-  token     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime
-  ipAddress String?
-  userAgent String?
-  userId    String
-  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token             String   @unique
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime
+  ipAddress         String?
+  userAgent         String?
+  userId            String
+
+  // admin
+  impersonatedBy    String?
+
+  user      user             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -50,6 +54,13 @@ model user {
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime
+
+  // admin
+  role          String    @default("user")
+  banned        Boolean   @default(false)
+  banReason     String?
+  banExpires    DateTime?
+
   account       account[]
   session       session[]
 

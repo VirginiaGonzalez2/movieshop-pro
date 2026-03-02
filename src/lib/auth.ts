@@ -1,5 +1,6 @@
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
+import { admin } from "better-auth/plugins";
 import { prisma } from "./prisma";
 
 // Added this to solve some issues I have personally ran into
@@ -7,6 +8,8 @@ import { prisma } from "./prisma";
 const development = process.env.NODE_ENV == "development";
 
 export const auth = betterAuth({
+    plugins: [admin()],
+
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
