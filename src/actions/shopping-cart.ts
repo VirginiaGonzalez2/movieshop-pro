@@ -10,6 +10,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
+import { applyDealDiscountToPrice } from "@/actions/deal-of-the-day";
 
 type ShoppingCartItem = {
     id: number;
@@ -253,13 +254,16 @@ async function getShoppingCartInfo(): Promise<ShoppingCartItemInfo[] | null> {
             continue;
         }
 
+        const basePrice = movie.price.toNumber();
+        const finalPrice = await applyDealDiscountToPrice(item.id, basePrice);
+
         shoppingCartInfo.push({
             itemId: item.id,
             quantity: item.qty,
             title: movie.title,
             imageUrl: movie.imageUrl,
             genres: movie.genres.map((value) => value.genre.name).flat(),
-            price: movie.price.toNumber(),
+            price: finalPrice,
             stock: movie.stock,
         });
     }
