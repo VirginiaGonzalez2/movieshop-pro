@@ -20,6 +20,11 @@ export default function MovieRatingSection({ movieId, avgRating, ratingCount }: 
 
     const [userRating, setUserRating] = useState<number>(0);
     const [loadingMine, setLoadingMine] = useState<boolean>(true);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     useEffect(() => {
         let alive = true;
@@ -107,7 +112,7 @@ export default function MovieRatingSection({ movieId, avgRating, ratingCount }: 
                 </div>
             </div>
 
-            {!session.data ? (
+            {mounted && !session.data ? (
                 <p className="text-xs text-muted-foreground">
                     Log in to rate. Clicking a star will take you to login.
                 </p>
