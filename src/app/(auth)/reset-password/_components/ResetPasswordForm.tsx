@@ -14,34 +14,47 @@ export default function ResetPasswordForm() {
     const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
 
-    const token = searchParams.get("token");
+    const tokenRaw = searchParams.get("token");
+    const token = tokenRaw?.trim() || null;
+
+    // better-auth may append an error code in query params
     const error = searchParams.get("error");
 
     const [email, setEmail] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
+    // If token exists -> set new password mode, otherwise request reset mode
     const isTokenMode = !!token;
 
+    // Use current origin in browser (no hardcoded localhost)
     const redirectTo = useMemo(() => {
-        if (typeof window === "undefined") return "http://localhost:3000/reset-password";
+        if (typeof window === "undefined") return "";
         return `${window.location.origin}/reset-password`;
     }, []);
 
     async function submitRequestReset() {
-        if (!email.trim()) {
+        const trimmed = email.trim();
+
+        if (!trimmed) {
             toast.error("Please enter your email");
             return;
         }
 
+        // Must have redirectTo in browser. If user somehow submits before hydration, block safely.
+        if (!redirectTo) {
+            toast.error("Please try again");
+            return;
+        }
+
         const { error } = await authClient.requestPasswordReset({
-            email: email.trim(),
+            email: trimmed,
             redirectTo,
         });
 
-        // For security: don't reveal whether email exists.
+        // Security: never reveal whether email exists
         if (error) {
-            toast.error("If that email exists, a reset link will be sent.");
+            toast.success("If that email exists, a reset link will be sent.");
             return;
         }
 
@@ -51,7 +64,7 @@ export default function ResetPasswordForm() {
 
     async function submitResetPassword() {
         if (!token) {
-            toast.error("Missing token");
+            toast.error("Reset token is missing. Please request a new link.");
             return;
         }
 
@@ -76,11 +89,14 @@ export default function ResetPasswordForm() {
         }
 
         toast.success("Password reset successfully. Please log in.");
+        setNewPassword("");
+        setConfirmPassword("");
         router.replace("/login");
     }
 
     function onSubmit(e: React.FormEvent) {
         e.preventDefault();
+
         startTransition(async () => {
             if (isTokenMode) {
                 await submitResetPassword();
@@ -120,7 +136,12 @@ export default function ResetPasswordForm() {
                             onChange={(e) => setEmail(e.target.value)}
                             autoComplete="email"
                         />
-                        <Button type="submit" className="w-full" disabled={isPending}>
+
+                        <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={isPending || !email.trim()}
+                        >
                             {isPending ? "Sending..." : "Send reset link"}
                         </Button>
                     </>
@@ -133,6 +154,7 @@ export default function ResetPasswordForm() {
                             onChange={(e) => setNewPassword(e.target.value)}
                             autoComplete="new-password"
                         />
+
                         <Input
                             type="password"
                             placeholder="Confirm new password"
@@ -140,9 +162,24 @@ export default function ResetPasswordForm() {
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             autoComplete="new-password"
                         />
-                        <Button type="submit" className="w-full" disabled={isPending}>
+
+                        <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={
+                                isPending ||
+                                !newPassword ||
+                                !confirmPassword ||
+                                newPassword.length < 8 ||
+                                newPassword !== confirmPassword
+                            }
+                        >
                             {isPending ? "Saving..." : "Reset password"}
                         </Button>
+
+                        <p className="text-xs text-muted-foreground">
+                            Password must be at least 8 characters.
+                        </p>
                     </>
                 )}
             </form>
