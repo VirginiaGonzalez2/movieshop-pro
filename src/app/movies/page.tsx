@@ -154,6 +154,15 @@ export default async function MoviesPage({
             runtime: true,
             imageUrl: true,
             createdAt: true,
+            genres: {
+                select: {
+                    genre: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                },
+            },
         },
     });
 
@@ -273,6 +282,7 @@ export default async function MoviesPage({
             imageUrl: m.imageUrl ?? null,
             directors: info.directors,
             actors: info.actors,
+            genres: m.genres.map((mg) => mg.genre.name),
         };
     });
 

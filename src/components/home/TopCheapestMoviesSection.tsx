@@ -29,6 +29,17 @@ export default async function TopCheapestMoviesSection({ genre }: { genre?: stri
             : undefined,
         orderBy: { price: "asc" },
         take: 5,
+        include: {
+            genres: {
+                include: {
+                    genre: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                },
+            },
+        },
     });
 
     // Compute rating aggregates for the movies we loaded.
@@ -61,6 +72,7 @@ export default async function TopCheapestMoviesSection({ genre }: { genre?: stri
             stock: movie.stock,
             runtime: movie.runtime,
             imageUrl: movie.imageUrl,
+            genres: movie.genres.map((mg) => mg.genre.name),
 
             avgRating: rating.avgRating,
             ratingCount: rating.ratingCount,

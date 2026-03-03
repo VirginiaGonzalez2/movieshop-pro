@@ -36,6 +36,17 @@ export default async function TopRecentMoviesSection({ genre }: { genre?: string
             : undefined,
         orderBy: { releaseDate: "desc" },
         take: 5,
+        include: {
+            genres: {
+                include: {
+                    genre: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                },
+            },
+        },
     });
     // Compute ratings for the movies we just loaded.
     const movieIds = movies.map((m) => m.id);
@@ -91,6 +102,7 @@ export default async function TopRecentMoviesSection({ genre }: { genre?: string
                                 releaseYear: movie.releaseDate
                                     ? movie.releaseDate.getFullYear()
                                     : undefined,
+                                genres: movie.genres.map((mg) => mg.genre.name),
 
                                 avgRating: rating.avgRating,
                                 ratingCount: rating.ratingCount,

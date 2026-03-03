@@ -54,7 +54,8 @@ async function checkout(
             data: {
                 userId: userId,
                 totalAmount: safeValues.orderCost,
-                status: "placed",
+                // ADDED: Order starts as PENDING until PayPal confirmation
+                status: "PENDING",
                 items: {
                     create: safeValues.orderItems
                         .map((item) => {

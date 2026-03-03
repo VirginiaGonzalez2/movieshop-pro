@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { X, ChevronRight, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { addShoppingCartItem } from "@/actions/shopping-cart";
+import { toast } from "sonner";
 
 type Props = {
     deal: {
@@ -37,6 +39,7 @@ function writeLS(key: string, value: string) {
 
 export default function DealOfTheDayClient({ deal }: Props) {
     const dayKey = deal?.date ?? "no-deal";
+    const [isPending, startTransition] = useTransition();
 
     const [isClosed, setIsClosed] = useState(() => readLS(`dotd_closed_${dayKey}`, "0") === "1");
     const [isMinimized, setIsMinimized] = useState(() => readLS(`dotd_min_${dayKey}`, "0") === "1");
@@ -160,11 +163,19 @@ export default function DealOfTheDayClient({ deal }: Props) {
                             variant="outline"
                             className="flex-1 shadow-sm transition-transform duration-200 hover:scale-105 active:scale-95"
                             onClick={() => {
-                                // user can add from movie page/cart.
-                                window.location.href = `/movies/${deal?.movieId}`;
+                                if (!deal?.movieId) return;
+                                startTransition(async () => {
+                                    try {
+                                        await addShoppingCartItem(deal.movieId, 1);
+                                        toast.success("Movie added to cart");
+                                    } catch {
+                                        toast.error("Could not add movie to cart");
+                                    }
+                                });
                             }}
+                            disabled={isPending || deal?.stock === 0}
                         >
-                            Add to cart
+                            {deal?.stock === 0 ? "Out of stock" : "Add to cart"}
                         </Button>
                     </div>
 
