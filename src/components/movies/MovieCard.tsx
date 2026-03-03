@@ -21,6 +21,12 @@ export type MovieCardItem = {
     // real ratings
     avgRating: number; // 0..5
     ratingCount: number;
+
+    // optional short genres text on card
+    genres?: string[];
+
+    // optional purchased count for top purchased section
+    purchasedCount?: number;
 };
 
 export default function MovieCard({ movie }: { movie: MovieCardItem }) {
@@ -67,6 +73,18 @@ export default function MovieCard({ movie }: { movie: MovieCardItem }) {
                         ) : null}
                     </div>
                 </Link>
+
+                {movie.genres && movie.genres.length > 0 ? (
+                    <p className="text-xs text-muted-foreground line-clamp-1">
+                        {movie.genres.join(" • ")}
+                    </p>
+                ) : null}
+
+                {movie.purchasedCount !== undefined && movie.purchasedCount > 0 ? (
+                    <p className="text-xs text-muted-foreground">
+                        {movie.purchasedCount} sold
+                    </p>
+                ) : null}
 
                 <div className="flex items-start justify-between">
                     <div className="text-lg font-semibold">

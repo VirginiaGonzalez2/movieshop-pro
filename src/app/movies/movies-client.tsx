@@ -23,6 +23,7 @@ type MoviesClientItem = {
     imageUrl: string | null;
     directors: string[];
     actors: string[];
+    genres?: string[];
 };
 
 export default function MoviesClient({
@@ -85,6 +86,7 @@ export default function MoviesClient({
                                     avgRating: movie.avgRating,
                                     ratingCount: movie.ratingCount,
                                     imageUrl: movie.imageUrl,
+                                    genres: movie.genres,
                                 }}
                             />
                         ))}

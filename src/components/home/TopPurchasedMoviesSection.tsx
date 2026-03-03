@@ -20,6 +20,12 @@ export default async function TopPurchasedMoviesSection({
     (m) => m.movieId
   );
 
+  // Create map of purchased counts
+  const purchasedCountMap = new Map<number, number>();
+  for (const item of topSelling) {
+    purchasedCountMap.set(item.movieId, item._sum.quantity ?? 0);
+  }
+
   let whereClause: Prisma.MovieWhereInput;
 
   if (genre) {
@@ -48,6 +54,17 @@ export default async function TopPurchasedMoviesSection({
 
   const movies = await prisma.movie.findMany({
     where: whereClause,
+    include: {
+      genres: {
+        include: {
+          genre: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   const moviesSorted = movieIdsInOrder
@@ -96,8 +113,10 @@ export default async function TopPurchasedMoviesSection({
       stock: movie.stock,
       runtime: movie.runtime,
       imageUrl: movie.imageUrl,
+      genres: movie.genres.map((mg) => mg.genre.name),
       avgRating: rating.avgRating,
       ratingCount: rating.ratingCount,
+      purchasedCount: purchasedCountMap.get(movie.id) ?? 0,
     };
   });
 
