@@ -21,6 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useOriginRouter } from "@/hooks/use-origin-router";
 import { authClient } from "@/lib/auth-client";
+import { claimGuestOrdersForUser } from "@/actions/order";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useRef } from "react";
@@ -62,6 +63,12 @@ export function RegistrationForm({ className, ...rest }: Props) {
         if (error) {
             toast.error(error.message || "An unknown error occurred. Please try again later.");
             return;
+        }
+
+        try {
+            await claimGuestOrdersForUser(values.email, values.name);
+        } catch {
+            // Keep signup successful even if order linking fails.
         }
 
         toast.warning("Before you can sign in you must verify your email.", {
