@@ -2,13 +2,11 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { X, ChevronRight, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { addShoppingCartItem } from "@/actions/shopping-cart";
 import { toast } from "sonner";
-
-const CLOSE_DURATION_MS = 20 * 60 * 1000;
 
 type Props = {
     deal: {
@@ -44,33 +42,8 @@ export default function DealOfTheDayClient({ deal }: Props) {
     const dayKey = deal?.date ?? "no-deal";
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
-    const closedUntilKey = `dotd_closed_until_${dayKey}`;
-    const [isClosed, setIsClosed] = useState(() => {
-        const closedUntil = Number(readLS(closedUntilKey, "0"));
-        return Number.isFinite(closedUntil) && closedUntil > Date.now();
-    });
+    const [isClosed, setIsClosed] = useState(false);
     const [isMinimized, setIsMinimized] = useState(() => readLS(`dotd_min_${dayKey}`, "0") === "1");
-
-    useEffect(() => {
-        const closedUntil = Number(readLS(closedUntilKey, "0"));
-        const isStillClosed = Number.isFinite(closedUntil) && closedUntil > Date.now();
-
-        setIsClosed(isStillClosed);
-
-        if (!isStillClosed) {
-            writeLS(closedUntilKey, "0");
-            return;
-        }
-
-        const timeout = window.setTimeout(() => {
-            setIsClosed(false);
-            writeLS(closedUntilKey, "0");
-        }, closedUntil - Date.now());
-
-        return () => {
-            window.clearTimeout(timeout);
-        };
-    }, [closedUntilKey]);
 
     const canRender = !!deal && !isClosed;
 
@@ -136,7 +109,6 @@ export default function DealOfTheDayClient({ deal }: Props) {
                             onClick={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                writeLS(closedUntilKey, String(Date.now() + CLOSE_DURATION_MS));
                                 setIsClosed(true);
                             }}
                             className="h-9 w-9 rounded-full hover:bg-muted transition"
