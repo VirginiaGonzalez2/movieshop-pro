@@ -42,7 +42,7 @@ export default async function CartPage() {
             <div className="flex justify-end">
                 <p>Subtotal:</p>
                 <div className="gap-2 flex flex-col items-end">
-                    <p>{totalPrice} sek</p>
+                    <p>{totalPrice.toFixed(2)} sek</p>
                     <LinkButton href="/checkout" disabled={!shoppingCartInfo}>
                         Checkout
                     </LinkButton>
