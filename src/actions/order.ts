@@ -83,12 +83,12 @@ async function getOrdersByUser(
         return { ok: false, statusCode: HTTPStatusCode.Unauthorized };
     }
 
-    const permissionOwn = await hasPermission(
+    const permission = await hasPermission(
         session.user.id,
         userId === session.user.id ? "get-own" : "get",
         headers,
     );
-    if (!permissionOwn) {
+    if (!permission) {
         return { ok: false, statusCode: HTTPStatusCode.Forbidden };
     }
 

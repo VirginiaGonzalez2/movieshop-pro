@@ -1,4 +1,11 @@
-import error from "next/error";
+/**
+ * @ Author: Sabrina Bjurman
+ * @ Create Time: 2026-03-02 10:47:24
+ * @ Modified by: Sabrina Bjurman
+ * @ Modified time: 2026-03-04 10:46:19
+ * @ Description: Utility for actions.
+ */
+
 import { forbidden, notFound, unauthorized } from "next/navigation";
 
 enum HTTPStatusCode {
@@ -29,8 +36,6 @@ function defaultActionErrorHandler(actionError: ActionError): void | never {
             forbidden();
         case HTTPStatusCode.NotFound:
             notFound();
-        default:
-            throw new error({ statusCode: actionError.statusCode });
     }
 }
 
