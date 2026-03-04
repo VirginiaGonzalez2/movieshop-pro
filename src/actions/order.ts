@@ -82,8 +82,7 @@ async function getOrder(orderId: number): Promise<ActionSuccess<Order> | ActionE
 }
 
 async function getOrdersByUser(
-    userId: number | string,
-    includeItems?: boolean,
+    userId: number | string
 ): Promise<ActionSuccess<Order[]> | ActionError> {
     const headers = await nextHeaders();
     const session = await auth.api.getSession({ headers: headers });
@@ -92,12 +91,12 @@ async function getOrdersByUser(
         return { ok: false, statusCode: HTTPStatusCode.Unauthorized };
     }
 
-    const permissionOwn = await hasPermission(
+    const permission = await hasPermission(
         session.user.id,
         userId === session.user.id ? "get-own" : "get",
         headers,
     );
-    if (!permissionOwn) {
+    if (!permission) {
         return { ok: false, statusCode: HTTPStatusCode.Forbidden };
     }
 
