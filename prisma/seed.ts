@@ -21,6 +21,7 @@ type SeedMovie = {
   price: number;
   runtime: number;
   image: string;
+  trailerUrl?: string;
 };
 
 const genres = [
@@ -33,22 +34,39 @@ const genres = [
 ];
 
 const movies: SeedMovie[] = [
-  { title: "The Dark Knight", year: 2008, genre: "Action", director: "Christopher Nolan", actor: "Christian Bale", rating: 5, price: 19.99, runtime: 152, image: "/images/the_dark_knight.jpeg" },
-  { title: "Inception", year: 2010, genre: "Sci-Fi", director: "Christopher Nolan", actor: "Leonardo DiCaprio", rating: 5, price: 17.99, runtime: 148, image: "/images/inception.jpeg" },
-  { title: "Interstellar", year: 2014, genre: "Sci-Fi", director: "Christopher Nolan", actor: "Matthew McConaughey", rating: 5, price: 18.99, runtime: 169, image: "/images/interstellar.jpeg" },
-  { title: "Parasite", year: 2019, genre: "Drama", director: "Bong Joon-ho", actor: "Song Kang-ho", rating: 5, price: 14.99, runtime: 132, image: "/images/parasite.jpeg" },
-  { title: "The Matrix", year: 1999, genre: "Sci-Fi", director: "Lana Wachowski", actor: "Keanu Reeves", rating: 5, price: 13.99, runtime: 136, image: "/images/the_matrix.jpeg" },
-  { title: "Joker", year: 2019, genre: "Drama", director: "Todd Phillips", actor: "Joaquin Phoenix", rating: 4, price: 12.99, runtime: 122, image: "/images/joker.jpeg" },
-  { title: "Her", year: 2013, genre: "Drama", director: "Spike Jonze", actor: "Joaquin Phoenix", rating: 4, price: 11.99, runtime: 126, image: "/images/her.jpeg" },
-  { title: "Coco", year: 2017, genre: "Animation", director: "Lee Unkrich", actor: "Anthony Gonzalez", rating: 4, price: 9.99, runtime: 105, image: "/images/coco.jpeg" },
-  { title: "Blade Runner 2049", year: 2017, genre: "Sci-Fi", director: "Denis Villeneuve", actor: "Ryan Gosling", rating: 4, price: 15.99, runtime: 164, image: "/images/blade_runner_2049.jpeg" },
-  { title: "Casablanca", year: 1942, genre: "Romance", director: "Michael Curtiz", actor: "Humphrey Bogart", rating: 5, price: 8.99, runtime: 102, image: "/images/casablanca.jpeg" },
-  { title: "La La Land", year: 2016, genre: "Romance", director: "Damien Chazelle", actor: "Emma Stone", rating: 4, price: 13.49, runtime: 128, image: "/images/la_la_land.jpeg" },
-  { title: "Moonlight", year: 2016, genre: "Drama", director: "Barry Jenkins", actor: "Trevante Rhodes", rating: 4, price: 10.49, runtime: 111, image: "/images/moonlight.jpeg" },
+  { title: "The Dark Knight", year: 2008, genre: "Action", director: "Christopher Nolan", actor: "Christian Bale", rating: 5, price: 19.99, runtime: 152, image: "/images/the_dark_knight.jpeg", trailerUrl: "https://www.youtube.com/watch?v=EXeTwQWrcwY" },
+  { title: "Inception", year: 2010, genre: "Sci-Fi", director: "Christopher Nolan", actor: "Leonardo DiCaprio", rating: 5, price: 17.99, runtime: 148, image: "/images/inception.jpeg", trailerUrl: "https://www.youtube.com/watch?v=YoHD9XEInc0" },
+  { title: "Interstellar", year: 2014, genre: "Sci-Fi", director: "Christopher Nolan", actor: "Matthew McConaughey", rating: 5, price: 18.99, runtime: 169, image: "/images/interstellar.jpeg", trailerUrl: "https://www.youtube.com/watch?v=zSWdZVtXT7E" },
+  { title: "Parasite", year: 2019, genre: "Drama", director: "Bong Joon-ho", actor: "Song Kang-ho", rating: 5, price: 14.99, runtime: 132, image: "/images/parasite.jpeg", trailerUrl: "https://www.youtube.com/watch?v=5xH0HfJHsaY" },
+  { title: "The Matrix", year: 1999, genre: "Sci-Fi", director: "Lana Wachowski", actor: "Keanu Reeves", rating: 5, price: 13.99, runtime: 136, image: "/images/the_matrix.jpeg", trailerUrl: "https://www.youtube.com/watch?v=vKQi3bBA1y8" },
+  { title: "Joker", year: 2019, genre: "Drama", director: "Todd Phillips", actor: "Joaquin Phoenix", rating: 4, price: 12.99, runtime: 122, image: "/images/joker.jpeg", trailerUrl: "https://www.youtube.com/watch?v=zAGVQLHvwOY" },
+  { title: "Her", year: 2013, genre: "Drama", director: "Spike Jonze", actor: "Joaquin Phoenix", rating: 4, price: 11.99, runtime: 126, image: "/images/her.jpeg", trailerUrl: "https://www.youtube.com/watch?v=WzV6mXIOVl4" },
+  { title: "Coco", year: 2017, genre: "Animation", director: "Lee Unkrich", actor: "Anthony Gonzalez", rating: 4, price: 9.99, runtime: 105, image: "/images/coco.jpeg", trailerUrl: "https://www.youtube.com/watch?v=Rvr68u6k5sI" },
+  { title: "Blade Runner 2049", year: 2017, genre: "Sci-Fi", director: "Denis Villeneuve", actor: "Ryan Gosling", rating: 4, price: 15.99, runtime: 164, image: "/images/blade_runner_2049.jpeg", trailerUrl: "https://www.youtube.com/watch?v=gCcx85zbxz4" },
+  { title: "Casablanca", year: 1942, genre: "Romance", director: "Michael Curtiz", actor: "Humphrey Bogart", rating: 5, price: 8.99, runtime: 102, image: "/images/casablanca.jpeg", trailerUrl: "https://www.youtube.com/watch?v=BkL9l7qovsE" },
+  { title: "La La Land", year: 2016, genre: "Romance", director: "Damien Chazelle", actor: "Emma Stone", rating: 4, price: 13.49, runtime: 128, image: "/images/la_la_land.jpeg", trailerUrl: "https://www.youtube.com/watch?v=0pdqf4P9MB8" },
+  { title: "Moonlight", year: 2016, genre: "Drama", director: "Barry Jenkins", actor: "Trevante Rhodes", rating: 4, price: 10.49, runtime: 111, image: "/images/moonlight.jpeg", trailerUrl: "https://www.youtube.com/watch?v=9NJj12tJzqc" },
 ];
 
 function buildReleaseDate(year: number) {
   return new Date(`${year}-01-01`);
+}
+
+function buildShortEnglishDescription(movie: SeedMovie) {
+  return `${movie.title} is a ${movie.genre.toLowerCase()} feature directed by ${movie.director}. With a runtime of ${movie.runtime} minutes, it balances atmosphere, emotion, and strong storytelling. ${movie.actor} leads a compelling performance that keeps every scene engaging. A polished and memorable choice for any movie night.`;
+}
+
+function isGenericDescription(description: string | null | undefined, title: string) {
+  const clean = (description ?? "").trim().toLowerCase();
+  const cleanTitle = title.trim().toLowerCase();
+
+  return (
+    !clean ||
+    clean === `${cleanTitle} description.` ||
+    clean === `${cleanTitle} description` ||
+    clean === "description." ||
+    clean === "description"
+  );
 }
 
 async function getOrCreatePerson(name: string) {
@@ -107,6 +125,7 @@ async function main() {
     ]);
 
     const releaseDate = buildReleaseDate(m.year);
+    const shortDescription = buildShortEnglishDescription(m);
 
     let movie = await prisma.movie.findFirst({
       where: { title: m.title, releaseDate },
@@ -116,13 +135,32 @@ async function main() {
       movie = await prisma.movie.create({
         data: {
           title: m.title,
-          description: `${m.title} description.`,
+          description: shortDescription,
           price: m.price,
           releaseDate,
           runtime: m.runtime,
           stock: 20,
           imageUrl: m.image,
+          trailerUrl: m.trailerUrl ?? null,
           createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      });
+    } else if (isGenericDescription(movie.description, m.title)) {
+      movie = await prisma.movie.update({
+        where: { id: movie.id },
+        data: {
+          description: shortDescription,
+          updatedAt: new Date(),
+        },
+      });
+    }
+
+    if (m.trailerUrl && !movie.trailerUrl) {
+      movie = await prisma.movie.update({
+        where: { id: movie.id },
+        data: {
+          trailerUrl: m.trailerUrl,
           updatedAt: new Date(),
         },
       });
@@ -181,6 +219,23 @@ async function main() {
         userId: "user-1",
         value: m.rating,
         createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  const additionalTrailerByTitle = new Map<string, string>([
+    ["Barbie", "https://www.youtube.com/watch?v=8zIf0XvoL9Y"],
+  ]);
+
+  for (const [title, trailerUrl] of additionalTrailerByTitle) {
+    await prisma.movie.updateMany({
+      where: {
+        title,
+        OR: [{ trailerUrl: null }, { trailerUrl: "" }],
+      },
+      data: {
+        trailerUrl,
         updatedAt: new Date(),
       },
     });

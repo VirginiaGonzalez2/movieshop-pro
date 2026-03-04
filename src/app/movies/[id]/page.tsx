@@ -79,6 +79,44 @@ function capFirst(s: string) {
     return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+function isGenericMovieDescription(description: string | null | undefined, title: string) {
+    const clean = (description ?? "").trim().toLowerCase();
+    if (!clean) return true;
+
+    const cleanTitle = title.trim().toLowerCase();
+    return (
+        clean === `${cleanTitle} description.` ||
+        clean === `${cleanTitle} description` ||
+        clean === "description." ||
+        clean === "description"
+    );
+}
+
+function buildShortEnglishDescription({
+    title,
+    runtime,
+    genres,
+    directors,
+    actors,
+}: {
+    title: string;
+    runtime: number;
+    genres: string[];
+    directors: string[];
+    actors: string[];
+}) {
+    const mainGenre = (genres[0] ?? "drama").toLowerCase();
+    const directorLine = directors[0]
+        ? `Directed by ${directors[0]}, it delivers a focused and memorable vision.`
+        : "It delivers a focused and memorable cinematic vision.";
+    const castLine =
+        actors.length > 0
+            ? `Featuring ${actors.slice(0, 2).join(" and ")}, the performances keep every moment engaging.`
+            : "The performances keep every moment engaging and emotionally grounded.";
+
+    return `${capFirst(title)} is a ${mainGenre} film with a ${runtime}-minute runtime. ${directorLine} ${castLine} A strong blend of atmosphere, story, and character makes it a great pick for movie night.`;
+}
+
 export default async function MovieDetailsPage({
     params,
 }: {
@@ -129,9 +167,20 @@ export default async function MovieDetailsPage({
 
     const directors = movie.people.filter((p) => p.role === "DIRECTOR").map((p) => p.person.name);
     const actors = movie.people.filter((p) => p.role === "ACTOR").map((p) => p.person.name);
+    const genreNames = movie.genres.map((mg) => mg.genre.name);
 
     const priceNumber = Number(movie.price.toString());
     const inStock = movie.stock > 0;
+
+    const displayDescription = isGenericMovieDescription(movie.description, movie.title)
+        ? buildShortEnglishDescription({
+              title: movie.title,
+              runtime: movie.runtime,
+              genres: genreNames,
+              directors,
+              actors,
+          })
+        : (movie.description ?? "").trim();
 
     const genreIds = movie.genres.map((mg) => mg.genre.id);
 
@@ -296,7 +345,7 @@ export default async function MovieDetailsPage({
 
                             {/* About */}
                             <div className="rounded-2xl border bg-background shadow-sm p-6">
-                                <MovieDescription description={movie.description ?? ""} />
+                                <MovieDescription description={displayDescription} />
                             </div>
 
                             {/* Rating  */}
@@ -312,16 +361,6 @@ export default async function MovieDetailsPage({
                             <div className="rounded-2xl border bg-background shadow-sm overflow-hidden">
                                 <div className="flex items-center justify-between px-6 py-4">
                                     <div className="font-semibold">Trailer</div>
-                                    {movie.trailerUrl ? (
-                                        <a
-                                            className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4"
-                                            href={movie.trailerUrl}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                        >
-                                            Open in YouTube ↗
-                                        </a>
-                                    ) : null}
                                 </div>
 
                                 <div className="px-6 pb-6">

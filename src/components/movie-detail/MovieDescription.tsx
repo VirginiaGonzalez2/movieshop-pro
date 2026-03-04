@@ -4,7 +4,7 @@ type Props = {
 
 export default function MovieDescription({ description }: Props) {
     return (
-        <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+        <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line line-clamp-4">
             {description}
         </p>
     );
