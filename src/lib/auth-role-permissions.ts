@@ -3,6 +3,9 @@ import { defaultStatements, adminAc } from "better-auth/plugins/admin/access";
 
 export const statement = {
     ...defaultStatements,
+    movies: ["create", "get", "edit", "delete"],
+    genres: ["create", "get", "edit", "delete"],
+    people: ["create", "get", "edit", "delete"],
     orders: ["create", "get", "get-own", "delete"],
 } as const;
 
