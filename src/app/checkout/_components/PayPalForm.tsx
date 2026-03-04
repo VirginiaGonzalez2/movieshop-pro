@@ -20,6 +20,7 @@ import { useEffect, useRef } from "react";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { PaymentMethodFormValues } from "@/form-schemas/payment";
+import { PAYPAL_APPROVED_SESSION_KEY } from "@/lib/payment-flags";
 import { Controller, UseFormReturn } from "react-hook-form";
 
 type Props = {
@@ -33,6 +34,12 @@ export function PayPalForm({ form }: Props) {
        This does NOT interfere with the existing form logic.
     */
     const paypalRef = useRef<HTMLDivElement>(null);
+
+    function redirectToFail(message: string) {
+        const params = new URLSearchParams();
+        params.set("err", JSON.stringify({ message }));
+        window.location.href = `/checkout/fail?${params.toString()}`;
+    }
 
     useEffect(() => {
         if (typeof window === "undefined") return;
@@ -73,6 +80,8 @@ export function PayPalForm({ form }: Props) {
                        Does NOT modify checkout logic.
                     */
                     createOrder: (_data: any, actions: any) => {
+                        window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
+
                         return actions.order.create({
                             purchase_units: [
                                 {
@@ -92,17 +101,32 @@ export function PayPalForm({ form }: Props) {
                        without modifying architecture or server actions.
                     */
                     onApprove: async (_data: any, actions: any) => {
-                        await actions.order.capture();
+                        try {
+                            await actions.order.capture();
+                            window.sessionStorage.setItem(PAYPAL_APPROVED_SESSION_KEY, "true");
+                            console.log("PayPal payment approved");
 
-                        console.log("PayPal payment approved");
-
-                        // Trigger existing checkout form submission
-                        // This simulates clicking the "Place Order" button
-                        document.querySelector("form")?.requestSubmit();
+                            paypalRef.current?.closest("form")?.requestSubmit();
+                        } catch (error) {
+                            console.error("PayPal capture failed:", error);
+                            window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
+                            redirectToFail(
+                                "PayPal payment could not be completed. Please try again or use another method.",
+                            );
+                        }
                     },
 
                     onError: (err: any) => {
                         console.error("PayPal error:", err);
+                        window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
+                        redirectToFail(
+                            "PayPal returned an error while processing your payment. Please try again.",
+                        );
+                    },
+
+                    onCancel: () => {
+                        window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
+                        redirectToFail("PayPal payment was canceled.");
                     },
                 })
                 .render(paypalRef.current);

@@ -11,8 +11,10 @@
 import { checkout } from "@/actions/checkout";
 // ADDED: Import backend confirmation after checkout
 import { confirmOrderPayment } from "@/actions/confirm-order-payment";
+import { clearShoppingCart } from "@/actions/shopping-cart";
 import { Button } from "@/components/ui/button";
 import { FieldContent, FieldGroup } from "@/components/ui/field";
+import { PAYPAL_APPROVED_SESSION_KEY } from "@/lib/payment-flags";
 import {
     CheckoutFormValues,
     checkoutSchema,
@@ -55,14 +57,25 @@ export function PlaceOrder(props: Props) {
     });
 
     async function handleSubmit(values: CheckoutFormValues) {
+        const isPayPal = values.paymentMethod === "paypal";
+
         const result = await checkout(values);
 
         if (result.ok) {
             // ADDED: Confirm payment before redirecting to success page
             await confirmOrderPayment(result.order.id);
+            await clearShoppingCart();
+
+            if (isPayPal && typeof window !== "undefined") {
+                window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
+            }
 
             redirect(`/checkout/success?orderId=${result.order.id}`, RedirectType.replace);
         } else {
+            if (isPayPal && typeof window !== "undefined") {
+                window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
+            }
+
             const params = new URLSearchParams();
 
             // ADDED: Pass orderId if available to allow status validation on fail page
