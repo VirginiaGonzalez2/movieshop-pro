@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { PriceTag } from "@/components/ui/PriceTag";
 import { Play } from "lucide-react";
+import Image from "next/image";
 
 type Props = {
     title: string;
@@ -51,23 +52,25 @@ export default function MovieHeroSection({
                                 aria-label="Open trailer"
                                 title="Open trailer"
                             >
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
+                                <Image
                                     src={imageUrl}
                                     alt={title}
                                     className="w-full object-cover"
                                     style={{ height: "calc(100vh - 10rem)" }}
                                     loading="lazy"
+                                    width={444}
+                                    height={666}
                                 />
                             </Link>
                         ) : (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
+                            <Image
                                 src={imageUrl}
                                 alt={title}
                                 className="w-full object-cover"
                                 style={{ height: "calc(100vh - 10rem)" }}
                                 loading="lazy"
+                                width={444}
+                                height={666}
                             />
                         )
                     ) : (

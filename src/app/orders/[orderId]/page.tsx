@@ -1,5 +1,6 @@
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { prisma } from "@/lib/prisma";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -43,17 +44,23 @@ export default async function OrderDetailsPage({
 
                     <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                         <div className="rounded-lg border bg-background p-3">
-                            <p className="text-xs uppercase tracking-wide text-muted-foreground">Order ID</p>
+                            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                                Order ID
+                            </p>
                             <p className="mt-1 text-lg font-semibold">#{order.id}</p>
                         </div>
 
                         <div className="rounded-lg border bg-background p-3">
-                            <p className="text-xs uppercase tracking-wide text-muted-foreground">Status</p>
+                            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                                Status
+                            </p>
                             <p className="mt-1 text-lg font-semibold">{order.status}</p>
                         </div>
 
                         <div className="rounded-lg border bg-background p-3">
-                            <p className="text-xs uppercase tracking-wide text-muted-foreground">Total</p>
+                            <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                                Total
+                            </p>
                             <p className="mt-1 text-lg font-semibold">${itemTotal.toFixed(2)}</p>
                         </div>
                     </div>
@@ -67,15 +74,19 @@ export default async function OrderDetailsPage({
                             <article key={item.id} className="py-4">
                                 <div className="flex items-center justify-between gap-4">
                                     <div className="flex min-w-0 items-center gap-3">
-                                        <div className="h-20 w-14 overflow-hidden rounded-md bg-muted flex-shrink-0">
-                                            <img
-                                                src={item.movie.imageUrl || "/placeholder-movie.jpg"}
+                                        <div className="h-20 w-14 overflow-hidden rounded-md bg-muted shrink-0">
+                                            <Image
+                                                src={
+                                                    item.movie.imageUrl || "/placeholder-movie.jpg"
+                                                }
                                                 alt={item.movie.title}
                                                 className="h-full w-full object-cover"
+                                                width={80}
+                                                height={56}
                                             />
                                         </div>
 
-                                        <h3 className="text-sm md:text-base font-medium break-words">
+                                        <h3 className="text-sm md:text-base font-medium wrap-break-word">
                                             {item.movie.title}
                                         </h3>
                                     </div>

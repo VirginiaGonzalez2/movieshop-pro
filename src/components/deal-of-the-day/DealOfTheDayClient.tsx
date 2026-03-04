@@ -7,6 +7,7 @@ import { X, ChevronRight, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { addShoppingCartItem } from "@/actions/shopping-cart";
 import { toast } from "sonner";
+import Image from "next/image";
 
 type Props = {
     deal: {
@@ -123,14 +124,15 @@ export default function DealOfTheDayClient({ deal }: Props) {
                 {/* Content */}
                 <div className="px-4 pb-4">
                     <div className="flex gap-3">
-                        <div className="h-20 w-14 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                        <div className="h-20 w-14 rounded-lg overflow-hidden bg-muted shrink-0">
                             {deal?.imageUrl ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
+                                <Image
                                     src={deal.imageUrl}
                                     alt={deal.title}
                                     className="h-full w-full object-cover"
                                     loading="lazy"
+                                    width={80}
+                                    height={56}
                                 />
                             ) : null}
                         </div>

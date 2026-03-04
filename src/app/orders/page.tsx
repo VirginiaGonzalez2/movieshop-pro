@@ -2,6 +2,7 @@ import { AuthGuard } from "@/components/auth/AuthGuard";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -57,11 +58,15 @@ export default async function Orders() {
                             );
 
                             return (
-                                <article key={order.id} className="rounded-xl border bg-card p-4 shadow-sm">
+                                <article
+                                    key={order.id}
+                                    className="rounded-xl border bg-card p-4 shadow-sm"
+                                >
                                     <div className="flex flex-wrap items-center justify-between gap-3">
                                         <div className="text-sm">
                                             <p>
-                                                <span className="font-semibold">Order ID:</span> #{order.id}
+                                                <span className="font-semibold">Order ID:</span> #
+                                                {order.id}
                                             </p>
                                             <p className="text-muted-foreground">
                                                 {new Date(order.orderDate).toLocaleString()}
@@ -70,10 +75,12 @@ export default async function Orders() {
 
                                         <div className="text-sm">
                                             <p>
-                                                <span className="font-semibold">Status:</span> {order.status}
+                                                <span className="font-semibold">Status:</span>{" "}
+                                                {order.status}
                                             </p>
                                             <p>
-                                                <span className="font-semibold">Total:</span> ${total.toFixed(2)}
+                                                <span className="font-semibold">Total:</span> $
+                                                {total.toFixed(2)}
                                             </p>
                                         </div>
 
@@ -87,11 +94,15 @@ export default async function Orders() {
 
                                     <div className="mt-4 flex flex-wrap gap-2">
                                         {order.items.slice(0, 4).map((item) => (
-                                            <img
+                                            <Image
                                                 key={item.id}
-                                                src={item.movie.imageUrl || "/placeholder-movie.jpg"}
+                                                src={
+                                                    item.movie.imageUrl || "/placeholder-movie.jpg"
+                                                }
                                                 alt={item.movie.title}
                                                 className="h-16 w-12 rounded object-cover border"
+                                                width={64}
+                                                height={48}
                                             />
                                         ))}
                                     </div>

@@ -13,6 +13,7 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Prisma } from "@prisma/client";
+import Image from "next/image";
 
 /*
   ADDED:
@@ -86,7 +87,9 @@ export default async function SuccessPage({ searchParams }: Props) {
             <div className="mx-auto w-full max-w-5xl space-y-8">
                 <section className="rounded-2xl border bg-card p-6 md:p-8 shadow-sm">
                     <div className="rounded-xl border border-dashed bg-muted/30 p-4 text-center">
-                        <p className="text-sm text-muted-foreground mb-2">Your next purchase discount code</p>
+                        <p className="text-sm text-muted-foreground mb-2">
+                            Your next purchase discount code
+                        </p>
                         <p className="text-2xl font-bold tracking-wide">NEXT20</p>
                     </div>
 
@@ -125,12 +128,18 @@ export default async function SuccessPage({ searchParams }: Props) {
                                     strokeWidth={3}
                                     viewBox="0 0 24 24"
                                 >
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M5 13l4 4L19 7"
+                                    />
                                 </svg>
                             </div>
 
                             <div>
-                                <h1 className="text-2xl md:text-3xl font-semibold">Payment confirmed</h1>
+                                <h1 className="text-2xl md:text-3xl font-semibold">
+                                    Payment confirmed
+                                </h1>
                                 <p className="mt-1 text-sm text-muted-foreground">
                                     Thank you for your purchase. Your order is now confirmed.
                                 </p>
@@ -152,13 +161,17 @@ export default async function SuccessPage({ searchParams }: Props) {
                     <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
                         {order.items.map((item) => (
                             <article key={item.id} className="rounded-xl border bg-background p-3">
-                                <img
+                                <Image
                                     src={item.movie.imageUrl || "/placeholder-movie.jpg"}
                                     alt={item.movie.title}
-                                    className="w-full aspect-[2/3] object-cover rounded-md mb-3"
+                                    className="w-full aspect-2/3 object-cover rounded-md mb-3"
+                                    width={444}
+                                    height={666}
                                 />
 
-                                <p className="font-medium text-sm line-clamp-2 min-h-10">{item.movie.title}</p>
+                                <p className="font-medium text-sm line-clamp-2 min-h-10">
+                                    {item.movie.title}
+                                </p>
 
                                 <p className="mt-1 text-sm text-muted-foreground">
                                     ${Number(item.priceAtPurchase).toFixed(2)}

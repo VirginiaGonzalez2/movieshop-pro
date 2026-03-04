@@ -12,6 +12,7 @@ import BuyNowButton from "@/components/movie-detail/BuyNowButton";
 
 import { getMovieRatingSummary } from "@/actions/movie-rating";
 import { type MovieCardItem } from "@/components/movies/MovieCard";
+import Image from "next/image";
 
 export async function generateMetadata({
     params,
@@ -251,14 +252,15 @@ export default async function MovieDetailsPage({
                 {/* Poster (sticky) */}
                 <div className="lg:col-span-5 lg:sticky lg:top-24">
                     <div className="rounded-2xl border bg-card shadow-sm overflow-hidden">
-                        <div className="aspect-[2/3] bg-muted flex items-center justify-center overflow-hidden">
+                        <div className="aspect-2/3 bg-muted flex items-center justify-center overflow-hidden">
                             {movie.imageUrl ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
+                                <Image
                                     src={movie.imageUrl}
                                     alt={movie.title}
                                     className="h-full w-full object-cover"
                                     loading="lazy"
+                                    width={444}
+                                    height={666}
                                 />
                             ) : (
                                 <div className="text-sm text-muted-foreground">No image</div>
