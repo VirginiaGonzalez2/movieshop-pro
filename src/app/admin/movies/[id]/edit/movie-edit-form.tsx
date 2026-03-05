@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -40,39 +41,51 @@ export default function MovieEditForm({
 }: Props) {
     const router = useRouter();
 
-    const selectedGenreSet = new Set(selectedGenreIds);
-    const selectedActorSet = new Set(selectedActorIds);
-    const selectedDirectorSet = new Set(selectedDirectorIds);
+    const selectedGenreSet = useMemo(() => new Set(selectedGenreIds), [selectedGenreIds]);
+    const selectedActorSet = useMemo(() => new Set(selectedActorIds), [selectedActorIds]);
+    const selectedDirectorSet = useMemo(() => new Set(selectedDirectorIds), [selectedDirectorIds]);
 
-    // useActionState is the correct way /Sabrina
-    const updateWithId = updateMovie.bind(null, movie.id);
+    // Band-aid solution
+    const initialState: MovieActionState = { ok: false, message: "" };
 
-    const initialState: MovieActionState = { ok: true };
+    // useActionState is the correct way
+    const [state, formAction, isPending] = useActionState(
+        updateMovie.bind(null, movie.id),
+        initialState,
+    );
 
-    const [state, formAction, isPending] = useActionState(updateWithId, initialState);
+    // Prevent "green toast" on first render (when just click Edit)
+    const submittedRef = useRef(false);
 
     useEffect(() => {
-        if (!state) return;
+        if (!submittedRef.current) return;
 
         if (state.ok) {
             toast.success("Movie updated");
+            // refresh so the server page re-fetches the updated movie
             router.refresh();
-        } else {
-            toast.error(state.message || "Failed to update movie");
+        } else if (state.message) {
+            toast.error(state.message);
         }
     }, [state, router]);
 
-    const fieldErrors = state && !state.ok ? state.fieldErrors : undefined;
+    const fe = state.ok ? undefined : state.fieldErrors;
 
     return (
-        <form action={formAction} className="space-y-4">
-            {/* Pass id as hidden input /Sabrina */}
+        <form
+            action={async (fd: FormData) => {
+                submittedRef.current = true;
+                await formAction(fd);
+            }}
+            className="space-y-4"
+        >
+            {/* Pass id as hidden input */}
             <input type="hidden" name="id" value={movie.id} />
 
             <div>
                 <input name="title" defaultValue={movie.title} className="w-full border p-2" />
-                {fieldErrors?.title?.length ? (
-                    <p className="text-red-600 text-sm mt-1">{fieldErrors.title[0]}</p>
+                {fe?.title?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fe.title[0]}</p>
                 ) : null}
             </div>
 
@@ -82,8 +95,8 @@ export default function MovieEditForm({
                     defaultValue={movie.description}
                     className="w-full border p-2"
                 />
-                {fieldErrors?.description?.length ? (
-                    <p className="text-red-600 text-sm mt-1">{fieldErrors.description[0]}</p>
+                {fe?.description?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fe.description[0]}</p>
                 ) : null}
             </div>
 
@@ -95,8 +108,8 @@ export default function MovieEditForm({
                     defaultValue={movie.price}
                     className="w-full border p-2"
                 />
-                {fieldErrors?.price?.length ? (
-                    <p className="text-red-600 text-sm mt-1">{fieldErrors.price[0]}</p>
+                {fe?.price?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fe.price[0]}</p>
                 ) : null}
             </div>
 
@@ -107,8 +120,8 @@ export default function MovieEditForm({
                     defaultValue={movie.releaseDate}
                     className="w-full border p-2"
                 />
-                {fieldErrors?.releaseDate?.length ? (
-                    <p className="text-red-600 text-sm mt-1">{fieldErrors.releaseDate[0]}</p>
+                {fe?.releaseDate?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fe.releaseDate[0]}</p>
                 ) : null}
             </div>
 
@@ -119,8 +132,8 @@ export default function MovieEditForm({
                     defaultValue={movie.runtime}
                     className="w-full border p-2"
                 />
-                {fieldErrors?.runtime?.length ? (
-                    <p className="text-red-600 text-sm mt-1">{fieldErrors.runtime[0]}</p>
+                {fe?.runtime?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fe.runtime[0]}</p>
                 ) : null}
             </div>
 
@@ -141,8 +154,8 @@ export default function MovieEditForm({
                     placeholder="Image URL (optional)"
                     className="w-full border p-2"
                 />
-                {fieldErrors?.imageUrl?.length ? (
-                    <p className="text-red-600 text-sm mt-1">{fieldErrors.imageUrl[0]}</p>
+                {fe?.imageUrl?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fe.imageUrl[0]}</p>
                 ) : null}
             </div>
 
@@ -154,8 +167,8 @@ export default function MovieEditForm({
                     placeholder="Trailer URL (YouTube link)"
                     className="w-full border p-2"
                 />
-                {fieldErrors?.trailerUrl?.length ? (
-                    <p className="text-red-600 text-sm mt-1">{fieldErrors.trailerUrl[0]}</p>
+                {fe?.trailerUrl?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fe.trailerUrl[0]}</p>
                 ) : null}
             </div>
 
@@ -166,8 +179,8 @@ export default function MovieEditForm({
                     defaultValue={movie.stock}
                     className="w-full border p-2"
                 />
-                {fieldErrors?.stock?.length ? (
-                    <p className="text-red-600 text-sm mt-1">{fieldErrors.stock[0]}</p>
+                {fe?.stock?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fe.stock[0]}</p>
                 ) : null}
             </div>
 
@@ -225,14 +238,17 @@ export default function MovieEditForm({
                 </div>
             </div>
 
-            {fieldErrors?.form?.length ? (
-                <p className="text-red-600 text-sm">{fieldErrors.form[0]}</p>
+            {/* form-level errors */}
+            {!state.ok && fe?.form?.length ? (
+                <div className="border border-red-200 bg-red-50 text-red-700 p-3 rounded">
+                    {fe.form[0]}
+                </div>
             ) : null}
 
             <button
                 type="submit"
-                className="bg-black text-white px-4 py-2 rounded"
                 disabled={isPending}
+                className="bg-black text-white px-4 py-2 rounded disabled:opacity-60"
             >
                 {isPending ? "Updating..." : "Update Movie"}
             </button>
