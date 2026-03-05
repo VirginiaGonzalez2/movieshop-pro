@@ -1,5 +1,9 @@
 "use client";
 
+import { useActionState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
 import { MovieActionState, updateMovie } from "@/actions/movie";
 
 type Genre = { id: number; name: string };
@@ -34,28 +38,42 @@ export default function MovieEditForm({
     selectedActorIds,
     selectedDirectorIds,
 }: Props) {
+    const router = useRouter();
+
     const selectedGenreSet = new Set(selectedGenreIds);
     const selectedActorSet = new Set(selectedActorIds);
     const selectedDirectorSet = new Set(selectedDirectorIds);
 
-    // Band-aid solution kinda /Sabrina
-    async function onSubmitForm(data: FormData) {
-        // Could do this in updateMovie instead but I will leave that to you. /Sabrina
-        const id = Number(data.get("id")?.toString());
-        if (!isNaN(id)) {
-            // Where am I supposed to get prevState from? /Sabrina
-            const result = await updateMovie(id, /*prevState: */ { ok: true }, data);
-            console.log("result", result);
+    // useActionState is the correct way /Sabrina
+    const updateWithId = updateMovie.bind(null, movie.id);
+
+    const initialState: MovieActionState = { ok: true };
+
+    const [state, formAction, isPending] = useActionState(updateWithId, initialState);
+
+    useEffect(() => {
+        if (!state) return;
+
+        if (state.ok) {
+            toast.success("Movie updated");
+            router.refresh();
+        } else {
+            toast.error(state.message || "Failed to update movie");
         }
-    }
+    }, [state, router]);
+
+    const fieldErrors = state && !state.ok ? state.fieldErrors : undefined;
 
     return (
-        <form action={onSubmitForm} className="space-y-4">
+        <form action={formAction} className="space-y-4">
             {/* Pass id as hidden input /Sabrina */}
             <input type="hidden" name="id" value={movie.id} />
 
             <div>
                 <input name="title" defaultValue={movie.title} className="w-full border p-2" />
+                {fieldErrors?.title?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fieldErrors.title[0]}</p>
+                ) : null}
             </div>
 
             <div>
@@ -64,6 +82,9 @@ export default function MovieEditForm({
                     defaultValue={movie.description}
                     className="w-full border p-2"
                 />
+                {fieldErrors?.description?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fieldErrors.description[0]}</p>
+                ) : null}
             </div>
 
             <div>
@@ -74,6 +95,9 @@ export default function MovieEditForm({
                     defaultValue={movie.price}
                     className="w-full border p-2"
                 />
+                {fieldErrors?.price?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fieldErrors.price[0]}</p>
+                ) : null}
             </div>
 
             <div>
@@ -83,6 +107,9 @@ export default function MovieEditForm({
                     defaultValue={movie.releaseDate}
                     className="w-full border p-2"
                 />
+                {fieldErrors?.releaseDate?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fieldErrors.releaseDate[0]}</p>
+                ) : null}
             </div>
 
             <div>
@@ -92,6 +119,9 @@ export default function MovieEditForm({
                     defaultValue={movie.runtime}
                     className="w-full border p-2"
                 />
+                {fieldErrors?.runtime?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fieldErrors.runtime[0]}</p>
+                ) : null}
             </div>
 
             {/* file upload */}
@@ -108,8 +138,12 @@ export default function MovieEditForm({
                 <input
                     name="imageUrl"
                     defaultValue={movie.imageUrl ?? ""}
+                    placeholder="Image URL (optional)"
                     className="w-full border p-2"
                 />
+                {fieldErrors?.imageUrl?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fieldErrors.imageUrl[0]}</p>
+                ) : null}
             </div>
 
             {/* Trailer URL */}
@@ -120,28 +154,9 @@ export default function MovieEditForm({
                     placeholder="Trailer URL (YouTube link)"
                     className="w-full border p-2"
                 />
-                {movie.trailerUrl?.length ? (
-                    <p className="text-red-600 text-sm">{movie.trailerUrl[0]}</p>
+                {fieldErrors?.trailerUrl?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fieldErrors.trailerUrl[0]}</p>
                 ) : null}
-            </div>
-
-            {/* Image upload (optional) */}
-            <div className="space-y-1">
-                <div className="text-sm font-medium">Poster Image (Upload)</div>
-                <input name="image" type="file" accept="image/*" className="w-full border p-2" />
-                <p className="text-xs text-muted-foreground">
-                    Upload is preferred. If you don’t upload, the Image URL below will be used.
-                </p>
-            </div>
-
-            {/* Image URL fallback */}
-            <div>
-                <input
-                    name="imageUrl"
-                    defaultValue={movie.imageUrl ?? ""}
-                    placeholder="Image URL (optional)"
-                    className="w-full border p-2"
-                />
             </div>
 
             <div>
@@ -151,6 +166,9 @@ export default function MovieEditForm({
                     defaultValue={movie.stock}
                     className="w-full border p-2"
                 />
+                {fieldErrors?.stock?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fieldErrors.stock[0]}</p>
+                ) : null}
             </div>
 
             {/* Genres */}
@@ -207,8 +225,16 @@ export default function MovieEditForm({
                 </div>
             </div>
 
-            <button type="submit" className="bg-black text-white px-4 py-2 rounded">
-                Update Movie
+            {fieldErrors?.form?.length ? (
+                <p className="text-red-600 text-sm">{fieldErrors.form[0]}</p>
+            ) : null}
+
+            <button
+                type="submit"
+                className="bg-black text-white px-4 py-2 rounded"
+                disabled={isPending}
+            >
+                {isPending ? "Updating..." : "Update Movie"}
             </button>
         </form>
     );
