@@ -13,6 +13,7 @@ import BuyNowButton from "@/components/movie-detail/BuyNowButton";
 import { getMovieRatingSummary } from "@/actions/movie-rating";
 import { type MovieCardItem } from "@/components/movies/MovieCard";
 import Image from "next/image";
+import { PriceTag } from "@/components/ui/PriceTag";
 
 export async function generateMetadata({
     params,
@@ -71,9 +72,9 @@ function toYouTubeEmbedUrl(url: string | null): string | null {
     }
 }
 
-function formatMoney(n: number) {
-    return n.toFixed(2);
-}
+// function formatMoney(n: number) {
+//     return n.toFixed(2);
+// }
 
 function capFirst(s: string) {
     if (!s) return s;
@@ -331,9 +332,10 @@ export default async function MovieDetailsPage({
                             <div className="flex items-end justify-between gap-4">
                                 <div>
                                     <div className="text-xs text-muted-foreground">Price</div>
-                                    <div className="text-4xl font-extrabold tracking-tight">
-                                        ${formatMoney(priceNumber)}
-                                    </div>
+                                    <PriceTag
+                                        className="text-4xl font-extrabold tracking-tight"
+                                        amount={priceNumber}
+                                    />
                                     <div className="text-xs text-muted-foreground mt-1">
                                         Taxes calculated at checkout
                                     </div>

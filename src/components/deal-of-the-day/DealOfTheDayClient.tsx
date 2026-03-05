@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { addShoppingCartItem } from "@/actions/shopping-cart";
 import { toast } from "sonner";
 import Image from "next/image";
+import { PriceTag } from "../ui/PriceTag";
 
 type Props = {
     deal: {
@@ -53,7 +54,7 @@ export default function DealOfTheDayClient({ deal }: Props) {
         return `${deal.discountPct}% OFF`;
     }, [deal]);
 
-    if (!canRender) return null;
+    if (!canRender) return <></>;
 
     // Minimized pill
     if (isMinimized) {
@@ -143,12 +144,14 @@ export default function DealOfTheDayClient({ deal }: Props) {
                             </div>
 
                             <div className="mt-1 flex items-baseline gap-2">
-                                <span className="text-lg font-bold">
-                                    ${deal?.discountedPrice.toFixed(2)}
-                                </span>
-                                <span className="text-sm text-muted-foreground line-through">
-                                    ${deal?.originalPrice.toFixed(2)}
-                                </span>
+                                <PriceTag
+                                    className="text-lg font-bold"
+                                    amount={deal.discountedPrice}
+                                />
+                                <PriceTag
+                                    className="text-sm text-muted-foreground line-through"
+                                    amount={deal.originalPrice}
+                                />
                             </div>
 
                             <div className="text-xs text-muted-foreground mt-1">

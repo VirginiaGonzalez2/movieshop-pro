@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-12 08:45:41
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-27 09:44:44
+ *   Modified time: 2026-03-05 10:30:47
  *   Description: Cart page.
  */
 
@@ -11,6 +11,7 @@
 import { getShoppingCartInfo } from "@/actions/shopping-cart";
 import { LinkButton } from "@/components/ui-custom-shadcn/LinkButton";
 import CartItem from "./_components/CartItem";
+import { PriceTag } from "@/components/ui/PriceTag";
 
 export default async function CartPage() {
     const shoppingCartInfo = await getShoppingCartInfo();
@@ -42,7 +43,7 @@ export default async function CartPage() {
             <div className="flex justify-end">
                 <p>Subtotal:</p>
                 <div className="gap-2 flex flex-col items-end">
-                    <p>{totalPrice.toFixed(2)} sek</p>
+                    <PriceTag amount={totalPrice} />
                     <LinkButton href="/checkout" disabled={!shoppingCartInfo}>
                         Checkout
                     </LinkButton>

@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-18 13:18:06
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-27 13:34:03
+ *   Modified time: 2026-03-05 10:29:23
  *   Description: Cart item.
  */
 
@@ -19,14 +19,13 @@ import {
 } from "@/components/ui/item";
 import Image from "next/image";
 import { CartItemControls } from "@/components/cart/CartItemControls";
+import { PriceTag } from "@/components/ui/PriceTag";
 
 type Props = {
     item: ShoppingCartItemInfo;
 };
 
 export default async function CartItem({ item }: Props) {
-    const formatter = Intl.NumberFormat("sv-SE", { style: "currency", currency: "SEK" });
-
     return (
         <Item asChild className="p-4 border-2 w-full rounded-xl">
             <li className="flex items-center">
@@ -52,7 +51,7 @@ export default async function CartItem({ item }: Props) {
                     />
                 </div>
                 <ItemContent className="min-w-14 flex-0 text-center">
-                    {formatter.format(Number(item.price * item.quantity))}
+                    <PriceTag amount={Number(item.price * item.quantity)} />
                 </ItemContent>
             </li>
         </Item>
