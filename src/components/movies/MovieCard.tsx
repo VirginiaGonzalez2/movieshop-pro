@@ -7,6 +7,7 @@ import { PriceTag } from "@/components/ui/PriceTag";
 import { RatingStars } from "@/components/ui/RatingStars";
 import AddToCartButton from "@/components/movie-detail/AddToCartButton";
 import { addShoppingCartItem } from "@/actions/shopping-cart";
+import Image from "next/image";
 
 export type MovieCardItem = {
     id: number;
@@ -21,6 +22,12 @@ export type MovieCardItem = {
     // real ratings
     avgRating: number; // 0..5
     ratingCount: number;
+
+    // optional short genres text on card
+    genres?: string[];
+
+    // optional purchased count for top purchased section
+    purchasedCount?: number;
 };
 
 export default function MovieCard({ movie }: { movie: MovieCardItem }) {
@@ -32,6 +39,7 @@ export default function MovieCard({ movie }: { movie: MovieCardItem }) {
             try {
                 await addShoppingCartItem(movie.id, 1);
                 router.push("/checkout");
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
             } catch (e) {
                 // ignore; toast handled elsewhere if desired
             }
@@ -42,14 +50,15 @@ export default function MovieCard({ movie }: { movie: MovieCardItem }) {
         <div className="block border rounded-lg overflow-hidden transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg">
             {/* Poster (clickable) */}
             <Link href={`/movies/${movie.id}`} className="block">
-                <div className="aspect-[2/3] bg-muted flex items-center justify-center overflow-hidden">
+                <div className="aspect-2/3 bg-muted flex items-center justify-center overflow-hidden">
                     {movie.imageUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <Image
                             src={movie.imageUrl}
                             alt={movie.title}
                             className="h-full w-full object-cover"
                             loading="lazy"
+                            width={444}
+                            height={666}
                         />
                     ) : (
                         <div className="text-sm text-muted-foreground">No image</div>
@@ -63,10 +72,22 @@ export default function MovieCard({ movie }: { movie: MovieCardItem }) {
                     <div className="font-semibold line-clamp-1 flex items-baseline gap-2">
                         <span className="truncate">{movie.title}</span>
                         {movie.releaseYear ? (
-                            <span className="text-xs text-muted-foreground">{movie.releaseYear}</span>
+                            <span className="text-xs text-muted-foreground">
+                                {movie.releaseYear}
+                            </span>
                         ) : null}
                     </div>
                 </Link>
+
+                {movie.genres && movie.genres.length > 0 ? (
+                    <p className="text-xs text-muted-foreground line-clamp-1">
+                        {movie.genres.join(" • ")}
+                    </p>
+                ) : null}
+
+                {movie.purchasedCount !== undefined && movie.purchasedCount > 0 ? (
+                    <p className="text-xs text-muted-foreground">{movie.purchasedCount} sold</p>
+                ) : null}
 
                 <div className="flex items-start justify-between">
                     <div className="text-lg font-semibold">

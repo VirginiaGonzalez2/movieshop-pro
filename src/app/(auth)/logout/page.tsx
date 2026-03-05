@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useOriginRouter } from "@/hooks/use-origin-router";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Status = "processing" | "success" | "fail";
 
@@ -20,10 +20,19 @@ export default function LogoutPage() {
     const router = useOriginRouter(true);
     const session = authClient.useSession();
     const [status, setStatus] = useState<Status>("processing");
+    const hasRequestedSignOut = useRef(false);
 
-    if (!session.data && status === "processing") {
-        router.returnToOrigin();
-    } else if (session.data) {
+    useEffect(() => {
+        if (status !== "processing") return;
+
+        if (!session.data) {
+            router.returnToOrigin();
+            return;
+        }
+
+        if (hasRequestedSignOut.current) return;
+        hasRequestedSignOut.current = true;
+
         authClient
             .signOut()
             .then((response) => {
@@ -33,7 +42,7 @@ export default function LogoutPage() {
                 setStatus("fail");
                 console.log(error);
             });
-    }
+    }, [router, session.data, status]);
 
     function getStatusMessage(status: Status) {
         switch (status) {

@@ -9,10 +9,10 @@ import CustomerConfirmation from "@/emails/CustomerConfirmation";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendContactMessage(prevState: { success: boolean }, formData: FormData) {
-    // Extract form values from submitted form
-    const name = formData.get("name") as string;
-    const email = formData.get("email") as string;
-    const message = formData.get("message") as string;
+    // Extract and normalize form values from submitted form
+    const name = String(formData.get("name") ?? "").trim();
+    const email = String(formData.get("email") ?? "").trim().toLowerCase();
+    const message = String(formData.get("message") ?? "").trim();
 
     // Basic validation to ensure required fields exist
     if (!name || !email || !message) {
@@ -20,7 +20,7 @@ export async function sendContactMessage(prevState: { success: boolean }, formDa
     }
 
     try {
-        // 1️⃣ Save message to database
+        // 1️⃣ Save message to database (source of truth)
         await prisma.contactMessage.create({
             data: {
                 name,
@@ -28,8 +28,17 @@ export async function sendContactMessage(prevState: { success: boolean }, formDa
                 message,
             },
         });
+    } catch (error) {
+        console.error("Contact form DB error:", error);
+        return { success: false };
+    }
 
-        // 2️⃣ Send email notification to team inbox
+    // 2️⃣ & 3️⃣ Send emails in best-effort mode; DB save should not fail because of email issues
+    if (!process.env.RESEND_API_KEY) {
+        return { success: true };
+    }
+
+    try {
         await resend.emails.send({
             from: "onboarding@resend.dev",
             to: "aplusmovieshop.team@gmail.com",
@@ -41,19 +50,17 @@ export async function sendContactMessage(prevState: { success: boolean }, formDa
             }),
         });
 
-        // 3️⃣ Send automatic confirmation email to customer
         await resend.emails.send({
             from: "onboarding@resend.dev",
-            to: email, // <-- restored original behavior
+            to: email,
             subject: "We received your message 🎬",
             react: CustomerConfirmation({
                 name,
             }),
         });
-
-        return { success: true };
     } catch (error) {
-        console.error("Contact form error:", error);
-        return { success: false };
+        console.error("Contact form email warning:", error);
     }
+
+    return { success: true };
 }

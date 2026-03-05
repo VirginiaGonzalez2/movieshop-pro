@@ -46,7 +46,9 @@ async function checkout(
         return { ok: false, cause: "better-auth", error: error };
     }
 
-    const userId = session ? session.user.id : `${safeValues.firstName} ${safeValues.lastName}`;
+    const guestIdentifier =
+        safeValues.paymentPayPalInfo?.payPalEmail ?? `${safeValues.firstName} ${safeValues.lastName}`;
+    const userId = session ? session.user.id : guestIdentifier;
 
     let result;
     try {
@@ -54,7 +56,8 @@ async function checkout(
             data: {
                 userId: userId,
                 totalAmount: safeValues.orderCost,
-                status: "placed",
+                // ADDED: Order starts as PENDING until PayPal confirmation
+                status: "PENDING",
                 items: {
                     create: safeValues.orderItems
                         .map((item) => {

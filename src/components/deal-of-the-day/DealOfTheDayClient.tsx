@@ -1,9 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useMemo, useState, useTransition } from "react";
 import { X, ChevronRight, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { addShoppingCartItem } from "@/actions/shopping-cart";
+import { toast } from "sonner";
+import Image from "next/image";
 
 type Props = {
     deal: {
@@ -37,8 +41,9 @@ function writeLS(key: string, value: string) {
 
 export default function DealOfTheDayClient({ deal }: Props) {
     const dayKey = deal?.date ?? "no-deal";
-
-    const [isClosed, setIsClosed] = useState(() => readLS(`dotd_closed_${dayKey}`, "0") === "1");
+    const router = useRouter();
+    const [isPending, startTransition] = useTransition();
+    const [isClosed, setIsClosed] = useState(false);
     const [isMinimized, setIsMinimized] = useState(() => readLS(`dotd_min_${dayKey}`, "0") === "1");
 
     const canRender = !!deal && !isClosed;
@@ -102,9 +107,10 @@ export default function DealOfTheDayClient({ deal }: Props) {
 
                         <button
                             type="button"
-                            onClick={() => {
+                            onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
                                 setIsClosed(true);
-                                writeLS(`dotd_closed_${dayKey}`, "1");
                             }}
                             className="h-9 w-9 rounded-full hover:bg-muted transition"
                             aria-label="Close"
@@ -118,14 +124,15 @@ export default function DealOfTheDayClient({ deal }: Props) {
                 {/* Content */}
                 <div className="px-4 pb-4">
                     <div className="flex gap-3">
-                        <div className="h-20 w-14 rounded-lg overflow-hidden bg-muted flex-shrink-0">
+                        <div className="h-20 w-14 rounded-lg overflow-hidden bg-muted shrink-0">
                             {deal?.imageUrl ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
+                                <Image
                                     src={deal.imageUrl}
                                     alt={deal.title}
                                     className="h-full w-full object-cover"
                                     loading="lazy"
+                                    width={80}
+                                    height={56}
                                 />
                             ) : null}
                         </div>
@@ -160,11 +167,20 @@ export default function DealOfTheDayClient({ deal }: Props) {
                             variant="outline"
                             className="flex-1 shadow-sm transition-transform duration-200 hover:scale-105 active:scale-95"
                             onClick={() => {
-                                // user can add from movie page/cart.
-                                window.location.href = `/movies/${deal?.movieId}`;
+                                if (!deal?.movieId) return;
+                                startTransition(async () => {
+                                    try {
+                                        await addShoppingCartItem(deal.movieId, 1);
+                                        toast.success("Movie added to cart");
+                                        router.push("/cart");
+                                    } catch {
+                                        toast.error("Could not add movie to cart");
+                                    }
+                                });
                             }}
+                            disabled={isPending || deal?.stock === 0}
                         >
-                            Add to cart
+                            {deal?.stock === 0 ? "Out of stock" : "Add to cart"}
                         </Button>
                     </div>
 

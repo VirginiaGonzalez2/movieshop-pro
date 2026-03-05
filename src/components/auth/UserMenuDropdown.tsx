@@ -79,15 +79,24 @@ export default function UserMenuDropdown() {
                         </DropdownMenuItem>
                     </>
                 ) : (
-                    <DropdownMenuItem asChild>
-                        <Link
-                            replace
-                            href={router.formatUrl("/logout")}
-                            onClick={blockWhilePending}
-                        >
-                            Log Out
-                        </Link>
-                    </DropdownMenuItem>
+                    <>
+                        {session.data?.user.role === "admin" && (
+                            <DropdownMenuItem asChild>
+                                <Link href={router.formatUrl("/admin")} onClick={blockWhilePending}>
+                                    Admin Dashboard
+                                </Link>
+                            </DropdownMenuItem>
+                        )}
+                        <DropdownMenuItem asChild>
+                            <Link
+                                replace
+                                href={router.formatUrl("/logout")}
+                                onClick={blockWhilePending}
+                            >
+                                Log Out
+                            </Link>
+                        </DropdownMenuItem>
+                    </>
                 )}
             </DropdownMenuContent>
         </DropdownMenu>

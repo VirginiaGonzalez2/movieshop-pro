@@ -9,8 +9,12 @@
 "use client";
 
 import { checkout } from "@/actions/checkout";
+// ADDED: Import backend confirmation after checkout
+import { confirmOrderPayment } from "@/actions/confirm-order-payment";
+import { clearShoppingCart } from "@/actions/shopping-cart";
 import { Button } from "@/components/ui/button";
 import { FieldContent, FieldGroup } from "@/components/ui/field";
+import { PAYPAL_APPROVED_SESSION_KEY } from "@/lib/payment-flags";
 import {
     CheckoutFormValues,
     checkoutSchema,
@@ -29,6 +33,17 @@ type Props = {
     paymentMethod: FullPaymentMethodFormValues;
 };
 
+// ADDED: Narrow unknown runtime shapes safely before reading orderId in the fail branch.
+function hasOrderId(value: unknown): value is { order: { id: number } } {
+    if (!value || typeof value !== "object") return false;
+    if (!("order" in value)) return false;
+
+    const order = (value as { order?: unknown }).order;
+    if (!order || typeof order !== "object") return false;
+
+    return typeof (order as { id?: unknown }).id === "number";
+}
+
 export function PlaceOrder(props: Props) {
     const form = useForm<CheckoutFormValues>({
         resolver: zodResolver(checkoutSchema),
@@ -42,13 +57,34 @@ export function PlaceOrder(props: Props) {
     });
 
     async function handleSubmit(values: CheckoutFormValues) {
+        const isPayPal = values.paymentMethod === "paypal";
+
         const result = await checkout(values);
 
         if (result.ok) {
+            // ADDED: Confirm payment before redirecting to success page
+            await confirmOrderPayment(result.order.id);
+            await clearShoppingCart();
+
+            if (isPayPal && typeof window !== "undefined") {
+                window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
+            }
+
             redirect(`/checkout/success?orderId=${result.order.id}`, RedirectType.replace);
         } else {
+            if (isPayPal && typeof window !== "undefined") {
+                window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
+            }
+
             const params = new URLSearchParams();
+
+            // ADDED: Pass orderId if available to allow status validation on fail page
+            if (hasOrderId(result)) {
+                params.set("orderId", String(result.order.id));
+            }
+
             params.set("err", JSON.stringify(result.error));
+
             redirect(`/checkout/fail?${params}`, RedirectType.replace);
         }
     }
@@ -64,3 +100,4 @@ export function PlaceOrder(props: Props) {
         </form>
     );
 }
+

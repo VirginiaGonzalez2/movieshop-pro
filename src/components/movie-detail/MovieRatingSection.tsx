@@ -42,7 +42,8 @@ export default function MovieRatingSection({ movieId, avgRating, ratingCount }: 
 
     const avgLabel = useMemo(() => {
         if (!ratingCount) return "No ratings yet";
-        return `${avgRating.toFixed(1)} / 5 (${ratingCount})`;
+        const ratingsWord = ratingCount === 1 ? "rating" : "ratings";
+        return `Avg ${avgRating.toFixed(1)} · ${ratingCount} ${ratingsWord}`;
     }, [avgRating, ratingCount]);
 
     function onRate(value: number) {
@@ -52,13 +53,9 @@ export default function MovieRatingSection({ movieId, avgRating, ratingCount }: 
         }
 
         startTransition(async () => {
-            try {
-                await setMovieRating(movieId, value);
-                setUserRating(value);
-                router.refresh();
-            } catch {
-                // keep silent or add toast
-            }
+            await setMovieRating(movieId, value);
+            setUserRating(value);
+            router.refresh();
         });
     }
 
@@ -66,51 +63,46 @@ export default function MovieRatingSection({ movieId, avgRating, ratingCount }: 
 
     return (
         <div className="space-y-2">
-            {/* avg label */}
-            <div className="text-sm text-muted-foreground">{avgLabel}</div>
+            {/* Keep stars + avg aligned together */}
+            <div className="inline-block">
+                <div className="flex items-center justify-center gap-2">
+                    {[1, 2, 3, 4, 5].map((v) => {
+                        const active = userRating >= v && userRating > 0;
 
-            {/* stars */}
-            <div className="flex items-center gap-2">
-                {[1, 2, 3, 4, 5].map((v) => {
-                    const active = userRating >= v;
+                        return (
+                            <button
+                                key={v}
+                                type="button"
+                                disabled={disabled}
+                                onClick={() => onRate(v)}
+                                aria-label={`Rate ${v} out of 5`}
+                                title={`Rate ${v}`}
+                                className="group"
+                            >
+                                <span
+                                    className={`inline-flex h-12 w-12 items-center justify-center rounded-full
+                                    transition-transform duration-200
+                                    group-hover:scale-110 group-active:scale-95
+                                    disabled:opacity-60 disabled:group-hover:scale-100
+                                    ${active ? "bg-foreground text-background" : "bg-muted text-foreground"}`}
+                                >
+                                    <span className="text-xl leading-none">★</span>
+                                </span>
+                            </button>
+                        );
+                    })}
+                </div>
 
-                    return (
-                        <button
-                            key={v}
-                            type="button"
-                            disabled={disabled}
-                            onClick={() => onRate(v)}
-                            aria-label={`Rate ${v} out of 5`}
-                            title={`Rate ${v}`}
-                            className={[
-                                "h-11 w-11 rounded-full bg-white shadow-sm",
-                                "transition-transform duration-200 hover:shadow-md hover:scale-105 active:scale-95",
-                                "disabled:opacity-60 disabled:hover:scale-100",
-                                "flex items-center justify-center text-lg",
-                                active ? "text-black" : "text-muted-foreground",
-                            ].join(" ")}
-                        >
-                            ★
-                        </button>
-                    );
-                })}
-
-                <div className="ml-2 text-sm">
-                    <div className="font-medium">
-                        Your rating: {userRating ? `${userRating}/5` : "-"}
-                    </div>
-                    {loadingMine ? (
-                        <div className="text-xs text-muted-foreground">Loading…</div>
-                    ) : isPending ? (
-                        <div className="text-xs text-muted-foreground">Saving…</div>
-                    ) : null}
+                {/* centered under the stars */}
+                <div className="mt-2 text-center text-sm text-muted-foreground">
+                    {avgLabel}
+                    {userRating ? <div>Your rating: {userRating}/5</div> : null}
+                    {loadingMine ? <div>Loading…</div> : isPending ? <div>Saving…</div> : null}
                 </div>
             </div>
 
             {!session.data ? (
-                <p className="text-xs text-muted-foreground">
-                    Log in to rate. Clicking a star will take you to login.
-                </p>
+                <p className="text-xs text-muted-foreground">You must be logged in to rate.</p>
             ) : null}
         </div>
     );

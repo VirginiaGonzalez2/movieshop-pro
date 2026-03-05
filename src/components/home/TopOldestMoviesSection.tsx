@@ -29,6 +29,17 @@ export default async function TopOldestMoviesSection({ genre }: { genre?: string
             : undefined,
         orderBy: { releaseDate: "asc" },
         take: 5,
+        include: {
+            genres: {
+                include: {
+                    genre: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                },
+            },
+        },
     });
 
     // Compute rating aggregates for the movies we loaded.
@@ -73,6 +84,7 @@ export default async function TopOldestMoviesSection({ genre }: { genre?: string
             imageUrl: movie.imageUrl,
             // include release year so MovieCard can show it in small text
             releaseYear: movie.releaseDate ? movie.releaseDate.getFullYear() : undefined,
+            genres: movie.genres.map((mg) => mg.genre.name),
 
             avgRating: rating.avgRating,
             ratingCount: rating.ratingCount,

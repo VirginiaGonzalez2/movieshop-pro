@@ -1,13 +1,15 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // This is a quick filter section for the Home page.
 // It provides a set of category buttons that redirect users to the
 // Movies page with a pre-filled `genre` query param for quick filtering.
 export default function HomeQuickFilters() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const selectedGenre = searchParams.get("genre")?.toLowerCase();
 
     const categories = ["Action", "Drama", "Comedy", "Animation", "Sci-Fi", "Fantasy"];
 
@@ -40,15 +42,24 @@ export default function HomeQuickFilters() {
 
                 <div className="flex justify-center">
                     <nav className="inline-flex bg-white border rounded-lg shadow-sm px-3 py-2 gap-2">
-                        {categories.map((c) => (
-                            <button
-                                key={c}
-                                onClick={() => goToGenre(c)}
-                                className="px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition"
-                            >
-                                {c}
-                            </button>
-                        ))}
+                        {categories.map((c) => {
+                            const isActive = selectedGenre === c.toLowerCase();
+
+                            return (
+                                <button
+                                    key={c}
+                                    onClick={() => goToGenre(c)}
+                                    aria-pressed={isActive}
+                                    className={`px-3 py-1 text-sm font-medium rounded-md transition border ${
+                                        isActive
+                                            ? "bg-blue-600 text-white border-blue-600"
+                                            : "text-gray-700 bg-gray-100 border-transparent hover:bg-gray-200"
+                                    }`}
+                                >
+                                    {c}
+                                </button>
+                            );
+                        })}
                     </nav>
                 </div>
 
