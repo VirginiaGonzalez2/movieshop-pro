@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { addShoppingCartItem } from "@/actions/shopping-cart";
 import { toast } from "sonner";
 import Image from "next/image";
-import { PriceTag } from "../ui/PriceTag";
+import { PriceTag } from "../ui-localized/PriceTag";
 
 type Props = {
     deal: {

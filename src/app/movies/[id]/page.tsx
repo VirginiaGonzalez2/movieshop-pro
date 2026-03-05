@@ -13,7 +13,7 @@ import BuyNowButton from "@/components/movie-detail/BuyNowButton";
 import { getMovieRatingSummary } from "@/actions/movie-rating";
 import { type MovieCardItem } from "@/components/movies/MovieCard";
 import Image from "next/image";
-import { PriceTag } from "@/components/ui/PriceTag";
+import { PriceTag } from "@/components/ui-localized/PriceTag";
 
 export async function generateMetadata({
     params,

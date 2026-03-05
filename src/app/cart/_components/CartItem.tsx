@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/item";
 import Image from "next/image";
 import { CartItemControls } from "@/components/cart/CartItemControls";
-import { PriceTag } from "@/components/ui/PriceTag";
+import { PriceTag } from "@/components/ui-localized/PriceTag";
 
 type Props = {
     item: ShoppingCartItemInfo;

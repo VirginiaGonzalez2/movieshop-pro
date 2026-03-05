@@ -11,7 +11,7 @@
 import { getShoppingCartInfo } from "@/actions/shopping-cart";
 import { LinkButton } from "@/components/ui-custom-shadcn/LinkButton";
 import CartItem from "./_components/CartItem";
-import { PriceTag } from "@/components/ui/PriceTag";
+import { PriceTag } from "@/components/ui-localized/PriceTag";
 
 export default async function CartPage() {
     const shoppingCartInfo = await getShoppingCartInfo();

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SearchInput } from "@/components/ui/SearchInput";
+import { SearchInput } from "@/components/search/SearchInput";
 
 export default function MoviesSearchBar({ onSearch }: { onSearch: (value: string) => void }) {
     const [value, setValue] = useState("");

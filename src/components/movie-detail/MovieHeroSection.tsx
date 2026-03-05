@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PriceTag } from "@/components/ui/PriceTag";
+import { PriceTag } from "@/components/ui-localized/PriceTag";
 import { Play } from "lucide-react";
 import Image from "next/image";
 

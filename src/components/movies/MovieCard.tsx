@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { PriceTag } from "@/components/ui/PriceTag";
+import { PriceTag } from "@/components/ui-localized/PriceTag";
 import { RatingStars } from "@/components/ui/RatingStars";
 import AddToCartButton from "@/components/movie-detail/AddToCartButton";
 import { addShoppingCartItem } from "@/actions/shopping-cart";
