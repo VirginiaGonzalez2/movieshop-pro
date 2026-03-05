@@ -50,7 +50,7 @@ export default function UserMenuDropdown() {
                 <Button
                     type="button"
                     aria-label="User menu"
-                    className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-muted transition"
+                    className="flex h-9 w-9 items-center justify-center rounded-full hover:opacity-50 transition" 
                 >
                     <User className="h-5 w-5" />
                 </Button>
