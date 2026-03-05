@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { X, ChevronRight, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { addShoppingCartItem } from "@/actions/shopping-cart";
@@ -45,7 +45,11 @@ export default function DealOfTheDayClient({ deal }: Props) {
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
     const [isClosed, setIsClosed] = useState(false);
-    const [isMinimized, setIsMinimized] = useState(() => readLS(`dotd_min_${dayKey}`, "0") === "1");
+    const [isMinimized, setIsMinimized] = useState(false);
+
+    useEffect(() => {
+        setIsMinimized(readLS(`dotd_min_${dayKey}`, "0") === "1");
+    }, [dayKey]);
 
     const canRender = !!deal && !isClosed;
 
