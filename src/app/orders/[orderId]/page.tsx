@@ -1,15 +1,20 @@
-import { AuthGuard } from "@/components/auth/AuthGuard";
+import { auth } from "@/lib/auth";
+import { isOrderGuestAccessTokenValid } from "@/lib/order-access";
 import { prisma } from "@/lib/prisma";
+import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 export default async function OrderDetailsPage({
     params,
+    searchParams,
 }: {
     params: Promise<{ orderId: string }> | { orderId: string };
+    searchParams?: Promise<{ access?: string }> | { access?: string };
 }) {
     const resolved = await Promise.resolve(params);
+    const resolvedSearchParams = searchParams ? await Promise.resolve(searchParams) : undefined;
     const orderId = Number(resolved.orderId);
 
     if (Number.isNaN(orderId)) {
@@ -31,14 +36,28 @@ export default async function OrderDetailsPage({
         notFound();
     }
 
+    const session = await auth.api.getSession({ headers: await headers() });
+
+    const isOrderOwner = !!session &&
+        (session.user.id === order.userId || session.user.email === order.userId);
+
+    const hasValidGuestAccess = isOrderGuestAccessTokenValid(
+        order.id,
+        order.userId,
+        resolvedSearchParams?.access,
+    );
+
+    if (!isOrderOwner && !hasValidGuestAccess) {
+        redirect(`/login?from=orders/${order.id}`);
+    }
+
     const itemTotal = order.items.reduce(
         (sum, item) => sum + Number(item.priceAtPurchase) * item.quantity,
         0,
     );
 
     return (
-        <AuthGuard>
-            <div className="mx-auto max-w-6xl py-10 px-4 space-y-6">
+        <div className="mx-auto max-w-6xl py-10 px-4 space-y-6">
                 <div className="rounded-2xl border bg-card p-6 shadow-sm space-y-4">
                     <h1 className="text-2xl font-bold">Order Details</h1>
 
@@ -103,6 +122,5 @@ export default async function OrderDetailsPage({
                     </div>
                 </div>
             </div>
-        </AuthGuard>
     );
 }

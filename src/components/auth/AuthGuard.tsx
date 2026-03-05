@@ -2,7 +2,8 @@
 
 import { authClient } from "@/lib/auth-client";
 import { useOriginRouter } from "@/hooks/use-origin-router";
-import { ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { ReactNode, useEffect, useMemo } from "react";
 
 type Props = {
     children: ReactNode;
@@ -14,17 +15,28 @@ type Props = {
 };
 
 export function AuthGuard({ children, redirectTo = "/login" }: Props) {
-    const router = useOriginRouter();
+    const originRouter = useOriginRouter();
+    const router = useRouter();
     const session = authClient.useSession();
+    const redirectUrl = useMemo(
+        () => originRouter.formatUrl(redirectTo),
+        [originRouter, redirectTo],
+    );
+
+    useEffect(() => {
+        if (!session.isPending && !session.isRefetching && !session.data) {
+            router.replace(redirectUrl);
+        }
+    }, [session.isPending, session.isRefetching, session.data, router, redirectUrl]);
 
     // While session is loading, render nothing
     if (session.isPending || session.isRefetching) {
         return <></>;
     }
 
-    // Not logged-in go to login
+    // Not logged-in: redirect happens in useEffect
     if (!session.data) {
-        router.replace(redirectTo);
+        return <></>;
     }
 
     // Logged-in render page

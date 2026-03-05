@@ -14,7 +14,11 @@ import { confirmOrderPayment } from "@/actions/confirm-order-payment";
 import { clearShoppingCart } from "@/actions/shopping-cart";
 import { Button } from "@/components/ui/button";
 import { FieldContent, FieldGroup } from "@/components/ui/field";
-import { PAYPAL_APPROVED_SESSION_KEY } from "@/lib/payment-flags";
+import {
+    PAYPAL_APPROVED_COOKIE_KEY,
+    PAYPAL_APPROVED_LOCAL_KEY,
+    PAYPAL_APPROVED_SESSION_KEY,
+} from "@/lib/payment-flags";
 import {
     CheckoutFormValues,
     checkoutSchema,
@@ -31,6 +35,7 @@ type Props = {
     shippingAddress: ShippingAddressFormValues;
     shippingMethod: ShippingMethodFormValues;
     paymentMethod: FullPaymentMethodFormValues;
+    paypalApproved: boolean;
 };
 
 // ADDED: Narrow unknown runtime shapes safely before reading orderId in the fail branch.
@@ -58,6 +63,56 @@ export function PlaceOrder(props: Props) {
 
     async function handleSubmit(values: CheckoutFormValues) {
         const isPayPal = values.paymentMethod === "paypal";
+        const paypalEmail = values.paymentPayPalInfo?.payPalEmail?.toLowerCase().trim();
+        const isSandboxBypassEmail =
+            process.env.NODE_ENV === "development" &&
+            paypalEmail === "marisilva703@gmail.com";
+        const isSandboxForcedFailEmail =
+            process.env.NODE_ENV === "development" &&
+            paypalEmail === "sb-9aklq49665943@personal.example.com";
+
+        if (isPayPal && typeof window !== "undefined") {
+            if (isSandboxForcedFailEmail) {
+                const params = new URLSearchParams();
+                params.set(
+                    "err",
+                    JSON.stringify({
+                        message: "Sandbox test: forced failed payment for this PayPal email.",
+                    }),
+                );
+
+                redirect(`/checkout/fail?${params.toString()}`, RedirectType.replace);
+                return;
+            }
+
+            const isPayPalApprovedInState = props.paypalApproved;
+            const isPayPalApprovedInSession =
+                window.sessionStorage.getItem(PAYPAL_APPROVED_SESSION_KEY) === "true";
+            const isPayPalApprovedInLocal =
+                window.localStorage.getItem(PAYPAL_APPROVED_LOCAL_KEY) === "true";
+            const isPayPalApprovedInCookie = document.cookie
+                .split(";")
+                .some((cookie) => cookie.trim() === `${PAYPAL_APPROVED_COOKIE_KEY}=true`);
+            const isPayPalApproved =
+                isPayPalApprovedInState ||
+                isPayPalApprovedInSession ||
+                isPayPalApprovedInLocal ||
+                isPayPalApprovedInCookie;
+
+            if (!isPayPalApproved && !isSandboxBypassEmail) {
+                const params = new URLSearchParams();
+                params.set(
+                    "err",
+                    JSON.stringify({
+                        message:
+                            "PayPal payment was not confirmed. Please complete PayPal approval before placing the order.",
+                    }),
+                );
+
+                redirect(`/checkout/fail?${params.toString()}`, RedirectType.replace);
+                return;
+            }
+        }
 
         const result = await checkout(values);
 
@@ -68,12 +123,16 @@ export function PlaceOrder(props: Props) {
 
             if (isPayPal && typeof window !== "undefined") {
                 window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
+                window.localStorage.removeItem(PAYPAL_APPROVED_LOCAL_KEY);
+                document.cookie = `${PAYPAL_APPROVED_COOKIE_KEY}=; Max-Age=0; Path=/; SameSite=Lax`;
             }
 
             redirect(`/checkout/success?orderId=${result.order.id}`, RedirectType.replace);
         } else {
             if (isPayPal && typeof window !== "undefined") {
                 window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
+                window.localStorage.removeItem(PAYPAL_APPROVED_LOCAL_KEY);
+                document.cookie = `${PAYPAL_APPROVED_COOKIE_KEY}=; Max-Age=0; Path=/; SameSite=Lax`;
             }
 
             const params = new URLSearchParams();

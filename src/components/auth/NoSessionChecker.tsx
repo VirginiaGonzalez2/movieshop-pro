@@ -10,8 +10,8 @@
 "use client";
 
 import { authClient } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
-import { ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import { ReactNode, useEffect } from "react";
 
 type Props = {
     children: ReactNode;
@@ -19,14 +19,21 @@ type Props = {
 };
 
 export function NoSessionChecker({ children, originUrl }: Props) {
+    const router = useRouter();
     const session = authClient.useSession();
 
-    if (session.data) {
-        redirect(originUrl);
-    }
+    useEffect(() => {
+        if (!session.isPending && !session.isRefetching && session.data) {
+            router.replace(originUrl);
+        }
+    }, [session.isPending, session.isRefetching, session.data, router, originUrl]);
 
     if (session.isPending || session.isRefetching) {
         // Loading
+        return <></>;
+    }
+
+    if (session.data) {
         return <></>;
     }
 

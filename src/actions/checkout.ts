@@ -9,6 +9,7 @@
 "use server";
 
 import { CheckoutFormValues, checkoutSchema } from "@/form-schemas/checkout";
+import { applyDealDiscountToPrice } from "@/actions/deal-of-the-day";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { Order } from "@prisma/client";
@@ -50,24 +51,50 @@ async function checkout(
         safeValues.paymentPayPalInfo?.payPalEmail ?? `${safeValues.firstName} ${safeValues.lastName}`;
     const userId = session ? session.user.id : guestIdentifier;
 
+    const requestedIds = safeValues.orderItems.map((item) => item.id);
+    const movies = await prisma.movie.findMany({
+        where: { id: { in: requestedIds } },
+        select: { id: true, price: true },
+    });
+
+    const movieById = new Map(movies.map((movie) => [movie.id, movie]));
+
+    const normalizedOrderItems = [] as Array<{
+        movieId: number;
+        quantity: number;
+        priceAtPurchase: number;
+    }>;
+
+    let normalizedOrderCost = 0;
+    for (const item of safeValues.orderItems) {
+        const movie = movieById.get(item.id);
+        if (!movie) {
+            continue;
+        }
+
+        const basePrice = movie.price.toNumber();
+        const discountedPrice = await applyDealDiscountToPrice(item.id, basePrice);
+        const priceAtPurchase = Number(discountedPrice.toFixed(2));
+
+        normalizedOrderItems.push({
+            movieId: item.id,
+            quantity: item.quantity,
+            priceAtPurchase,
+        });
+
+        normalizedOrderCost += priceAtPurchase * item.quantity;
+    }
+
     let result;
     try {
         result = await prisma.order.create({
             data: {
                 userId: userId,
-                totalAmount: safeValues.orderCost,
+                totalAmount: Number(normalizedOrderCost.toFixed(2)),
                 // ADDED: Order starts as PENDING until PayPal confirmation
                 status: "PENDING",
                 items: {
-                    create: safeValues.orderItems
-                        .map((item) => {
-                            return {
-                                movieId: item.id,
-                                quantity: item.quantity,
-                                priceAtPurchase: item.cost,
-                            };
-                        })
-                        .flat(),
+                    create: normalizedOrderItems,
                 },
             },
         });

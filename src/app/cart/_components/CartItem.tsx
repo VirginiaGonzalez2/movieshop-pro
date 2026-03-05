@@ -50,8 +50,19 @@ export default async function CartItem({ item }: Props) {
                         stock={item.stock}
                     />
                 </div>
-                <ItemContent className="min-w-14 flex-0 text-center">
-                    <PriceTag amount={Number(item.price * item.quantity)} />
+                <ItemContent className="min-w-14 flex-0">
+                    <div className="flex flex-col items-end gap-1">
+                        {item.isDealApplied && (
+                            <div className="flex flex-col items-end gap-1">
+                                <div className="text-xs text-muted-foreground line-through">
+                                    <PriceTag
+                                        amount={Number(item.originalPrice * item.quantity)}
+                                    />
+                                </div>
+                            </div>
+                        )}
+                        <PriceTag amount={Number(item.price * item.quantity)} />
+                    </div>
                 </ItemContent>
             </li>
         </Item>
