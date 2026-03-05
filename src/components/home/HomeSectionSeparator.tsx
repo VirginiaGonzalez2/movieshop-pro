@@ -13,9 +13,7 @@ export default function HomeSectionSeparator({ genre }: { genre?: string | null 
 
     return (
         <div>
-            <div className="mx-auto max-w-2xl py-8 px-4">
-                <h1 className="text-2xl font-bold mb-4">Hero section</h1>
-                <p className="mb-2">Browse and buy your favorite movies.</p>
+            <div className="mx-auto max-w-2xl pt-22 pb-22">
                 <HomeHero />
             </div>
 
