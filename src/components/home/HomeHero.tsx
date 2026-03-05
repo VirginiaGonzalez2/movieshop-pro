@@ -32,58 +32,52 @@ export default async function HomeHero()
 
   return (
     <div className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] overflow-hidden">
-      {/* Image container with all overlays positioned relative to it */}
-      {heroImage && (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={heroImage}
-          alt={deal?.title}
-          className="relative w-full h-auto scale-95 -my-2"
-          loading="lazy"
-        />
-      )}
+      <div className="relative mx-auto w-full max-w-[1920px] aspect-[96/35]">
+        {/* Image container with all overlays positioned relative to it */}
+        {heroImage && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={heroImage}
+            alt={deal?.title}
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+          />
+        )}
 
-      {/* Top left: "Check out our Deals of the Day" */}
-      <div className="absolute top-16 left-26 z-30">
-        <h1 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg text-left">
-          Check out our<br />Deals of the Day
-        </h1>
-      </div>
+        <div className="absolute inset-0 z-30 flex items-center justify-center px-4">
+          <div className="text-center space-y-4 md:space-y-6">
+          <h1 className="text-2xl md:text-4xl font-bold tracking-tight text-white drop-shadow-lg leading-tight">
+            Checkout Our Deals of the Day
+          </h1>
 
-      {/* Center top: Deal title */}
-      <div className="absolute top-16  left-1/2 -translate-x-1/2 z-30 text-center px-4">
-        <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
-          {deal?.title}
-        </h1>
-      </div>
+          <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white drop-shadow-lg leading-tight">
+            {deal?.title}
+          </h2>
 
-      {/* Center bottom: "High Quality Movies" */}
-      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-30 text-center">
-        <h2 className="text-lg md:text-2xl text-white drop-shadow-lg">
-          High Quality Movies
-        </h2>
-      </div>
+          <div className="flex justify-center gap-3">
+            <Button
+              asChild
+              className="bg-white/90 rounded text-foreground text-lg md:text-xl"
+              variant="secondary"
+            >
+              <Link href={`/movies/${dealId?.movieId}`}>View</Link>
+            </Button>
 
-      {/* Buttons container - positioned above "High Quality Movies" */}
-      <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-25 flex gap-3">
-        {/* View button */}
-        <Button
-          asChild
-          className="bg-white/90 rounded text-foreground text-lg md:text-xl"
-          variant="secondary"
-        >
-          <Link href={`/movies/${dealId?.movieId}`}>View</Link>
-        </Button>
+            <form action={addAndRedirect}>
+              <Button
+                className="bg-white/90 rounded text-foreground text-lg md:text-xl"
+                variant="secondary"
+              >
+                Add to Cart
+              </Button>
+            </form>
+          </div>
 
-        {/* Add to Cart button */}
-        <form action={addAndRedirect}>
-          <Button
-            className="bg-white/90 rounded text-foreground text-lg md:text-xl"
-            variant="secondary"
-          >
-            Add to Cart
-          </Button>
-        </form>
+          <h3 className="text-lg md:text-2xl font-medium tracking-wide text-white drop-shadow-lg">
+            High Quality Movies
+          </h3>
+          </div>
+        </div>
       </div>
     </div>
   );

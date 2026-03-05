@@ -13,7 +13,7 @@ export default function HomeSectionSeparator({ genre }: { genre?: string | null 
 
     return (
         <div>
-            <div className="mx-auto max-w-2xl pt-22 pb-22">
+            <div className="mx-auto max-w-2xl py-0">
                 <HomeHero />
             </div>
 
