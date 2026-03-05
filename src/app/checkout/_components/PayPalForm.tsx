@@ -20,20 +20,40 @@ import { useEffect, useRef } from "react";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { PaymentMethodFormValues } from "@/form-schemas/payment";
-import { PAYPAL_APPROVED_SESSION_KEY } from "@/lib/payment-flags";
+import {
+    PAYPAL_APPROVED_COOKIE_KEY,
+    PAYPAL_APPROVED_LOCAL_KEY,
+    PAYPAL_APPROVED_SESSION_KEY,
+} from "@/lib/payment-flags";
 import { Controller, UseFormReturn } from "react-hook-form";
 
 type Props = {
     form: UseFormReturn<PaymentMethodFormValues>;
+    orderCost: number;
+    onApprovalChange: (approved: boolean) => void;
 };
 
-export function PayPalForm({ form }: Props) {
+export function PayPalForm({ form, orderCost, onApprovalChange }: Props) {
     /*
        ADDED:
        Ref to render the PayPal button safely.
        This does NOT interfere with the existing form logic.
     */
     const paypalRef = useRef<HTMLDivElement>(null);
+
+    function clearPayPalApproval() {
+        window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
+        window.localStorage.removeItem(PAYPAL_APPROVED_LOCAL_KEY);
+        document.cookie = `${PAYPAL_APPROVED_COOKIE_KEY}=; Max-Age=0; Path=/; SameSite=Lax`;
+        onApprovalChange(false);
+    }
+
+    function setPayPalApproval() {
+        window.sessionStorage.setItem(PAYPAL_APPROVED_SESSION_KEY, "true");
+        window.localStorage.setItem(PAYPAL_APPROVED_LOCAL_KEY, "true");
+        document.cookie = `${PAYPAL_APPROVED_COOKIE_KEY}=true; Max-Age=900; Path=/; SameSite=Lax`;
+        onApprovalChange(true);
+    }
 
     function redirectToFail(message: string) {
         const params = new URLSearchParams();
@@ -64,6 +84,11 @@ export function PayPalForm({ form }: Props) {
         const renderButtons = () => {
             if (!paypalRef.current || !window.paypal) return;
 
+            paypalRef.current.innerHTML = "";
+
+            const normalizedTotal = Math.max(0.01, Number(orderCost) || 0);
+            const amountValue = normalizedTotal.toFixed(2);
+
             window.paypal
                 .Buttons({
                     style: {
@@ -80,13 +105,13 @@ export function PayPalForm({ form }: Props) {
                        Does NOT modify checkout logic.
                     */
                     createOrder: (_data: any, actions: any) => {
-                        window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
+                        clearPayPalApproval();
 
                         return actions.order.create({
                             purchase_units: [
                                 {
                                     amount: {
-                                        value: "1.00", // Placeholder amount (can later connect to real total)
+                                        value: amountValue,
                                     },
                                 },
                             ],
@@ -102,14 +127,18 @@ export function PayPalForm({ form }: Props) {
                     */
                     onApprove: async (_data: any, actions: any) => {
                         try {
-                            await actions.order.capture();
-                            window.sessionStorage.setItem(PAYPAL_APPROVED_SESSION_KEY, "true");
+                            const captureResult = await actions.order.capture();
+                            if (captureResult?.status !== "COMPLETED") {
+                                throw new Error("PayPal capture is not COMPLETED.");
+                            }
+
+                            setPayPalApproval();
                             console.log("PayPal payment approved");
 
                             paypalRef.current?.closest("form")?.requestSubmit();
                         } catch (error) {
                             console.error("PayPal capture failed:", error);
-                            window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
+                            clearPayPalApproval();
                             redirectToFail(
                                 "PayPal payment could not be completed. Please try again or use another method.",
                             );
@@ -118,14 +147,14 @@ export function PayPalForm({ form }: Props) {
 
                     onError: (err: any) => {
                         console.error("PayPal error:", err);
-                        window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
+                        clearPayPalApproval();
                         redirectToFail(
                             "PayPal returned an error while processing your payment. Please try again.",
                         );
                     },
 
                     onCancel: () => {
-                        window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
+                        clearPayPalApproval();
                         redirectToFail("PayPal payment was canceled.");
                     },
                 })
@@ -133,7 +162,7 @@ export function PayPalForm({ form }: Props) {
         };
 
         loadScript();
-    }, []);
+    }, [orderCost, onApprovalChange]);
 
     return (
         <>

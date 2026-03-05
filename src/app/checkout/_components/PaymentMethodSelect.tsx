@@ -34,6 +34,8 @@ import { PayPalForm } from "./PayPalForm";
 type Props = {
     nextStep: string;
     savedValues: FullPaymentMethodFormValues | null;
+    orderCost: number;
+    onPayPalApprovedChange: (approved: boolean) => void;
     onSubmit: (values: PaymentMethodFormValues) => void;
 };
 
@@ -98,7 +100,11 @@ export function PaymentMethodSelect(props: Props) {
                     <PayByCardForm form={form} />
                 </FieldSet>
                 <FieldSet className={paymentMethod !== "paypal" ? "hidden" : undefined}>
-                    <PayPalForm form={form} />
+                    <PayPalForm
+                        form={form}
+                        orderCost={props.orderCost}
+                        onApprovalChange={props.onPayPalApprovedChange}
+                    />
                 </FieldSet>
                 <Button className="w-fit self-center" type="submit">
                     Continue to {props.nextStep}

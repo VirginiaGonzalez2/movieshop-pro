@@ -14,6 +14,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Prisma } from "@prisma/client";
 import Image from "next/image";
+import { createOrderGuestAccessToken } from "@/lib/order-access";
 
 /*
   ADDED:
@@ -82,6 +83,8 @@ export default async function SuccessPage({ searchParams }: Props) {
         notFound();
     }
 
+    const guestOrderAccessToken = createOrderGuestAccessToken(order.id, order.userId);
+
     return (
         <div className="min-h-screen bg-background px-4 py-12 md:py-16">
             <div className="mx-auto w-full max-w-5xl space-y-8">
@@ -102,7 +105,11 @@ export default async function SuccessPage({ searchParams }: Props) {
                         </Link>
 
                         <Link
-                            href={`/login?from=orders/${order.id}`}
+                            href={
+                                guestOrderAccessToken
+                                    ? `/orders/${order.id}?access=${guestOrderAccessToken}`
+                                    : `/login?from=orders/${order.id}`
+                            }
                             className="inline-flex items-center justify-center rounded-md border px-4 py-2 hover:bg-muted transition"
                         >
                             View Your Order

@@ -215,7 +215,9 @@ type ShoppingCartItemInfo = {
     title: string;
     imageUrl: string | null;
     genres: string[];
+    originalPrice: number;
     price: number;
+    isDealApplied: boolean;
     stock: number;
 };
 
@@ -263,7 +265,9 @@ async function getShoppingCartInfo(): Promise<ShoppingCartItemInfo[] | null> {
             title: movie.title,
             imageUrl: movie.imageUrl,
             genres: movie.genres.map((value) => value.genre.name).flat(),
+            originalPrice: basePrice,
             price: finalPrice,
+            isDealApplied: finalPrice < basePrice,
             stock: movie.stock,
         });
     }

@@ -47,6 +47,7 @@ export function Checkout(props: Props) {
     const [shippingAddressSubmitted, setShippingAddressSubmitted] = useState(false);
     const [shippingMethodSubmitted, setShippingMethodSubmitted] = useState(false);
     const [paymentMethodSubmitted, setPaymentMethodSubmitted] = useState(false);
+    const [paypalApproved, setPaypalApproved] = useState(false);
     const [currentStep, setCurrentStep] = useState<CheckoutStep>("shippingAddress");
 
     // Allow manual control of accordion.
@@ -127,6 +128,8 @@ export function Checkout(props: Props) {
                 <PaymentMethodSelect
                     nextStep="Confirmation"
                     savedValues={paymentMethodInfo}
+                    orderCost={props.cart.orderCost}
+                    onPayPalApprovedChange={setPaypalApproved}
                     onSubmit={handlePaymentMethodSubmit}
                 />
             </CheckoutStepComponent>
@@ -142,6 +145,7 @@ export function Checkout(props: Props) {
                         shippingAddress={shippingAddressInfo}
                         shippingMethod={shippingMethodInfo}
                         paymentMethod={paymentMethodInfo}
+                        paypalApproved={paypalApproved}
                     />
                 )}
             </CheckoutStepComponent>
