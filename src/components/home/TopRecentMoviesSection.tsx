@@ -89,25 +89,26 @@ export default async function TopRecentMoviesSection({ genre }: { genre?: string
                     }
 
                     return (
-                        <MovieCard
-                            key={movie.id}
-                            movie={{
-                                id: movie.id,
-                                title: movie.title,
-                                price: movie.price.toString(),
-                                stock: movie.stock,
-                                runtime: movie.runtime,
-                                imageUrl: movie.imageUrl,
-                                // include release year for recent movies as well
-                                releaseYear: movie.releaseDate
-                                    ? movie.releaseDate.getFullYear()
-                                    : undefined,
-                                genres: movie.genres.map((mg) => mg.genre.name),
+                        <div key={movie.id} className="mx-auto w-full max-w-[220px]">
+                            <MovieCard
+                                movie={{
+                                    id: movie.id,
+                                    title: movie.title,
+                                    price: movie.price.toString(),
+                                    stock: movie.stock,
+                                    runtime: movie.runtime,
+                                    imageUrl: movie.imageUrl,
+                                    // include release year for recent movies as well
+                                    releaseYear: movie.releaseDate
+                                        ? movie.releaseDate.getFullYear()
+                                        : undefined,
+                                    genres: movie.genres.map((mg) => mg.genre.name),
 
-                                avgRating: rating.avgRating,
-                                ratingCount: rating.ratingCount,
-                            }}
-                        />
+                                    avgRating: rating.avgRating,
+                                    ratingCount: rating.ratingCount,
+                                }}
+                            />
+                        </div>
                     );
                 })
             ) : (

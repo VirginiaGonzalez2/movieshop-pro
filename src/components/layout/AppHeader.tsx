@@ -49,6 +49,7 @@ export default function AppHeader() {
                 {/* DESKTOP NAVIGATION */}
                 <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
                     <Link href="/">Home</Link>
+                    <Link href="/home">Home Responsive</Link>
                     <Link href="/movies">Movies</Link>
                     <Link href="/orders">Orders</Link>
                     <Link href="/cart">Cart</Link>
@@ -79,6 +80,10 @@ export default function AppHeader() {
                         {/* Mobile Navigation Links */}
                         <Link href="/" onClick={() => setIsOpen(false)}>
                             Home
+                        </Link>
+
+                        <Link href="/home" onClick={() => setIsOpen(false)}>
+                            Home Responsive
                         </Link>
 
                         <Link href="/movies" onClick={() => setIsOpen(false)}>

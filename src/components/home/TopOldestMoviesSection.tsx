@@ -94,7 +94,11 @@ export default async function TopOldestMoviesSection({ genre }: { genre?: string
     return (
         <div className="grid grid-cols-5 gap-4">
             {movies.length > 0 ? (
-                movieItems.map((movie) => <MovieCard key={movie.id} movie={movie} />)
+                movieItems.map((movie) => (
+                    <div key={movie.id} className="mx-auto w-full max-w-[220px]">
+                        <MovieCard movie={movie} />
+                    </div>
+                ))
             ) : (
                 <p className="text-left text-2xl">No results found.</p>
             )}

@@ -30,7 +30,13 @@ export type MovieCardItem = {
     purchasedCount?: number;
 };
 
-export default function MovieCard({ movie }: { movie: MovieCardItem }) {
+export default function MovieCard({
+    movie,
+    compact = false,
+}: {
+    movie: MovieCardItem;
+    compact?: boolean;
+}) {
     const [isPending, startTransition] = useTransition();
     const router = useRouter();
 
@@ -47,7 +53,11 @@ export default function MovieCard({ movie }: { movie: MovieCardItem }) {
     }
 
     return (
-        <div className="block border rounded-lg overflow-hidden transition-all duration-200 transform hover:scale-[1.02] hover:shadow-lg">
+        <div
+            className={`block border rounded-lg overflow-hidden transition-all duration-200 transform hover:shadow-lg ${
+                compact ? "hover:scale-100" : "hover:scale-[1.02]"
+            }`}
+        >
             {/* Poster (clickable) */}
             <Link href={`/movies/${movie.id}`} className="block">
                 <div className="aspect-2/3 bg-muted flex items-center justify-center overflow-hidden">
@@ -67,9 +77,13 @@ export default function MovieCard({ movie }: { movie: MovieCardItem }) {
             </Link>
 
             {/* Content */}
-            <div className="p-3 space-y-2">
+            <div className={compact ? "p-2 space-y-1.5" : "p-3 space-y-2"}>
                 <Link href={`/movies/${movie.id}`} className="block">
-                    <div className="font-semibold line-clamp-1 flex items-baseline gap-2">
+                    <div
+                        className={`font-semibold line-clamp-1 flex items-baseline gap-2 ${
+                            compact ? "text-xs" : ""
+                        }`}
+                    >
                         <span className="truncate">{movie.title}</span>
                         {movie.releaseYear ? (
                             <span className="text-xs text-muted-foreground">
@@ -80,21 +94,31 @@ export default function MovieCard({ movie }: { movie: MovieCardItem }) {
                 </Link>
 
                 {movie.genres && movie.genres.length > 0 ? (
-                    <p className="text-xs text-muted-foreground line-clamp-1">
+                    <p
+                        className={`text-muted-foreground line-clamp-1 ${
+                            compact ? "text-[10px]" : "text-xs"
+                        }`}
+                    >
                         {movie.genres.join(" • ")}
                     </p>
                 ) : null}
 
                 {movie.purchasedCount !== undefined && movie.purchasedCount > 0 ? (
-                    <p className="text-xs text-muted-foreground">{movie.purchasedCount} sold</p>
+                    <p className={compact ? "text-[10px] text-muted-foreground" : "text-xs text-muted-foreground"}>
+                        {movie.purchasedCount} sold
+                    </p>
                 ) : null}
 
                 <div className="flex items-start justify-between">
-                    <div className="text-lg font-semibold">
+                    <div className={compact ? "text-sm font-semibold" : "text-lg font-semibold"}>
                         <PriceTag amount={movie.price} />
                     </div>
 
-                    <div className="text-xs text-muted-foreground text-right">
+                    <div
+                        className={`text-muted-foreground text-right ${
+                            compact ? "text-[10px]" : "text-xs"
+                        }`}
+                    >
                         <div>{movie.runtime} min</div>
                         <div>
                             {movie.stock > 0 ? (
@@ -107,15 +131,19 @@ export default function MovieCard({ movie }: { movie: MovieCardItem }) {
                 </div>
 
                 <div className="flex items-center justify-between gap-2">
-                    <RatingStars value={Math.round(movie.avgRating)} />
-                    <span className="text-xs text-muted-foreground">
+                    <RatingStars value={Math.round(movie.avgRating)} size={compact ? 12 : 16} />
+                    <span className={compact ? "text-[10px] text-muted-foreground" : "text-xs text-muted-foreground"}>
                         {movie.ratingCount > 0
                             ? `${movie.avgRating.toFixed(1)} (${movie.ratingCount})`
                             : "No ratings"}
                     </span>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-1 mt-2 items-stretch">
+                <div
+                    className={`flex flex-col sm:flex-row gap-1 mt-2 items-stretch ${
+                        compact ? "scale-90 origin-left" : ""
+                    }`}
+                >
                     <div className="w-full sm:w-auto">
                         <AddToCartButton movieId={movie.id} disabled={movie.stock <= 0} />
                     </div>

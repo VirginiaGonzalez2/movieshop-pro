@@ -121,15 +121,12 @@ export default async function TopPurchasedMoviesSection({
   });
 
   return (
-    <div className="px-6">
-      <div className="grid grid-cols-5 gap-6">
-        {movieItems.map((movie) => (
-          <MovieCard
-            key={movie.id}
-            movie={movie}
-          />
-        ))}
-      </div>
+    <div className="grid grid-cols-5 gap-4">
+      {movieItems.map((movie) => (
+        <div key={movie.id} className="mx-auto w-full max-w-[220px]">
+          <MovieCard movie={movie} />
+        </div>
+      ))}
     </div>
   );
 }
