@@ -114,7 +114,8 @@ export async function createMovie(
         revalidatePath("/admin/movies");
         revalidatePath("/movies");
 
-        redirect("/admin/movies");
+        // redirect back with a small flag so the page can show a toast
+        redirect("/admin/movies?created=1");
     } catch (e) {
         console.error(e);
         return { ok: false, message: "Failed to create movie. Please try again." };

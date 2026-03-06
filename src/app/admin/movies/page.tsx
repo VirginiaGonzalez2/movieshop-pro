@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { deleteMovie } from "@/actions/movie";
+import CreateMovieToast from "./_components/CreateMovieToast";
 
 export default async function AdminMoviesPage() {
     const movies = await prisma.movie.findMany({
@@ -9,6 +10,9 @@ export default async function AdminMoviesPage() {
 
     return (
         <div className="p-8">
+            {/* Shows toast after redirect from create */}
+            <CreateMovieToast />
+
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold">Admin: Movies</h1>
 
