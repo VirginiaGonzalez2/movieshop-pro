@@ -111,7 +111,7 @@ export default async function TopRecentMoviesSection({ genre }: { genre?: string
                     );
                 })
             ) : (
-                <p>No results found.</p>
+                <p className="text-left text-2xl">No results found.</p>
             )}
         </div>
     );
