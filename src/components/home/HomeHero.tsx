@@ -3,20 +3,28 @@ import { addShoppingCartItem } from "@/actions/shopping-cart";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { existsSync } from "node:fs";
+import path from "node:path";
 
 export default async function HomeHero()
 {
   const deal = await getDealMovie();
   const dealId = await getDealSelection();
 
-  const heroImage = deal?.imageUrl
-    ? `/images/movies-wide/${
-        deal.imageUrl
-          .split("/")
-          .pop()
-          ?.replace(/(\.[a-zA-Z]+)$/, "_hero$1")
-      }`
+  const heroFilename = deal?.imageUrl
+    ?.split("/")
+    .pop()
+    ?.replace(/(\.[a-zA-Z]+)$/, "_hero$1");
+
+  const wideHeroImage = heroFilename ? `/images/movies-wide/${heroFilename}` : null;
+  const wideHeroFilePath = heroFilename
+    ? path.join(process.cwd(), "public", "images", "movies-wide", heroFilename)
     : null;
+
+  const heroImage =
+    wideHeroImage && wideHeroFilePath && existsSync(wideHeroFilePath)
+      ? wideHeroImage
+      : (deal?.imageUrl ?? null);
 
   console.log("HERO image", heroImage);
 
