@@ -11,7 +11,7 @@ import { authClient } from "@/lib/auth-client";
 import { User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MouseEvent } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import { Button } from "../ui/button";
 
 type LoginStatus = "pending" | "loggedin" | "notloggedin";
@@ -28,6 +28,7 @@ export default function UserMenuDropdown() {
     const router = useOriginRouter(isAuthRoute);
 
     const session = authClient.useSession();
+    const [isAdmin, setIsAdmin] = useState(false);
 
     const loginStatus: LoginStatus =
         session.isPending || session.isRefetching
@@ -41,6 +42,52 @@ export default function UserMenuDropdown() {
             event.preventDefault();
         }
     }
+
+    useEffect(() => {
+        let mounted = true;
+
+        async function loadAdminStatus() {
+            if (loginStatus !== "loggedin") {
+                if (mounted) {
+                    setIsAdmin(false);
+                }
+                return;
+            }
+
+            const roleInSession = session.data?.user.role?.toLowerCase();
+            if (roleInSession === "admin") {
+                if (mounted) {
+                    setIsAdmin(true);
+                }
+                return;
+            }
+
+            try {
+                const response = await fetch("/api/auth/is-admin", { cache: "no-store" });
+                if (!response.ok) {
+                    if (mounted) {
+                        setIsAdmin(false);
+                    }
+                    return;
+                }
+
+                const data = (await response.json()) as { isAdmin?: boolean };
+                if (mounted) {
+                    setIsAdmin(Boolean(data.isAdmin));
+                }
+            } catch {
+                if (mounted) {
+                    setIsAdmin(false);
+                }
+            }
+        }
+
+        loadAdminStatus();
+
+        return () => {
+            mounted = false;
+        };
+    }, [loginStatus, session.data?.user.role]);
 
     // TODO: Use session data to display name and email profile pic etc.
 
@@ -80,7 +127,7 @@ export default function UserMenuDropdown() {
                     </>
                 ) : (
                     <>
-                        {session.data?.user.role === "admin" && (
+                        {isAdmin && (
                             <DropdownMenuItem asChild>
                                 <Link href={router.formatUrl("/admin")} onClick={blockWhilePending}>
                                     Admin Dashboard
