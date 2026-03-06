@@ -65,15 +65,15 @@ export enum PaymentSchemaKey {
     PAYPAL = "paymentPayPalInfo",
 }
 
-const errPaymentMethodMissing = "Please select a payment method.";
+//const errPaymentMethodMissing = "Please select a payment method.";
 
 export const paymentMethodSchema = z.discriminatedUnion(PaymentSchemaKey.METHOD, [
     z.object({
-        [PaymentSchemaKey.METHOD]: z.literal("card" as PaymentMethod, errPaymentMethodMissing),
+        [PaymentSchemaKey.METHOD]: z.literal("card" as PaymentMethod),
         [PaymentSchemaKey.CARD]: paymentCardSchema,
     }),
     z.object({
-        [PaymentSchemaKey.METHOD]: z.literal("paypal" as PaymentMethod, errPaymentMethodMissing),
+        [PaymentSchemaKey.METHOD]: z.literal("paypal" as PaymentMethod),
         [PaymentSchemaKey.PAYPAL]: paymentPayPalSchema,
     }),
 ]);

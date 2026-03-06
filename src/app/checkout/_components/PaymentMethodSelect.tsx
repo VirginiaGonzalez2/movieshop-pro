@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-19 16:57:39
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-25 09:20:26
+ *   Modified time: 2026-03-06 12:40:26
  *   Description: Payment method selection.
  */
 
@@ -40,8 +40,8 @@ type Props = {
 };
 
 export function PaymentMethodSelect(props: Props) {
-    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | undefined>(
-        props.savedValues?.paymentMethod,
+    const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
+        props.savedValues?.paymentMethod ?? "card",
     );
 
     const savedValues = props.savedValues as FullPaymentMethodFormValues;
@@ -75,7 +75,7 @@ export function PaymentMethodSelect(props: Props) {
                                     field.onChange(value);
                                     setPaymentMethod(value as PaymentMethod);
                                 }}
-                                defaultValue={paymentMethod ?? ""}
+                                defaultValue={paymentMethod}
                             >
                                 <SelectTrigger className="w-full max-w-48">
                                     <SelectValue placeholder="Payment Options" />

@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-19 17:05:36
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-26 10:56:33
+ *   Modified time: 2026-03-06 12:10:45
  *   Description: Shipping address form.
  */
 
@@ -45,12 +45,12 @@ export function ShippingAddressForm(props: Props) {
     const form = useForm<ShippingAddressFormValues>({
         resolver: zodResolver(shippingAddressSchema),
         defaultValues: {
-            firstName: props.savedValues?.firstName ?? "Sven",
-            lastName: props.savedValues?.lastName ?? "Svensson",
-            streetAddress: props.savedValues?.streetAddress ?? "Bogatan 5",
-            postalCode: props.savedValues?.postalCode ?? "12345",
-            city: props.savedValues?.city ?? "Stockholm",
-            country: props.savedValues?.country ?? "SWE",
+            firstName: props.savedValues?.firstName,
+            lastName: props.savedValues?.lastName,
+            streetAddress: props.savedValues?.streetAddress,
+            postalCode: props.savedValues?.postalCode,
+            city: props.savedValues?.city,
+            country: props.savedValues?.country,
         },
     });
 
@@ -93,33 +93,35 @@ export function ShippingAddressForm(props: Props) {
                         </Field>
                     )}
                 />
-                <Controller
-                    control={form.control}
-                    name="postalCode"
-                    render={({ field, fieldState }) => (
-                        <Field>
-                            <FieldLabel htmlFor={field.name}>Postal Code</FieldLabel>
-                            <Input
-                                {...field}
-                                id={field.name}
-                                autoComplete="postal-code"
-                                onBeforeInput={postalCodeInputFilter}
-                            />
-                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                        </Field>
-                    )}
-                />
-                <Controller
-                    control={form.control}
-                    name="city"
-                    render={({ field, fieldState }) => (
-                        <Field>
-                            <FieldLabel htmlFor={field.name}>City</FieldLabel>
-                            <Input {...field} id={field.name} autoComplete="address-level1" />
-                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-                        </Field>
-                    )}
-                />
+                <FieldSet className="flex-row">
+                    <Controller
+                        control={form.control}
+                        name="postalCode"
+                        render={({ field, fieldState }) => (
+                            <Field className="flex-2">
+                                <FieldLabel htmlFor={field.name}>Postal Code</FieldLabel>
+                                <Input
+                                    {...field}
+                                    id={field.name}
+                                    autoComplete="postal-code"
+                                    onBeforeInput={postalCodeInputFilter}
+                                />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        control={form.control}
+                        name="city"
+                        render={({ field, fieldState }) => (
+                            <Field className="flex-3">
+                                <FieldLabel htmlFor={field.name}>City</FieldLabel>
+                                <Input {...field} id={field.name} autoComplete="address-level1" />
+                                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                            </Field>
+                        )}
+                    />
+                </FieldSet>
                 <Controller
                     control={form.control}
                     name="country"
