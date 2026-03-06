@@ -36,7 +36,7 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
         // TODO: Change this to test e-mail verification.
-        requireEmailVerification: !development,
+        requireEmailVerification: false, //!development,
         sendResetPassword: async (data: { url: string }) => {
             console.log("Password Reset:", data.url);
         },
