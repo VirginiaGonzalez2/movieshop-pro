@@ -1,9 +1,9 @@
 import HomeHero from "./HomeHero";
-import HomeQuickFiltersResponsive from "./HomeQuickFiltersResponsive";
-import TopCheapestMoviesSectionResponsive from "./TopCheapestMoviesSectionResponsive";
-import TopOldestMoviesSectionResponsive from "./TopOldestMoviesSectionResponsive";
-import TopPurchasedMoviesSectionResponsive from "./TopPurchasedMoviesSectionResponsive";
-import TopRecentMoviesSectionResponsive from "./TopRecentMoviesSectionResponsive";
+import HomeQuickFilters from "./HomeQuickFilters";
+import TopCheapestMoviesSection from "./TopCheapestMoviesSection";
+import TopOldestMoviesSection from "./TopOldestMoviesSection";
+import TopPurchasedMoviesSection from "./TopPurchasedMoviesSection";
+import TopRecentMoviesSection from "./TopRecentMoviesSection";
 
 export default function HomeSectionSeparatorResponsive({ genre }: { genre?: string | null }) {
     const sectionTitleClass = "text-2xl md:text-3xl font-semibold tracking-tight text-foreground";
@@ -13,33 +13,33 @@ export default function HomeSectionSeparatorResponsive({ genre }: { genre?: stri
         <div>
             <HomeHero />
 
-            <HomeQuickFiltersResponsive genre={genre} />
+            <HomeQuickFilters />
 
             <section className={sectionClass}>
                 <h2 className={sectionTitleClass}>Top 4 Most Recent</h2>
                 <div className="mt-6 rounded-xl border bg-card/40 px-3 py-3 sm:px-4 sm:py-4 md:px-5 md:py-5">
-                    <TopRecentMoviesSectionResponsive genre={genre} />
+                    <TopRecentMoviesSection genre={genre} />
                 </div>
             </section>
 
             <section className={sectionClass}>
                 <h2 className={sectionTitleClass}>Top 4 Most Purchased</h2>
                 <div className="mt-6 rounded-xl border bg-card/40 px-3 py-3 sm:px-4 sm:py-4 md:px-5 md:py-5">
-                    <TopPurchasedMoviesSectionResponsive genre={genre} />
+                    <TopPurchasedMoviesSection genre={genre} />
                 </div>
             </section>
 
             <section className={sectionClass}>
                 <h2 className={sectionTitleClass}>Top 4 Oldest</h2>
                 <div className="mt-6 rounded-xl border bg-card/40 px-3 py-3 sm:px-4 sm:py-4 md:px-5 md:py-5">
-                    <TopOldestMoviesSectionResponsive genre={genre} />
+                    <TopOldestMoviesSection genre={genre} />
                 </div>
             </section>
 
             <section className={sectionClass}>
                 <h2 className={sectionTitleClass}>Top 4 Cheapest</h2>
                 <div className="mt-6 rounded-xl border bg-card/40 px-3 py-3 sm:px-4 sm:py-4 md:px-5 md:py-5">
-                    <TopCheapestMoviesSectionResponsive genre={genre} />
+                    <TopCheapestMoviesSection genre={genre} />
                 </div>
             </section>
         </div>
