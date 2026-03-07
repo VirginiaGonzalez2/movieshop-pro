@@ -1,4 +1,4 @@
-import HomeSectionSeparator from "@/components/home/HomeSectionSeparator";
+import HomeSectionSeparatorResponsive from "@/components/home/HomeSectionSeparatorResponsive";
 
 // Ensure the Home page is rendered server-side on every request
 export const dynamic = "force-dynamic";
@@ -8,16 +8,12 @@ export default async function HomePage({
 }: {
     searchParams: Promise<{ genre?: string }>;
 }) {
-    // IMPORTANT: unwrap searchParams in Next 16
     const params = await searchParams;
-
     const selectedGenre = params?.genre ?? null;
-
-    console.log("HOME PAGE GENRE:", selectedGenre);
 
     return (
         <div>
-            <HomeSectionSeparator genre={selectedGenre} />
+            <HomeSectionSeparatorResponsive genre={selectedGenre} />
         </div>
     );
 }

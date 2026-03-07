@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import dynamic from "next/dynamic";
 
 import NavSearch from "@/components/nav/NavSearch";
+import { WishlistButton } from "@/components/layout/WishlistButton";
 
 //  Client-only to avoid Radix hydration mismatch
 const UserMenuDropdown = dynamic(() => import("@/components/auth/UserMenuDropdown"), {
@@ -25,39 +26,6 @@ const UserMenuDropdown = dynamic(() => import("@/components/auth/UserMenuDropdow
  */
 export default function AppHeader() {
     const [isOpen, setIsOpen] = useState(false);
-    const [isAdmin, setIsAdmin] = useState(false);
-
-    useEffect(() => {
-        let mounted = true;
-
-        async function loadAdminStatus() {
-            try {
-                const response = await fetch("/api/auth/is-admin", { cache: "no-store" });
-
-                if (!response.ok) {
-                    if (mounted) {
-                        setIsAdmin(false);
-                    }
-                    return;
-                }
-
-                const data = (await response.json()) as { isAdmin?: boolean };
-                if (mounted) {
-                    setIsAdmin(Boolean(data.isAdmin));
-                }
-            } catch {
-                if (mounted) {
-                    setIsAdmin(false);
-                }
-            }
-        }
-
-        loadAdminStatus();
-
-        return () => {
-            mounted = false;
-        };
-    }, []);
 
     return (
         <header className="border-b bg-background relative z-50">
@@ -82,17 +50,16 @@ export default function AppHeader() {
                 {/* DESKTOP NAVIGATION */}
                 <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
                     <Link href="/">Home</Link>
-                    <Link href="/home">Home Responsive</Link>
                     <Link href="/movies">Movies</Link>
                     <Link href="/orders">Orders</Link>
                     <Link href="/cart">Cart</Link>
                     <Link href="/contact">Contact</Link>
-                    {isAdmin && <Link href="/admin">Admin</Link>}
                 </nav>
 
                 {/* RIGHT SIDE (Desktop) */}
                 <div className="hidden md:flex items-center gap-4">
                     <NavSearch />
+                    <WishlistButton initialCount={0} />
                     <UserMenuDropdown />
                 </div>
 
@@ -116,10 +83,6 @@ export default function AppHeader() {
                             Home
                         </Link>
 
-                        <Link href="/home" onClick={() => setIsOpen(false)}>
-                            Home Responsive
-                        </Link>
-
                         <Link href="/movies" onClick={() => setIsOpen(false)}>
                             Movies
                         </Link>
@@ -136,11 +99,9 @@ export default function AppHeader() {
                             Contact
                         </Link>
 
-                        {isAdmin && (
-                            <Link href="/admin" onClick={() => setIsOpen(false)}>
-                                Admin
-                            </Link>
-                        )}
+                        <Link href="/wishlist" onClick={() => setIsOpen(false)}>
+                            Wishlist
+                        </Link>
 
                         {/* Mobile Search */}
                         <div className="pt-2">

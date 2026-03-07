@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { admin as adminPlugin } from "better-auth/plugins";
 import { prisma } from "./prisma";
-import { ac, admin, user } from "./auth-role-permissions";
+import { ac, admin, catalogAdmin, ordersAdmin, supportAdmin, user } from "./auth-role-permissions";
 
 // Added this to solve some issues I have personally ran into
 // on a separate project. /Sabrina
@@ -14,6 +14,9 @@ export const auth = betterAuth({
             ac,
             roles: {
                 admin,
+                catalog_admin: catalogAdmin,
+                orders_admin: ordersAdmin,
+                support_admin: supportAdmin,
                 user,
             },
         }),

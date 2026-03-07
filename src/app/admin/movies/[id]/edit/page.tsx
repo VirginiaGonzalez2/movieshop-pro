@@ -1,11 +1,16 @@
+import Link from "next/link";
+import { requireAdminArea } from "@/lib/admin-rbac";
 import { prisma } from "@/lib/prisma";
 import MovieEditForm from "./movie-edit-form";
+import { ArrowLeft } from "lucide-react";
 
 export default async function AdminEditMoviePage({
     params,
 }: {
     params: Promise<{ id: string }> | { id: string };
 }) {
+    await requireAdminArea("movies");
+
     const resolvedParams = await Promise.resolve(params);
     const id = Number(resolvedParams.id);
 
@@ -48,27 +53,39 @@ export default async function AdminEditMoviePage({
         .map((p) => p.personId);
 
     return (
-        <div className="p-8 max-w-xl">
-            <h1 className="text-2xl font-bold mb-6">Edit Movie</h1>
+        <div className="max-w-3xl space-y-4">
+            <Link href="/admin/movies" className="inline-flex items-center gap-2 text-sm">
+                <ArrowLeft className="h-4 w-4" />
+                Back to Movies
+            </Link>
 
-            <MovieEditForm
-                movie={{
-                    id: movie.id,
-                    title: movie.title,
-                    description: movie.description,
-                    price: movie.price.toString(),
-                    releaseDate: movie.releaseDate.toISOString().split("T")[0],
-                    runtime: movie.runtime,
-                    imageUrl: movie.imageUrl ?? null,
-                    trailerUrl: movie.trailerUrl ?? null,
-                    stock: movie.stock,
-                }}
-                genres={genres}
-                people={people}
-                selectedGenreIds={selectedGenreIds}
-                selectedActorIds={selectedActorIds}
-                selectedDirectorIds={selectedDirectorIds}
-            />
+            <div>
+                <h2 className="text-xl font-semibold">Edit Movie</h2>
+                <p className="text-sm text-muted-foreground">
+                    Update movie details, media, and catalog relationships.
+                </p>
+            </div>
+
+            <div className="rounded-lg border p-5 bg-card">
+                <MovieEditForm
+                    movie={{
+                        id: movie.id,
+                        title: movie.title,
+                        description: movie.description,
+                        price: movie.price.toString(),
+                        releaseDate: movie.releaseDate.toISOString().split("T")[0],
+                        runtime: movie.runtime,
+                        imageUrl: movie.imageUrl ?? null,
+                        trailerUrl: movie.trailerUrl ?? null,
+                        stock: movie.stock,
+                    }}
+                    genres={genres}
+                    people={people}
+                    selectedGenreIds={selectedGenreIds}
+                    selectedActorIds={selectedActorIds}
+                    selectedDirectorIds={selectedDirectorIds}
+                />
+            </div>
         </div>
     );
 }

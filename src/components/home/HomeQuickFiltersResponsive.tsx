@@ -20,7 +20,7 @@ export default function HomeQuickFiltersResponsive({ genre }: { genre?: string |
                             return (
                                 <Link
                                     key={category}
-                                    href={`/home?genre=${encodeURIComponent(category)}`}
+                                    href={`/?genre=${encodeURIComponent(category)}`}
                                     aria-current={isActive ? "page" : undefined}
                                     className={`rounded-md border px-3 py-1 text-sm font-medium transition ${
                                         isActive
@@ -36,7 +36,7 @@ export default function HomeQuickFiltersResponsive({ genre }: { genre?: string |
                 </div>
 
                 <div className="mt-6 flex flex-col items-center gap-2">
-                    <Link href="/home" className="text-sm text-gray-600 hover:underline">
+                    <Link href="/" className="text-sm text-gray-600 hover:underline">
                         Clear filters
                     </Link>
                     <Link href="/movies" className="font-medium text-blue-600 hover:underline">

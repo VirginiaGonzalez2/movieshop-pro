@@ -34,7 +34,7 @@ export default async function TopRecentMoviesSection({ genre }: { genre?: string
                   },
               }
             : undefined,
-        orderBy: { releaseDate: "desc" },
+        orderBy: { createdAt: "desc" },
         take: 5,
         include: {
             genres: {
@@ -70,7 +70,7 @@ export default async function TopRecentMoviesSection({ genre }: { genre?: string
     }
 
     return (
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {movies.length > 0 ? (
                 movies.map((movie) => {
                     const rating = ratingMap.get(movie.id) ?? { avgRating: 0, ratingCount: 0 };

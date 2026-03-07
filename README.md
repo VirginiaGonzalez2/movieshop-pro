@@ -22,6 +22,17 @@ DATABASE_URL="postgres://postgres:postgres@localhost:5432/MovieShopDB?schema=pub
 # Go here to generate a unique secret: https://www.better-auth.com/docs/installation#set-environment-variables
 BETTER_AUTH_SECRET=<REPLACE WITH UNIQUE 32-BYTE BASE64-ENCODED SECRET>
 BETTER_AUTH_URL=http://localhost:3000
+
+# Optional (recommended for production distributed rate limiting in middleware)
+UPSTASH_REDIS_REST_URL=<YOUR_UPSTASH_REDIS_REST_URL>
+UPSTASH_REDIS_REST_TOKEN=<YOUR_UPSTASH_REDIS_REST_TOKEN>
+
+# PayPal Sandbox (client-side checkout button)
+# Use "sb" for quick sandbox testing without creating a PayPal app.
+NEXT_PUBLIC_PAYPAL_CLIENT_ID=sb
+# Optional (only needed if/when you add server-side PayPal API verification)
+PAYPAL_CLIENT_SECRET=<YOUR_PAYPAL_SANDBOX_CLIENT_SECRET>
+PAYPAL_BASE_URL=https://api-m.sandbox.paypal.com
 ```
 
 Initialize Prisma and seed the database.

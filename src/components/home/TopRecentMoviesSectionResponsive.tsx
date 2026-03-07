@@ -16,7 +16,7 @@ export default async function TopRecentMoviesSectionResponsive({
                   },
               }
             : undefined,
-        orderBy: { releaseDate: "desc" },
+        orderBy: { createdAt: "desc" },
         take: 4,
         include: {
             genres: {

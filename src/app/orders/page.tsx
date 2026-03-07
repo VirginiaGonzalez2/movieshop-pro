@@ -1,10 +1,26 @@
 import { AuthGuard } from "@/components/auth/AuthGuard";
+import { PriceTag } from "@/components/ui-localized/PriceTag";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+
+function getStatusBadgeClasses(status: string): string {
+    switch (status) {
+        case "PAID":
+            return "bg-emerald-50 text-emerald-700 border-emerald-200";
+        case "SHIPPED":
+            return "bg-blue-50 text-blue-700 border-blue-200";
+        case "CANCELLED":
+            return "bg-rose-50 text-rose-700 border-rose-200";
+        case "REFUNDED":
+            return "bg-amber-50 text-amber-700 border-amber-200";
+        default:
+            return "bg-slate-50 text-slate-700 border-slate-200";
+    }
+}
 
 export default async function Orders() {
     const session = await auth.api.getSession({ headers: await headers() });
@@ -43,7 +59,21 @@ export default async function Orders() {
     return (
         <AuthGuard>
             <div className="mx-auto max-w-5xl py-10 px-4 space-y-6">
-                <h1 className="text-2xl font-bold mb-4">Orders</h1>
+                <section className="rounded-2xl border bg-card p-6 shadow-sm">
+                    <div className="flex flex-wrap items-start justify-between gap-4">
+                        <div>
+                            <h1 className="text-2xl font-bold">Orders</h1>
+                            <p className="mt-1 text-sm text-muted-foreground">
+                                Review your purchases, order status, and item details.
+                            </p>
+                        </div>
+
+                        <div className="rounded-lg border bg-background px-3 py-2 text-sm">
+                            <span className="text-muted-foreground">Customer: </span>
+                            <span className="font-medium">{session.user.name || session.user.email}</span>
+                        </div>
+                    </div>
+                </section>
 
                 {orders.length === 0 ? (
                     <div className="rounded-xl border bg-card p-6 text-sm text-muted-foreground">
@@ -56,37 +86,42 @@ export default async function Orders() {
                                 (sum, item) => sum + Number(item.priceAtPurchase) * item.quantity,
                                 0,
                             );
+                            const itemCount = order.items.reduce((sum, item) => sum + item.quantity, 0);
 
                             return (
                                 <article
                                     key={order.id}
-                                    className="rounded-xl border bg-card p-4 shadow-sm"
+                                    className="rounded-xl border bg-card p-5 shadow-sm"
                                 >
-                                    <div className="flex flex-wrap items-center justify-between gap-3">
-                                        <div className="text-sm">
-                                            <p>
-                                                <span className="font-semibold">Order ID:</span> #
-                                                {order.id}
-                                            </p>
-                                            <p className="text-muted-foreground">
-                                                {new Date(order.orderDate).toLocaleString()}
+                                    <div className="flex flex-wrap items-start justify-between gap-4">
+                                        <div className="space-y-2 min-w-[220px]">
+                                            <div className="flex items-center gap-2">
+                                                <h2 className="text-lg font-semibold">Order #{order.id}</h2>
+                                                <span
+                                                    className={`inline-flex rounded-full border px-2 py-0.5 text-xs font-medium ${getStatusBadgeClasses(order.status)}`}
+                                                >
+                                                    {order.status}
+                                                </span>
+                                            </div>
+
+                                            <p className="text-sm text-muted-foreground">
+                                                Placed on {new Date(order.orderDate).toLocaleString()}
                                             </p>
                                         </div>
 
-                                        <div className="text-sm">
-                                            <p>
-                                                <span className="font-semibold">Status:</span>{" "}
-                                                {order.status}
-                                            </p>
-                                            <p>
-                                                <span className="font-semibold">Total:</span> $
-                                                {total.toFixed(2)}
-                                            </p>
+                                        <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-sm min-w-[220px]">
+                                            <span className="text-muted-foreground">Items</span>
+                                            <span className="font-medium text-right">{itemCount}</span>
+
+                                            <span className="text-muted-foreground">Order Total</span>
+                                            <span className="font-semibold text-right">
+                                                <PriceTag amount={total} />
+                                            </span>
                                         </div>
 
                                         <Link
                                             href={`/orders/${order.id}`}
-                                            className="inline-flex items-center justify-center rounded-md border px-3 py-2 text-sm hover:bg-muted transition"
+                                            className="inline-flex items-center justify-center rounded-md border px-3 py-2 text-sm font-medium hover:bg-muted transition"
                                         >
                                             View Details
                                         </Link>

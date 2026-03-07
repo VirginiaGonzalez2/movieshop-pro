@@ -9,10 +9,10 @@
 "use server";
 
 import { CheckoutFormValues, checkoutSchema } from "@/form-schemas/checkout";
-import { applyDealDiscountToPrice } from "@/actions/deal-of-the-day";
+import { getDealSelection } from "@/actions/deal-of-the-day";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Order } from "@prisma/client";
+import { Order, OrderStatus } from "@prisma/client";
 import { headers } from "next/headers";
 import { ZodError } from "zod";
 
@@ -20,12 +20,20 @@ type SerializableOrder = Pick<Order, "id" | "userId" | "status" | "orderDate"> &
     totalAmount: string;
 };
 
+class CheckoutBusinessError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "CheckoutBusinessError";
+    }
+}
+
 async function checkout(
     values: CheckoutFormValues,
 ): Promise<
     | { ok: true; order: SerializableOrder }
     | { ok: false; cause: "zod"; error: ZodError<CheckoutFormValues> }
     | { ok: false; cause: "better-auth"; error: unknown }
+    | { ok: false; cause: "business"; error: string }
     | { ok: false; cause: "prisma"; error: unknown }
 > {
     const parsed = checkoutSchema.safeParse(values);
@@ -50,14 +58,43 @@ async function checkout(
     const guestIdentifier =
         safeValues.paymentPayPalInfo?.payPalEmail ?? `${safeValues.firstName} ${safeValues.lastName}`;
     const userId = session ? session.user.id : guestIdentifier;
+    const authUserId = session?.user?.id ?? null;
 
-    const requestedIds = safeValues.orderItems.map((item) => item.id);
+    if (safeValues.orderItems.length === 0) {
+        return { ok: false, cause: "business", error: "Cart is empty." };
+    }
+
+    const orderQuantityByMovieId = new Map<number, number>();
+    for (const item of safeValues.orderItems) {
+        if (!Number.isInteger(item.id) || item.id <= 0 || item.quantity <= 0) {
+            return { ok: false, cause: "business", error: "Invalid cart item data." };
+        }
+        orderQuantityByMovieId.set(item.id, (orderQuantityByMovieId.get(item.id) ?? 0) + item.quantity);
+    }
+
+    const requestedIds = [...orderQuantityByMovieId.keys()];
     const movies = await prisma.movie.findMany({
         where: { id: { in: requestedIds } },
-        select: { id: true, price: true },
+        select: { id: true, price: true, stock: true },
     });
 
+    if (movies.length !== requestedIds.length) {
+        return { ok: false, cause: "business", error: "One or more movies no longer exist." };
+    }
+
     const movieById = new Map(movies.map((movie) => [movie.id, movie]));
+    for (const [movieId, quantity] of orderQuantityByMovieId) {
+        const movie = movieById.get(movieId);
+        if (!movie || movie.stock < quantity) {
+            return {
+                ok: false,
+                cause: "business",
+                error: `Insufficient stock for movie ${movieId}.`,
+            };
+        }
+    }
+
+    const dealSelection = await getDealSelection();
 
     const normalizedOrderItems = [] as Array<{
         movieId: number;
@@ -73,7 +110,10 @@ async function checkout(
         }
 
         const basePrice = movie.price.toNumber();
-        const discountedPrice = await applyDealDiscountToPrice(item.id, basePrice);
+        const discountedPrice =
+            dealSelection && dealSelection.movieId === item.id
+                ? Number((basePrice * (1 - dealSelection.discountPct / 100)).toFixed(2))
+                : basePrice;
         const priceAtPurchase = Number(discountedPrice.toFixed(2));
 
         normalizedOrderItems.push({
@@ -87,18 +127,39 @@ async function checkout(
 
     let result;
     try {
-        result = await prisma.order.create({
-            data: {
-                userId: userId,
-                totalAmount: Number(normalizedOrderCost.toFixed(2)),
-                // ADDED: Order starts as PENDING until PayPal confirmation
-                status: "PENDING",
-                items: {
-                    create: normalizedOrderItems,
+        result = await prisma.$transaction(async (tx) => {
+            for (const [movieId, quantity] of orderQuantityByMovieId) {
+                const stockUpdated = await tx.movie.updateMany({
+                    where: {
+                        id: movieId,
+                        stock: { gte: quantity },
+                    },
+                    data: {
+                        stock: { decrement: quantity },
+                    },
+                });
+
+                if (stockUpdated.count !== 1) {
+                    throw new CheckoutBusinessError(`Insufficient stock for movie ${movieId}.`);
+                }
+            }
+
+            return tx.order.create({
+                data: {
+                    userId: userId,
+                    totalAmount: Number(normalizedOrderCost.toFixed(2)),
+                    status: OrderStatus.PENDING,
+                    authUserId,
+                    items: {
+                        create: normalizedOrderItems,
+                    },
                 },
-            },
+            });
         });
     } catch (error) {
+        if (error instanceof CheckoutBusinessError) {
+            return { ok: false, cause: "business", error: error.message };
+        }
         return { ok: false, cause: "prisma", error: error };
     }
 

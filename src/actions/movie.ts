@@ -1,11 +1,28 @@
 "use server";
 
+import { requireAdminArea } from "@/lib/admin-rbac";
 import { prisma } from "@/lib/prisma";
 import { movieSchema } from "@/lib/validations/movie";
 import { Prisma, Role } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { savePublicUpload } from "@/lib/upload";
+
+function revalidateMovieRelatedPaths(movieId?: number) {
+    revalidatePath("/");
+    revalidatePath("/home");
+    revalidatePath("/movies");
+    revalidatePath("/movies/[id]", "page");
+    revalidatePath("/genres");
+    revalidatePath("/genres/[id]", "page");
+    revalidatePath("/people");
+    revalidatePath("/search");
+    revalidatePath("/admin/movies");
+    if (movieId) {
+        revalidatePath(`/movies/${movieId}`);
+        revalidatePath(`/admin/movies/${movieId}/edit`);
+    }
+}
 
 export type MovieActionState =
     | { ok: true }
@@ -53,6 +70,8 @@ export async function createMovie(
     prevState: MovieActionState,
     formData: FormData,
 ): Promise<MovieActionState> {
+    await requireAdminArea("movies");
+
     const raw = Object.fromEntries(formData);
     const parsed = movieSchema.safeParse(raw);
 
@@ -111,8 +130,7 @@ export async function createMovie(
             });
         }
 
-        revalidatePath("/admin/movies");
-        revalidatePath("/movies");
+        revalidateMovieRelatedPaths(movie.id);
 
         // redirect back with a small flag so the page can show a toast
         redirect("/admin/movies?created=1");
@@ -128,6 +146,8 @@ export async function updateMovie(
     prevState: MovieActionState,
     formData: FormData,
 ): Promise<MovieActionState> {
+    await requireAdminArea("movies");
+
     const raw = Object.fromEntries(formData);
     const parsed = movieSchema.safeParse(raw);
 
@@ -195,9 +215,7 @@ export async function updateMovie(
                 : []),
         ]);
 
-        revalidatePath("/admin/movies");
-        revalidatePath("/movies");
-        revalidatePath(`/admin/movies/${id}/edit`);
+        revalidateMovieRelatedPaths(id);
 
         return { ok: true };
     } catch (e) {
@@ -208,11 +226,12 @@ export async function updateMovie(
 
 // DELETE
 export async function deleteMovie(id: number): Promise<void> {
+    await requireAdminArea("movies");
+
     await prisma.moviePerson.deleteMany({ where: { movieId: id } });
     await prisma.movieGenre.deleteMany({ where: { movieId: id } });
 
     await prisma.movie.delete({ where: { id } });
 
-    revalidatePath("/admin/movies");
-    revalidatePath("/movies");
+    revalidateMovieRelatedPaths(id);
 }

@@ -72,12 +72,29 @@ export async function getDealSelection(): Promise<DealSelection | null> {
     const date = todayKeyUTC();
     const userKey = await getUserKey();
 
-    // Pick from movies with stock > 0
-    const ids = await prisma.movie.findMany({
-        where: { stock: { gt: 0 } },
+    // Pick from movies with stock > 0, excluding Interstellar from deals
+    let ids = await prisma.movie.findMany({
+        where: {
+            stock: { gt: 0 },
+            NOT: {
+                title: {
+                    equals: "Interstellar",
+                    mode: "insensitive",
+                },
+            },
+        },
         select: { id: true },
         orderBy: { id: "asc" },
     });
+
+    // Safety fallback: if all available movies are excluded, keep deals working.
+    if (ids.length === 0) {
+        ids = await prisma.movie.findMany({
+            where: { stock: { gt: 0 } },
+            select: { id: true },
+            orderBy: { id: "asc" },
+        });
+    }
 
     if (ids.length === 0) return null;
 
