@@ -88,6 +88,11 @@ export default async function SuccessPage({ searchParams }: Props) {
     return (
         <div className="min-h-screen bg-background px-4 py-12 md:py-16">
             <div className="mx-auto w-full max-w-5xl space-y-8">
+                <section className="rounded-xl border bg-muted/30 p-4 mb-4">
+                    <p className="text-sm text-muted-foreground">
+                        <strong>Order access for guests:</strong> Your order is linked to the email you used for payment. If you registered with a different name, your order may be linked by name as fallback. For best results, always use your email.
+                    </p>
+                </section>
                 <section className="rounded-2xl border bg-card p-6 md:p-8 shadow-sm">
                     <div className="rounded-xl border border-dashed bg-muted/30 p-4 text-center">
                         <p className="text-sm text-muted-foreground mb-2">

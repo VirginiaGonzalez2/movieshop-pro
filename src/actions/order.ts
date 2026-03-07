@@ -133,14 +133,22 @@ async function claimGuestOrdersForUser(email: string, name: string) {
         return { ok: false as const, linked: 0 };
     }
 
-    const result = await prisma.order.updateMany({
-        where: {
-            OR: [{ userId: email }, { userId: name }],
-        },
-        data: {
-            userId: user.id,
-        },
+    // Primero vincula por email
+    const resultEmail = await prisma.order.updateMany({
+        where: { userId: email },
+        data: { userId: user.id },
     });
+
+    // Fallback: vincula por nombre SOLO si no se encontró por email
+    let resultName = { count: 0 };
+    if (resultEmail.count === 0 && name && name !== email) {
+        resultName = await prisma.order.updateMany({
+            where: { userId: name },
+            data: { userId: user.id },
+        });
+    }
+
+    return { ok: true as const, linked: resultEmail.count + resultName.count };
 
     return { ok: true as const, linked: result.count };
 }
