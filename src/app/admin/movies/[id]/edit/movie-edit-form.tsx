@@ -77,110 +77,129 @@ export default function MovieEditForm({
                 submittedRef.current = true;
                 await formAction(fd);
             }}
-            className="space-y-4"
+            className="space-y-6"
         >
             {/* Pass id as hidden input */}
             <input type="hidden" name="id" value={movie.id} />
 
+            <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-1 md:col-span-2">
+                    <label className="text-sm font-medium">Title</label>
+                    <input
+                        name="title"
+                        defaultValue={movie.title}
+                        className="w-full border rounded-md p-2"
+                    />
+                </div>
+
+                <div className="space-y-1 md:col-span-2">
+                    <label className="text-sm font-medium">Description</label>
+                    <textarea
+                        name="description"
+                        defaultValue={movie.description}
+                        className="w-full border rounded-md p-2 min-h-[110px]"
+                    />
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-sm font-medium">Price</label>
+                    <input
+                        name="price"
+                        type="number"
+                        step="0.01"
+                        defaultValue={movie.price}
+                        className="w-full border rounded-md p-2"
+                    />
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-sm font-medium">Release Date</label>
+                    <input
+                        name="releaseDate"
+                        type="date"
+                        defaultValue={movie.releaseDate}
+                        className="w-full border rounded-md p-2"
+                    />
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-sm font-medium">Runtime (minutes)</label>
+                    <input
+                        name="runtime"
+                        type="number"
+                        defaultValue={movie.runtime}
+                        className="w-full border rounded-md p-2"
+                    />
+                </div>
+
+                <div className="space-y-1">
+                    <label className="text-sm font-medium">Stock</label>
+                    <input
+                        name="stock"
+                        type="number"
+                        defaultValue={movie.stock}
+                        className="w-full border rounded-md p-2"
+                    />
+                </div>
+
+                <div className="space-y-1 md:col-span-2">
+                    <div className="text-sm font-medium">Poster Image (Upload)</div>
+                    <input
+                        name="image"
+                        type="file"
+                        accept="image/*"
+                        className="w-full border rounded-md p-2"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                        Upload overrides Image URL. Leave empty to keep current.
+                    </p>
+                </div>
+
+                <div className="space-y-1 md:col-span-2">
+                    <label className="text-sm font-medium">Image URL</label>
+                    <input
+                        name="imageUrl"
+                        defaultValue={movie.imageUrl ?? ""}
+                        placeholder="Image URL (optional)"
+                        className="w-full border rounded-md p-2"
+                    />
+                </div>
+
+                <div className="space-y-1 md:col-span-2">
+                    <label className="text-sm font-medium">Trailer URL</label>
+                    <input
+                        name="trailerUrl"
+                        defaultValue={movie.trailerUrl ?? ""}
+                        placeholder="Trailer URL (YouTube link)"
+                        className="w-full border rounded-md p-2"
+                    />
+                </div>
+            </div>
+
             <div>
-                <input name="title" defaultValue={movie.title} className="w-full border p-2" />
                 {fe?.title?.length ? (
                     <p className="text-red-600 text-sm mt-1">{fe.title[0]}</p>
                 ) : null}
-            </div>
-
-            <div>
-                <textarea
-                    name="description"
-                    defaultValue={movie.description}
-                    className="w-full border p-2"
-                />
                 {fe?.description?.length ? (
                     <p className="text-red-600 text-sm mt-1">{fe.description[0]}</p>
                 ) : null}
-            </div>
-
-            <div>
-                <input
-                    name="price"
-                    type="number"
-                    step="0.01"
-                    defaultValue={movie.price}
-                    className="w-full border p-2"
-                />
                 {fe?.price?.length ? (
                     <p className="text-red-600 text-sm mt-1">{fe.price[0]}</p>
                 ) : null}
-            </div>
-
-            <div>
-                <input
-                    name="releaseDate"
-                    type="date"
-                    defaultValue={movie.releaseDate}
-                    className="w-full border p-2"
-                />
                 {fe?.releaseDate?.length ? (
                     <p className="text-red-600 text-sm mt-1">{fe.releaseDate[0]}</p>
                 ) : null}
-            </div>
-
-            <div>
-                <input
-                    name="runtime"
-                    type="number"
-                    defaultValue={movie.runtime}
-                    className="w-full border p-2"
-                />
                 {fe?.runtime?.length ? (
                     <p className="text-red-600 text-sm mt-1">{fe.runtime[0]}</p>
                 ) : null}
-            </div>
-
-            {/* file upload */}
-            <div className="space-y-1">
-                <div className="text-sm font-medium">Poster Image (Upload)</div>
-                <input name="image" type="file" accept="image/*" className="w-full border p-2" />
-                <p className="text-xs text-muted-foreground">
-                    Upload overrides Image URL. Leave empty to keep current.
-                </p>
-            </div>
-
-            {/* Image URL fallback */}
-            <div>
-                <input
-                    name="imageUrl"
-                    defaultValue={movie.imageUrl ?? ""}
-                    placeholder="Image URL (optional)"
-                    className="w-full border p-2"
-                />
+                {fe?.stock?.length ? (
+                    <p className="text-red-600 text-sm mt-1">{fe.stock[0]}</p>
+                ) : null}
                 {fe?.imageUrl?.length ? (
                     <p className="text-red-600 text-sm mt-1">{fe.imageUrl[0]}</p>
                 ) : null}
-            </div>
-
-            {/* Trailer URL */}
-            <div>
-                <input
-                    name="trailerUrl"
-                    defaultValue={movie.trailerUrl ?? ""}
-                    placeholder="Trailer URL (YouTube link)"
-                    className="w-full border p-2"
-                />
                 {fe?.trailerUrl?.length ? (
                     <p className="text-red-600 text-sm mt-1">{fe.trailerUrl[0]}</p>
-                ) : null}
-            </div>
-
-            <div>
-                <input
-                    name="stock"
-                    type="number"
-                    defaultValue={movie.stock}
-                    className="w-full border p-2"
-                />
-                {fe?.stock?.length ? (
-                    <p className="text-red-600 text-sm mt-1">{fe.stock[0]}</p>
                 ) : null}
             </div>
 
@@ -248,7 +267,7 @@ export default function MovieEditForm({
             <button
                 type="submit"
                 disabled={isPending}
-                className="bg-black text-white px-4 py-2 rounded disabled:opacity-60"
+                className="rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm disabled:opacity-60"
             >
                 {isPending ? "Updating..." : "Update Movie"}
             </button>

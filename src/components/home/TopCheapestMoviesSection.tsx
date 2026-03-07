@@ -80,7 +80,7 @@ export default async function TopCheapestMoviesSection({ genre }: { genre?: stri
     });
 
     return (
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {movies.length > 0 ? (
                 movieItems.map((movie) => (
                     <div key={movie.id} className="mx-auto w-full max-w-[220px]">

@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useOriginRouter } from "@/hooks/use-origin-router";
 import { authClient } from "@/lib/auth-client";
+import { isAdminRole } from "@/lib/admin-roles";
 import { User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -54,8 +55,8 @@ export default function UserMenuDropdown() {
                 return;
             }
 
-            const roleInSession = session.data?.user.role?.toLowerCase();
-            if (roleInSession === "admin") {
+            const roleInSession = session.data?.user.role;
+            if (isAdminRole(roleInSession)) {
                 if (mounted) {
                     setIsAdmin(true);
                 }

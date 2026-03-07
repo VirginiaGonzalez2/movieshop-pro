@@ -10,7 +10,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { cookies } from "next/headers";
-import { applyDealDiscountToPrice } from "@/actions/deal-of-the-day";
+import { getDealSelection } from "@/actions/deal-of-the-day";
 
 type ShoppingCartItem = {
     id: number;
@@ -234,30 +234,36 @@ async function getShoppingCartInfo(): Promise<ShoppingCartItemInfo[] | null> {
     }
 
     const shoppingCartInfo: ShoppingCartItemInfo[] = [];
+    const movieIds = [...new Set(shoppingCart.map((item) => item.id))];
+    const dealSelection = await getDealSelection();
 
-    for (let i = 0; i < shoppingCart.length; i++) {
-        const item = shoppingCart[i];
-
-        const movie = await prisma.movie.findFirst({
-            select: {
-                title: true,
-                price: true,
-                imageUrl: true,
-                stock: true,
-                genres: {
-                    select: { genre: { select: { name: true } } },
-                    where: { movieId: item.id },
-                },
+    const movies = await prisma.movie.findMany({
+        where: { id: { in: movieIds } },
+        select: {
+            id: true,
+            title: true,
+            price: true,
+            imageUrl: true,
+            stock: true,
+            genres: {
+                select: { genre: { select: { name: true } } },
             },
-            where: { id: item.id },
-        });
+        },
+    });
 
+    const movieById = new Map(movies.map((movie) => [movie.id, movie]));
+
+    for (const item of shoppingCart) {
+        const movie = movieById.get(item.id);
         if (!movie) {
             continue;
         }
 
         const basePrice = movie.price.toNumber();
-        const finalPrice = await applyDealDiscountToPrice(item.id, basePrice);
+        const finalPrice =
+            dealSelection && dealSelection.movieId === item.id
+                ? Number((basePrice * (1 - dealSelection.discountPct / 100)).toFixed(2))
+                : basePrice;
 
         shoppingCartInfo.push({
             itemId: item.id,
@@ -275,8 +281,36 @@ async function getShoppingCartInfo(): Promise<ShoppingCartItemInfo[] | null> {
     return shoppingCartInfo.length > 0 ? shoppingCartInfo : null;
 }
 
+/**
+ * Add multiple items to cart at once (for bulk operations like "Add All Wishlist")
+ * @param movieIds Array of movie IDs to add
+ * @returns Number of items added
+ */
+async function addShoppingCartMultipleItems(movieIds: number[]): Promise<number> {
+    if (!movieIds.length) return 0;
+
+    const shoppingCart = (await getShoppingCart()) ?? [];
+
+    let addedCount = 0;
+    for (const movieId of movieIds) {
+        const existing = findShoppingCartItem(shoppingCart, movieId);
+        if (!existing) {
+            // Only add if not already in cart
+            modifyShoppingCartItem(shoppingCart, movieId, 1);
+            addedCount++;
+        }
+    }
+
+    if (addedCount > 0) {
+        await saveShoppingCart(shoppingCart);
+    }
+
+    return addedCount;
+}
+
 export {
     addShoppingCartItem,
+    addShoppingCartMultipleItems,
     clearShoppingCart,
     getShoppingCart,
     getShoppingCartInfo,

@@ -33,7 +33,7 @@ export function ShippingMethodSelect(props: Props) {
     const form = useForm<ShippingMethodFormValues>({
         resolver: zodResolver(shippingMethodSchema),
         defaultValues: {
-            shippingMethod: props.savedValues?.shippingMethod,
+            shippingMethod: props.savedValues?.shippingMethod ?? "",
         },
     });
 

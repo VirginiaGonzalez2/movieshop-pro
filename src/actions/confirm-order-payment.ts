@@ -8,12 +8,13 @@
  */
 
 import { prisma } from "@/lib/prisma";
+import { OrderStatus } from "@prisma/client";
 
 export async function confirmOrderPayment(orderId: number) {
     await prisma.order.update({
         where: { id: orderId },
         data: {
-            status: "PAID", // ADDED: Order is now confirmed as paid
+            status: OrderStatus.PAID,
         },
     });
 }

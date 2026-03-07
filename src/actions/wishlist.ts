@@ -66,3 +66,75 @@ export async function toggleWishlist(movieId: number): Promise<boolean> {
     revalidatePath(`/movies/${movieId}`);
     return true;
 }
+
+/**
+ * Gets count of wishlisted items for the current logged-in user.
+ */
+export async function getWishlistCount(): Promise<number> {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    const userId = session?.user?.id;
+    if (!userId) return 0;
+
+    const count = await prisma.wishlistItem.count({
+        where: { userId },
+    });
+
+    return count;
+}
+
+/**
+ * Gets all wishlisted movies for the current logged-in user.
+ * Returns null if not logged in or wishlist is empty.
+ */
+export type WishlistItemInfo = {
+    movieId: number;
+    title: string;
+    imageUrl: string | null;
+    genres: string[];
+    price: number;
+    stock: number;
+};
+
+export async function getWishlistInfo(): Promise<WishlistItemInfo[] | null> {
+    const session = await auth.api.getSession({
+        headers: await headers(),
+    });
+
+    const userId = session?.user?.id;
+    if (!userId) return null;
+
+    const wishlisted = await prisma.wishlistItem.findMany({
+        where: { userId },
+        select: { movieId: true },
+    });
+
+    if (!wishlisted.length) return null;
+
+    const movieIds = wishlisted.map((item) => item.movieId);
+
+    const movies = await prisma.movie.findMany({
+        where: { id: { in: movieIds } },
+        select: {
+            id: true,
+            title: true,
+            price: true,
+            imageUrl: true,
+            stock: true,
+            genres: {
+                select: { genre: { select: { name: true } } },
+            },
+        },
+    });
+
+    return movies.map((movie) => ({
+        movieId: movie.id,
+        title: movie.title,
+        imageUrl: movie.imageUrl,
+        genres: movie.genres.map((value) => value.genre.name).flat(),
+        price: Number(movie.price),
+        stock: movie.stock,
+    }));
+}

@@ -20,3 +20,18 @@ export const admin = ac.newRole({
     orders: [...statement.orders],
     ...adminAc.statements,
 });
+
+export const catalogAdmin = ac.newRole({
+    movies: [...statement.movies],
+    genres: [...statement.genres],
+    people: [...statement.people],
+    orders: ["get"],
+});
+
+export const ordersAdmin = ac.newRole({
+    orders: [...statement.orders],
+});
+
+export const supportAdmin = ac.newRole({
+    orders: ["get", "get-own"],
+});

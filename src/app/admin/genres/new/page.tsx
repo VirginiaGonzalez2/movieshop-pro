@@ -1,21 +1,24 @@
 import Link from "next/link";
 import { createGenre } from "@/actions/genre";
+import { requireAdminArea } from "@/lib/admin-rbac";
 import { ArrowLeft, Plus } from "lucide-react";
 
-export default function AdminNewGenrePage() {
+export default async function AdminNewGenrePage() {
+    await requireAdminArea("genres");
+
     return (
-        <div className="p-8 max-w-xl">
+        <div className="max-w-2xl space-y-4">
             <Link href="/admin/genres" className="inline-flex items-center gap-2 text-sm mb-4">
                 <ArrowLeft className="h-4 w-4" />
                 Back to Genres
             </Link>
 
-            <h1 className="text-2xl font-bold mb-2">Add Genre</h1>
+            <h2 className="text-xl font-semibold mb-2">Add Genre</h2>
             <p className="text-sm text-muted-foreground mb-6">
                 Create a genre to organize your movies.
             </p>
 
-            <form action={createGenre} className="space-y-4 border rounded-lg p-5">
+            <form action={createGenre} className="space-y-4 border rounded-lg p-5 bg-card">
                 <div className="space-y-1">
                     <label className="text-sm font-medium">Name</label>
                     <input
@@ -36,7 +39,7 @@ export default function AdminNewGenrePage() {
 
                 <button
                     type="submit"
-                    className="inline-flex items-center gap-2 rounded-md bg-black text-white px-4 py-2 text-sm hover:opacity-90"
+                    className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-4 py-2 text-sm hover:opacity-90"
                 >
                     <Plus className="h-4 w-4" />
                     Create Genre

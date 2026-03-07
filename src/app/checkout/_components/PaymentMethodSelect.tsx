@@ -96,16 +96,21 @@ export function PaymentMethodSelect(props: Props) {
                         </Field>
                     )}
                 />
-                <FieldSet className={paymentMethod !== "card" ? "hidden" : undefined}>
-                    <PayByCardForm form={form} />
-                </FieldSet>
-                <FieldSet className={paymentMethod !== "paypal" ? "hidden" : undefined}>
-                    <PayPalForm
-                        form={form}
-                        orderCost={props.orderCost}
-                        onApprovalChange={props.onPayPalApprovedChange}
-                    />
-                </FieldSet>
+                {paymentMethod === "card" && (
+                    <FieldSet>
+                        <PayByCardForm form={form} />
+                    </FieldSet>
+                )}
+
+                {paymentMethod === "paypal" && (
+                    <FieldSet>
+                        <PayPalForm
+                            form={form}
+                            orderCost={props.orderCost}
+                            onApprovalChange={props.onPayPalApprovedChange}
+                        />
+                    </FieldSet>
+                )}
                 <Button className="w-fit self-center" type="submit">
                     Continue to {props.nextStep}
                 </Button>

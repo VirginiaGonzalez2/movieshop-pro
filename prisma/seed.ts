@@ -25,12 +25,34 @@ type SeedMovie = {
 };
 
 const genres = [
-  "Action",
-  "Drama",
-  "Sci-Fi",
-  "Romance",
-  "Animation",
-  "Thriller",
+  {
+    name: "Action",
+    description: "Fast-paced movies with intense sequences and high-stakes conflict.",
+  },
+  {
+    name: "Animation",
+    description: "Animated stories for all ages, from family adventures to mature themes.",
+  },
+  {
+    name: "Comedy",
+    description: "Lighthearted films designed to entertain through humor and wit.",
+  },
+  {
+    name: "Drama",
+    description: "Character-driven stories focused on emotion, conflict, and realism.",
+  },
+  {
+    name: "Romance",
+    description: "Love-centered stories exploring relationships and emotional connection.",
+  },
+  {
+    name: "Sci-Fi",
+    description: "Speculative films featuring futuristic technology, science, or space themes.",
+  },
+  {
+    name: "Thriller",
+    description: "Suspenseful movies built around tension, danger, and twists.",
+  },
 ];
 
 const movies: SeedMovie[] = [
@@ -95,16 +117,19 @@ async function main() {
   console.log("🌱 Starting FULL seed...");
 
   // Create genres
-  for (const name of genres) {
+  for (const genre of genres) {
     await prisma.genre.upsert({
-      where: { name },
-      update: {},
-      create: { name },
+      where: { name: genre.name },
+      update: { description: genre.description },
+      create: {
+        name: genre.name,
+        description: genre.description,
+      },
     });
   }
 
   const allGenres = await prisma.genre.findMany({
-    where: { name: { in: genres } },
+    where: { name: { in: genres.map((g) => g.name) } },
   });
 
   const genreByName = new Map(allGenres.map(g => [g.name, g.id]));
@@ -253,12 +278,12 @@ async function main() {
 
   /* ---------------- FAKE PURCHASE DATA ---------------- */
 
-  // Create a single completed order for the test user
+  // Create a single paid order for the test user
   // This enables TopPurchasedMoviesSection to work
   const order = await prisma.order.create({
     data: {
       userId: "user-1",
-      status: "COMPLETED",
+      status: "PAID",
       totalAmount: 0,
       orderDate: new Date(),
     },

@@ -146,6 +146,9 @@ export function Checkout(props: Props) {
                         shippingMethod={shippingMethodInfo}
                         paymentMethod={paymentMethodInfo}
                         paypalApproved={paypalApproved}
+                        autoSubmit={
+                            paymentMethodInfo.paymentMethod === "paypal" && paypalApproved
+                        }
                     />
                 )}
             </CheckoutStepComponent>

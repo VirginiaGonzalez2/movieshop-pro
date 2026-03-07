@@ -45,12 +45,12 @@ export function ShippingAddressForm(props: Props) {
     const form = useForm<ShippingAddressFormValues>({
         resolver: zodResolver(shippingAddressSchema),
         defaultValues: {
-            firstName: props.savedValues?.firstName,
-            lastName: props.savedValues?.lastName,
-            streetAddress: props.savedValues?.streetAddress,
-            postalCode: props.savedValues?.postalCode,
-            city: props.savedValues?.city,
-            country: props.savedValues?.country,
+            firstName: props.savedValues?.firstName ?? "",
+            lastName: props.savedValues?.lastName ?? "",
+            streetAddress: props.savedValues?.streetAddress ?? "",
+            postalCode: props.savedValues?.postalCode ?? "",
+            city: props.savedValues?.city ?? "",
+            country: props.savedValues?.country ?? "",
         },
     });
 

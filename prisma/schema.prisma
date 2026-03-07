@@ -67,6 +67,7 @@ model user {
   // movie features
   ratings  MovieRating[]
   wishlist WishlistItem[]
+  orders   Order[]
 }
 
 // better-auth
@@ -99,6 +100,7 @@ model Movie {
   // movie features
   ratings      MovieRating[]
   wishlistedBy WishlistItem[]
+  discountCodeLinks DiscountCodeMovie[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -146,14 +148,41 @@ enum Role {
   DIRECTOR
 }
 
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  CANCELLED
+  REFUNDED
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+enum DiscountScope {
+  ALL_PRODUCTS
+  SELECTED_PRODUCTS
+}
+
 model Order {
   id          Int      @id @default(autoincrement())
   userId      String
   totalAmount Decimal
-  status      String
+  status      OrderStatus
   orderDate   DateTime @default(now())
+  authUserId  String?
+
+  user user? @relation(fields: [authUserId], references: [id])
 
   items OrderItem[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([orderDate])
+  @@index([authUserId])
+  @@index([status, orderDate])
 }
 
 model OrderItem {
@@ -165,6 +194,9 @@ model OrderItem {
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
   movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([movieId])
 }
 
 model MovieRating {
@@ -208,4 +240,37 @@ model ContactMessage {
 
   @@index([email])
   @@index([createdAt])
+}
+
+model DiscountCode {
+  id              Int           @id @default(autoincrement())
+  code            String        @unique
+  type            DiscountType
+  value           Decimal
+  scope           DiscountScope
+  startsAt        DateTime?
+  endsAt          DateTime?
+  isActive        Boolean       @default(true)
+  usageLimit      Int?
+  usageCount      Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  products DiscountCodeMovie[]
+
+  @@index([code])
+  @@index([isActive])
+  @@index([startsAt])
+  @@index([endsAt])
+}
+
+model DiscountCodeMovie {
+  discountCodeId Int
+  movieId        Int
+
+  discountCode DiscountCode @relation(fields: [discountCodeId], references: [id], onDelete: Cascade)
+  movie        Movie        @relation(fields: [movieId], references: [id], onDelete: Cascade)
+
+  @@id([discountCodeId, movieId])
+  @@index([movieId])
 }

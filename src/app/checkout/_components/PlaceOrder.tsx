@@ -28,6 +28,7 @@ import {
 import { ShippingAddressFormValues, ShippingMethodFormValues } from "@/form-schemas/shipping";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { redirect, RedirectType } from "next/navigation";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 
 type Props = {
@@ -36,6 +37,7 @@ type Props = {
     shippingMethod: ShippingMethodFormValues;
     paymentMethod: FullPaymentMethodFormValues;
     paypalApproved: boolean;
+    autoSubmit?: boolean;
 };
 
 // ADDED: Narrow unknown runtime shapes safely before reading orderId in the fail branch.
@@ -50,6 +52,9 @@ function hasOrderId(value: unknown): value is { order: { id: number } } {
 }
 
 export function PlaceOrder(props: Props) {
+    const formRef = useRef<HTMLFormElement>(null);
+    const autoSubmittedRef = useRef(false);
+
     const form = useForm<CheckoutFormValues>({
         resolver: zodResolver(checkoutSchema),
         values: {
@@ -61,30 +66,17 @@ export function PlaceOrder(props: Props) {
         },
     });
 
+    useEffect(() => {
+        if (!props.autoSubmit || autoSubmittedRef.current) return;
+
+        autoSubmittedRef.current = true;
+        formRef.current?.requestSubmit();
+    }, [props.autoSubmit]);
+
     async function handleSubmit(values: CheckoutFormValues) {
         const isPayPal = values.paymentMethod === "paypal";
-        const paypalEmail = values.paymentPayPalInfo?.payPalEmail?.toLowerCase().trim();
-        const isSandboxBypassEmail =
-            process.env.NODE_ENV === "development" &&
-            paypalEmail === "marisilva703@gmail.com";
-        const isSandboxForcedFailEmail =
-            process.env.NODE_ENV === "development" &&
-            paypalEmail === "sb-9aklq49665943@personal.example.com";
 
         if (isPayPal && typeof window !== "undefined") {
-            if (isSandboxForcedFailEmail) {
-                const params = new URLSearchParams();
-                params.set(
-                    "err",
-                    JSON.stringify({
-                        message: "Sandbox test: forced failed payment for this PayPal email.",
-                    }),
-                );
-
-                redirect(`/checkout/fail?${params.toString()}`, RedirectType.replace);
-                return;
-            }
-
             const isPayPalApprovedInState = props.paypalApproved;
             const isPayPalApprovedInSession =
                 window.sessionStorage.getItem(PAYPAL_APPROVED_SESSION_KEY) === "true";
@@ -99,7 +91,7 @@ export function PlaceOrder(props: Props) {
                 isPayPalApprovedInLocal ||
                 isPayPalApprovedInCookie;
 
-            if (!isPayPalApproved && !isSandboxBypassEmail) {
+            if (!isPayPalApproved) {
                 const params = new URLSearchParams();
                 params.set(
                     "err",
@@ -149,7 +141,7 @@ export function PlaceOrder(props: Props) {
     }
 
     return (
-        <form onSubmit={form.handleSubmit(handleSubmit)}>
+        <form ref={formRef} onSubmit={form.handleSubmit(handleSubmit)}>
             <FieldGroup>
                 <FieldContent>Click here to place your order.</FieldContent>
                 <Button className="w-fit self-center" type="submit">
