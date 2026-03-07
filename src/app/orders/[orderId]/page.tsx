@@ -84,7 +84,12 @@ export default async function OrderDetailsPage({
 
     return (
         <div className="mx-auto max-w-6xl py-10 px-4 space-y-6">
-                <div className="rounded-2xl border bg-card p-6 shadow-sm space-y-4">
+            <section className="rounded-xl border bg-muted/30 p-4 mb-4">
+                <p className="text-sm text-muted-foreground">
+                    <strong>Order access info:</strong> This order is linked to the email used for purchase. If you registered with a different name, your order may be linked by name as fallback. For best results, always use your email.
+                </p>
+            </section>
+            <div className="rounded-2xl border bg-card p-6 shadow-sm space-y-4">
                     <div className="flex items-center justify-between gap-3">
                         <h1 className="text-2xl font-bold">Order Details</h1>
                         <Link

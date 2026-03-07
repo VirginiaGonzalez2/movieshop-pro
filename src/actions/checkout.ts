@@ -55,8 +55,10 @@ async function checkout(
         return { ok: false, cause: "better-auth", error: error };
     }
 
-    const guestIdentifier =
-        safeValues.paymentPayPalInfo?.payPalEmail ?? `${safeValues.firstName} ${safeValues.lastName}`;
+    let guestIdentifier = safeValues.paymentPayPalInfo?.payPalEmail;
+    if (!guestIdentifier && safeValues.firstName && safeValues.lastName) {
+        guestIdentifier = `${safeValues.firstName} ${safeValues.lastName}`;
+    }
     const userId = session ? session.user.id : guestIdentifier;
     const authUserId = session?.user?.id ?? null;
 

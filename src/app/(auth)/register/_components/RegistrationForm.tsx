@@ -66,7 +66,12 @@ export function RegistrationForm({ className, ...rest }: Props) {
         }
 
         try {
-            await claimGuestOrdersForUser(values.email, values.name);
+            const result = await claimGuestOrdersForUser(values.email, values.name);
+            if (result.linked > 0 && values.name !== values.email) {
+                toast.info("Guest orders linked to your account.");
+            } else if (result.linked === 0 && values.name && values.name !== values.email) {
+                toast.warning("No guest orders found for your email. If you used a different name, your orders may be linked by name as fallback.");
+            }
         } catch {
             // Keep signup successful even if order linking fails.
         }
