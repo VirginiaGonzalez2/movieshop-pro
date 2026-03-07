@@ -66,9 +66,15 @@ export function LoginForm({ className, ...rest }: Props) {
             )}
             {...rest}
         >
+            <div className="mb-4 p-4 rounded-xl border bg-muted/30 text-center">
+                <h2 className="text-lg font-semibold mb-2">Save your wishlist!</h2>
+                <p className="text-sm text-muted-foreground">
+                    To add movies to your wishlist, you need an account. Log in if you already have one, or create a new account to start saving your favorites.
+                </p>
+            </div>
             <FieldGroup>
-                <FieldLegend>Log In</FieldLegend>
-                <FieldDescription>Log in to track your orders and more.</FieldDescription>
+                    <FieldLegend>Log In</FieldLegend>
+                    <FieldDescription>Log in to track your orders, wishlist, and more.</FieldDescription>
                 <FieldSet>
                     <Controller
                         control={form.control}
@@ -117,17 +123,7 @@ export function LoginForm({ className, ...rest }: Props) {
                     <FieldContinueWithLabel />
                 </Field>
                 <Field>
-                    <FieldDescription>
-                        Don&apos;t have an account? Click{" "}
-                        <Link
-                            replace
-                            href={router.formatUrl("/register")}
-                            className="text-link-primary"
-                        >
-                            here
-                        </Link>{" "}
-                        to register.
-                    </FieldDescription>
+                    {/* Bloque de registro mejorado ya incluido arriba */}
                 </Field>
             </FieldGroup>
         </form>
