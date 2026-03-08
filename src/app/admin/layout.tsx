@@ -13,6 +13,7 @@ const navItems = [
     { href: "/admin/orders", label: "Orders", area: "orders" as AdminArea },
     { href: "/admin/contact-messages", label: "Messages", area: "messages" as AdminArea },
     { href: "/admin/users", label: "Admin Users", area: "users" as AdminArea },
+    { href: "/admin/integrations", label: "Integrations", area: "integrations" as AdminArea },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

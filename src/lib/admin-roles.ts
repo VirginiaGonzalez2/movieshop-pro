@@ -7,7 +7,8 @@ export type AdminArea =
     | "orders"
     | "messages"
     | "users"
-    | "promo";
+    | "promo"
+    | "integrations";
 
 export const adminRoleLabels: Record<string, string> = {
     admin: "Super Admin",
@@ -26,13 +27,14 @@ const allAreas: AdminArea[] = [
     "messages",
     "users",
     "promo",
+    "integrations",
 ];
 
 export const adminRoleAreas: Record<string, AdminArea[]> = {
     admin: allAreas,
-    catalog_admin: ["overview", "movies", "discounts", "genres", "people", "promo"],
-    orders_admin: ["overview", "orders", "promo"],
-    support_admin: ["overview", "messages", "promo"],
+    catalog_admin: ["overview", "movies", "discounts", "genres", "people", "promo", "integrations"],
+    orders_admin: ["overview", "orders", "promo", "integrations"],
+    support_admin: ["overview", "messages", "promo", "integrations"],
 };
 
 export function normalizeUserRole(role: string | null | undefined): string {
