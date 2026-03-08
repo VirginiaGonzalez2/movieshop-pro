@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Film, Tags, Users, ArrowRight, ReceiptText, Mail, ShieldCheck, Percent } from "lucide-react";
+import { Film, Tags, Users, ArrowRight, ReceiptText, Mail, ShieldCheck, Percent, Megaphone, BarChart2 } from "lucide-react";
 import { AdminArea, getAreasForRole, requireAdminArea } from "@/lib/admin-rbac";
 
 const cards = [
@@ -51,6 +51,20 @@ const cards = [
         href: "/admin/users",
         icon: ShieldCheck,
         area: "users" as AdminArea,
+    },
+    {
+        title: "Analítica & GTM",
+        description: "Conecta y visualiza Google Analytics y Tag Manager.",
+        href: "/admin/analytics",
+        icon: require("lucide-react").BarChart2,
+        area: "overview" as AdminArea,
+    },
+    {
+        title: "Promo Bar",
+        description: "Edit, schedule, and customize the promotional bar for your site. Choose text, color, pages, and duration.",
+        href: "/admin/promobar",
+        icon: Megaphone,
+        area: "promo" as AdminArea,
     },
 ];
 

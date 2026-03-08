@@ -1,12 +1,30 @@
+// SEO metadata for Cart page
+export const metadata = {
+    title: "Shopping Cart - A+ MovieShop",
+    description: "View and manage your shopping cart. Checkout your favorite movies easily.",
+    openGraph: {
+        title: "Shopping Cart - A+ MovieShop",
+        description: "View and manage your shopping cart. Checkout your favorite movies easily.",
+        url: "https://tu-dominio.com/cart",
+        images: [
+            {
+                url: "https://tu-dominio.com/og-image.jpg",
+                width: 1200,
+                height: 630,
+                alt: "A+ MovieShop"
+            }
+        ]
+    }
+};
 /**
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-12 08:45:41
  *   Modified by: Sabrina Bjurman
  *   Modified time: 2026-03-05 10:30:47
  *   Description: Cart page.
- */
 
 "use server";
+ */
 
 import { getShoppingCartInfo } from "@/actions/shopping-cart";
 import { getWishlistInfo } from "@/actions/wishlist";

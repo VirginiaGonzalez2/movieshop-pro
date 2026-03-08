@@ -1,3 +1,11 @@
+model PromoBar {
+  id           Int      @id @default(autoincrement())
+  promoText    String
+  endDate      DateTime
+  visiblePages String   // Comma-separated paths
+  color        String
+  updatedAt    DateTime @updatedAt
+}
 generator client {
   provider = "prisma-client-js"
 }

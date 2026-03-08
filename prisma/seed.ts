@@ -113,43 +113,66 @@ async function getOrCreatePerson(name: string) {
   });
 }
 
+
 async function main() {
   console.log("🌱 Starting FULL seed...");
 
-  // Create genres
-  for (const genre of genres) {
-    await prisma.genre.upsert({
-      where: { name: genre.name },
-      update: { description: genre.description },
-      create: {
-        name: genre.name,
-        description: genre.description,
-      },
-    });
-  }
-
-  const allGenres = await prisma.genre.findMany({
-    where: { name: { in: genres.map((g) => g.name) } },
-  });
-
-  const genreByName = new Map(allGenres.map(g => [g.name, g.id]));
-
-  // Ensure user exists
-  await prisma.user.upsert({
-    where: { id: "user-1" },
-    update: { updatedAt: new Date() },
+  // 1. Crear usuario admin y cuenta asociada solo una vez
+  const adminUser = await prisma.user.upsert({
+    where: { email: "virginiagonzzalez@gmail.com" },
+    update: { role: "admin", updatedAt: new Date() },
     create: {
-      id: "user-1",
-      name: "Test User",
-      email: "test@example.com",
+      id: "user-virginia",
+      name: "Virginia Gonzalez",
+      email: "virginiagonzzalez@gmail.com",
       emailVerified: true,
+      role: "admin",
       createdAt: new Date(),
       updatedAt: new Date(),
     },
   });
 
-  /* ---------------- MOVIES + RELATIONS ---------------- */
+  await prisma.account.upsert({
+    where: { id: "acc-virginia" },
+    update: { password: "Exito2026#", updatedAt: new Date() },
+    create: {
+      id: "acc-virginia",
+      accountId: "virginiagonzzalez@gmail.com",
+      providerId: "email",
+      userId: adminUser.id,
+      password: "Exito2026#",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  });
 
+  // 2. Crear usuario de test para ratings y órdenes
+  const testUser = await prisma.user.upsert({
+    where: { email: "test@user.com" },
+    update: { updatedAt: new Date() },
+    create: {
+      id: "user-1",
+      name: "Test User",
+      email: "test@user.com",
+      emailVerified: true,
+      role: "user",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+  });
+
+  // 3. Crear géneros y obtener sus IDs
+  for (const genre of genres) {
+    await prisma.genre.upsert({
+      where: { name: genre.name },
+      update: { description: genre.description },
+      create: { name: genre.name, description: genre.description },
+    });
+  }
+  const allGenres = await prisma.genre.findMany();
+  const genreByName = new Map(allGenres.map(g => [g.name, g.id]));
+
+  // 4. Crear películas y relaciones
   for (const m of movies) {
     const genreId = genreByName.get(m.genre);
     if (!genreId) throw new Error(`Missing genre ${m.genre}`);
@@ -245,13 +268,13 @@ async function main() {
       where: {
         movieId_userId: {
           movieId: movie.id,
-          userId: "user-1",
+          userId: testUser.id,
         },
       },
       update: { value: m.rating },
       create: {
         movieId: movie.id,
-        userId: "user-1",
+        userId: testUser.id,
         value: m.rating,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -259,10 +282,10 @@ async function main() {
     });
   }
 
+  // 5. Añadir trailers adicionales si faltan
   const additionalTrailerByTitle = new Map<string, string>([
     ["Barbie", "https://www.youtube.com/watch?v=8zIf0XvoL9Y"],
   ]);
-
   for (const [title, trailerUrl] of additionalTrailerByTitle) {
     await prisma.movie.updateMany({
       where: {
@@ -276,34 +299,26 @@ async function main() {
     });
   }
 
-  /* ---------------- FAKE PURCHASE DATA ---------------- */
-
-  // Create a single paid order for the test user
-  // This enables TopPurchasedMoviesSection to work
+  // 6. Crear orden de prueba y order items
   const order = await prisma.order.create({
     data: {
-      userId: "user-1",
+      userId: testUser.id,
       status: "PAID",
       totalAmount: 0,
       orderDate: new Date(),
     },
   });
-
-  // Create order items with deterministic quantities
-  // Higher index = lower quantity (so ranking is visible)
   for (let i = 0; i < movies.length; i++) {
     const movie = await prisma.movie.findFirst({
       where: { title: movies[i].title },
     });
-
     if (!movie) continue;
-
     await prisma.orderItem.create({
       data: {
         orderId: order.id,
         movieId: movie.id,
         priceAtPurchase: movie.price,
-        quantity: movies.length - i, // descending quantity for ranking
+        quantity: movies.length - i,
       },
     });
   }

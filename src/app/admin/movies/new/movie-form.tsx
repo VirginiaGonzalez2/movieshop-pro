@@ -15,6 +15,36 @@ export default function NewMovieForm({ genres, people }: { genres: Genre[]; peop
     return (
         <form action={formAction} className="space-y-6">
             <div className="grid gap-4 md:grid-cols-2">
+                                <div className="space-y-1 md:col-span-2">
+                                    <label className="text-sm font-medium">Título SEO</label>
+                                    <input
+                                        name="seoTitle"
+                                        placeholder="Título para buscadores"
+                                        className="w-full border rounded-md p-2"
+                                    />
+                                </div>
+
+                                <div className="space-y-1 md:col-span-2">
+                                    <label className="text-sm font-medium">Descripción SEO</label>
+                                    <textarea
+                                        name="seoDescription"
+                                        placeholder="Descripción para buscadores"
+                                        className="w-full border rounded-md p-2 min-h-[80px]"
+                                    />
+                                </div>
+
+                                <div className="space-y-1 md:col-span-2">
+                                    <label className="text-sm font-medium">Imagen SEO</label>
+                                    <input
+                                        name="seoImage"
+                                        type="file"
+                                        accept="image/*"
+                                        className="w-full border rounded-md p-2"
+                                    />
+                                    <p className="text-xs text-muted-foreground">
+                                        Imagen para compartir en redes y buscadores (OpenGraph, Twitter, etc.)
+                                    </p>
+                                </div>
                 <div className="space-y-1 md:col-span-2">
                     <label className="text-sm font-medium">Title</label>
                     <input

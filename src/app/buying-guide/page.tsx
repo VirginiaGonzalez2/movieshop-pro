@@ -1,3 +1,21 @@
+// SEO metadata for Buying Guide page
+export const metadata = {
+    title: "Buying Guide - A+ MovieShop",
+    description: "Everything you need to know before purchasing on MovieShop — from choosing the right movie to understanding access and playback.",
+    openGraph: {
+        title: "Buying Guide - A+ MovieShop",
+        description: "Everything you need to know before purchasing on MovieShop — from choosing the right movie to understanding access and playback.",
+        url: "https://tu-dominio.com/buying-guide",
+        images: [
+            {
+                url: "https://tu-dominio.com/og-image.jpg",
+                width: 1200,
+                height: 630,
+                alt: "A+ MovieShop"
+            }
+        ]
+    }
+};
 import Link from "next/link";
 
 export default function BuyingGuidePage() {
