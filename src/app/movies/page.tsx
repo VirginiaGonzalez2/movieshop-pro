@@ -1,3 +1,21 @@
+// SEO metadata for Movies page
+export const metadata = {
+    title: "Movies Catalog - A+ MovieShop",
+    description: "Browse and discover movies. Filter by genre, director, actor, and more.",
+    openGraph: {
+        title: "Movies Catalog - A+ MovieShop",
+        description: "Browse and discover movies. Filter by genre, director, actor, and more.",
+        url: "https://tu-dominio.com/movies",
+        images: [
+            {
+                url: "https://tu-dominio.com/og-image.jpg",
+                width: 1200,
+                height: 630,
+                alt: "A+ MovieShop"
+            }
+        ]
+    }
+};
 import { prisma } from "@/lib/prisma";
 import { Role, Prisma } from "@prisma/client";
 import MoviesClient from "./movies-client";

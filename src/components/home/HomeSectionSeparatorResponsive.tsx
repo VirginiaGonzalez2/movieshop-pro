@@ -16,28 +16,28 @@ export default function HomeSectionSeparatorResponsive({ genre }: { genre?: stri
             <HomeQuickFilters />
 
             <section className={sectionClass}>
-                <h2 className={sectionTitleClass}>Top 4 Most Recent</h2>
+                <h2 className={sectionTitleClass}>Top 5 Most Recent</h2>
                 <div className="mt-6 rounded-xl border bg-card/40 px-3 py-3 sm:px-4 sm:py-4 md:px-5 md:py-5">
                     <TopRecentMoviesSection genre={genre} />
                 </div>
             </section>
 
             <section className={sectionClass}>
-                <h2 className={sectionTitleClass}>Top 4 Most Purchased</h2>
+                <h2 className={sectionTitleClass}>Top 5 Most Purchased</h2>
                 <div className="mt-6 rounded-xl border bg-card/40 px-3 py-3 sm:px-4 sm:py-4 md:px-5 md:py-5">
                     <TopPurchasedMoviesSection genre={genre} />
                 </div>
             </section>
 
             <section className={sectionClass}>
-                <h2 className={sectionTitleClass}>Top 4 Oldest</h2>
+                <h2 className={sectionTitleClass}>Top 5 Oldest</h2>
                 <div className="mt-6 rounded-xl border bg-card/40 px-3 py-3 sm:px-4 sm:py-4 md:px-5 md:py-5">
                     <TopOldestMoviesSection genre={genre} />
                 </div>
             </section>
 
             <section className={sectionClass}>
-                <h2 className={sectionTitleClass}>Top 4 Cheapest</h2>
+                <h2 className={sectionTitleClass}>Top 5 Cheapest</h2>
                 <div className="mt-6 rounded-xl border bg-card/40 px-3 py-3 sm:px-4 sm:py-4 md:px-5 md:py-5">
                     <TopCheapestMoviesSection genre={genre} />
                 </div>

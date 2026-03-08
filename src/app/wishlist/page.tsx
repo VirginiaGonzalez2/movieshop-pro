@@ -1,9 +1,27 @@
+// SEO metadata for Wishlist page
+export const metadata = {
+    title: "Wishlist - A+ MovieShop",
+    description: "View and manage your wishlist. Track stock and get notified for your favorite movies.",
+    openGraph: {
+        title: "Wishlist - A+ MovieShop",
+        description: "View and manage your wishlist. Track stock and get notified for your favorite movies.",
+        url: "https://tu-dominio.com/wishlist",
+        images: [
+            {
+                url: "https://tu-dominio.com/og-image.jpg",
+                width: 1200,
+                height: 630,
+                alt: "A+ MovieShop"
+            }
+        ]
+    }
+};
 /**
  *   Author: Maria Virgina Gonzalez
  *   Description: Dedicated Wishlist page
- */
 
 "use server";
+ */
 
 import Link from "next/link";
 import { getWishlistInfo } from "@/actions/wishlist";

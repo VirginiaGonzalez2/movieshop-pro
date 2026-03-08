@@ -1,3 +1,4 @@
+"use client";
 /**
  *  Author: Sabrina Bjurman
  *  Create Time: 2026-02-09 09:21:53
@@ -5,8 +6,6 @@
  *  Modified time: 2026-02-12 16:29:52
  *  Description: Login page.
  */
-
-"use client";
 
 import { NoSessionChecker } from "@/components/auth/NoSessionChecker";
 import { useOriginRouter } from "@/hooks/use-origin-router";

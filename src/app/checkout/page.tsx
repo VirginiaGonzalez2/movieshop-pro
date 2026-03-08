@@ -1,3 +1,21 @@
+// SEO metadata for Checkout page
+export const metadata = {
+    title: "Checkout - A+ MovieShop",
+    description: "Complete your purchase and enjoy your movies instantly.",
+    openGraph: {
+        title: "Checkout - A+ MovieShop",
+        description: "Complete your purchase and enjoy your movies instantly.",
+        url: "https://tu-dominio.com/checkout",
+        images: [
+            {
+                url: "https://tu-dominio.com/og-image.jpg",
+                width: 1200,
+                height: 630,
+                alt: "A+ MovieShop"
+            }
+        ]
+    }
+};
 "use server";
 
 import { getShoppingCartInfo } from "@/actions/shopping-cart";
