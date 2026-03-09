@@ -1,5 +1,3 @@
-"use server";
-
 // SEO metadata for Checkout page
 export const metadata = {
     title: "Checkout - A+ MovieShop",

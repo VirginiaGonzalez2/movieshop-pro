@@ -1,5 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { saveAnalyticsConfig } from "../../../actions/analytics";
 
 export default function AnalyticsConfigPage() {
   const [gaId, setGaId] = useState("");

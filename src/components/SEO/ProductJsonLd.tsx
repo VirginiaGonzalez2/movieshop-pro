@@ -1,21 +1,14 @@
-import { NextSeo, ProductJsonLd } from "next-seo";
+import NextSeo from "next-seo";
+import { ProductJsonLd } from "next-seo";
 
 export function MovieProductJsonLd({ movie }: { movie: any }) {
   return (
     <>
-      <NextSeo
-        title={movie.title}
-        description={movie.description}
-        openGraph={{
-          title: movie.title,
-          description: movie.description,
-          images: [{ url: movie.image }],
-        }}
-      />
+      {/* SEO meta tags logic removed. Use ProductJsonLd only. */}
       <ProductJsonLd
-        productName={movie.title}
+        name={movie.title}
         description={movie.description}
-        images={[movie.image]}
+        image={movie.image}
         offers={{
           price: movie.price,
           priceCurrency: "USD",

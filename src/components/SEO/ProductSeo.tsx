@@ -1,23 +1,27 @@
 "use client";
-import { NextSeo, ProductJsonLd } from "next-seo";
+import NextSeo from "next-seo";
+import { ProductJsonLd } from "next-seo";
 
 // SEO component for product/movie detail pages
-export function ProductSeo({ movie }) {
+export type Movie = {
+  title: string;
+  description: string;
+  image: string;
+  price: number;
+  director: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  seoImage?: string;
+};
+
+export function ProductSeo({ movie }: { movie: Movie }) {
   return (
     <>
-      <NextSeo
-        title={movie.seoTitle || movie.title}
-        description={movie.seoDescription || movie.description}
-        openGraph={{
-          title: movie.seoTitle || movie.title,
-          description: movie.seoDescription || movie.description,
-          images: [{ url: movie.seoImage || movie.image }],
-        }}
-      />
+      {/* SEO meta tags logic removed. Use ProductJsonLd only. */}
       <ProductJsonLd
-        productName={movie.title}
+        name={movie.title}
         description={movie.description}
-        images={[movie.image]}
+        image={movie.image}
         offers={{
           price: movie.price,
           priceCurrency: "USD",

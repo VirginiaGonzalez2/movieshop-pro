@@ -61,7 +61,12 @@ export function PayPalForm({ form, orderCost, onApprovalChange }: Props) {
        This does NOT interfere with the existing form logic.
     */
     const paypalRef = useRef<HTMLDivElement>(null);
-    const buttonsInstanceRef = useRef<unknown>(null);
+    type PayPalButtonsInstance = {
+        close?: () => void;
+        isEligible?: () => boolean;
+        render: (container: HTMLElement) => Promise<void>;
+    };
+    const buttonsInstanceRef = useRef<PayPalButtonsInstance | null>(null);
     const [sdkError, setSdkError] = useState<string | null>(null);
 
     function clearPayPalApproval() {
@@ -150,7 +155,7 @@ export function PayPalForm({ form, orderCost, onApprovalChange }: Props) {
             const normalizedTotal = Math.max(0.01, Number(orderCost) || 0);
             const amountValue = normalizedTotal.toFixed(2);
 
-            let buttons: unknown;
+            let buttons: PayPalButtonsInstance | null = null;
             try {
                 buttons = window.paypal.Buttons({
                     style: {
@@ -246,11 +251,13 @@ export function PayPalForm({ form, orderCost, onApprovalChange }: Props) {
 
             buttonsInstanceRef.current = buttons;
 
-            void buttons.render(paypalRef.current).catch((err: unknown) => {
-                console.error("PayPal render error:", err);
-                clearPayPalApproval();
-                setSdkError("PayPal could not initialize correctly. Please refresh and try again.");
-            });
+            if (paypalRef.current) {
+                void buttons.render(paypalRef.current).catch((err: unknown) => {
+                    console.error("PayPal render error:", err);
+                    clearPayPalApproval();
+                    setSdkError("PayPal could not initialize correctly. Please refresh and try again.");
+                });
+            }
         };
 
         loadScript();
