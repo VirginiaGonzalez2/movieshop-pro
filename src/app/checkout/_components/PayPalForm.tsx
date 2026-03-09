@@ -16,7 +16,6 @@
  * - Reuses existing checkout submit logic
  */
 
-import { useEffect, useRef, useState } from "react";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { PaymentMethodFormValues } from "@/form-schemas/payment";
@@ -25,6 +24,7 @@ import {
     PAYPAL_APPROVED_LOCAL_KEY,
     PAYPAL_APPROVED_SESSION_KEY,
 } from "@/lib/payment-flags";
+import { useEffect, useRef, useState } from "react";
 import { Controller, UseFormReturn } from "react-hook-form";
 
 type Props = {
@@ -61,7 +61,7 @@ export function PayPalForm({ form, orderCost, onApprovalChange }: Props) {
        This does NOT interfere with the existing form logic.
     */
     const paypalRef = useRef<HTMLDivElement>(null);
-    const buttonsInstanceRef = useRef<any>(null);
+    const buttonsInstanceRef = useRef<unknown>(null);
     const [sdkError, setSdkError] = useState<string | null>(null);
 
     function clearPayPalApproval() {
@@ -150,7 +150,7 @@ export function PayPalForm({ form, orderCost, onApprovalChange }: Props) {
             const normalizedTotal = Math.max(0.01, Number(orderCost) || 0);
             const amountValue = normalizedTotal.toFixed(2);
 
-            let buttons: any;
+            let buttons: unknown;
             try {
                 buttons = window.paypal.Buttons({
                     style: {
@@ -166,6 +166,7 @@ export function PayPalForm({ form, orderCost, onApprovalChange }: Props) {
                        Does NOT touch your database.
                        Does NOT modify checkout logic.
                     */
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     createOrder: (_data: any, actions: any) => {
                         clearPayPalApproval();
 
@@ -191,6 +192,7 @@ export function PayPalForm({ form, orderCost, onApprovalChange }: Props) {
                        This reuses the current form submit logic inside PlaceOrder.tsx
                        without modifying architecture or server actions.
                     */
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     onApprove: async (_data: any, actions: any) => {
                         try {
                             if (!actions?.order?.capture) {
@@ -215,10 +217,13 @@ export function PayPalForm({ form, orderCost, onApprovalChange }: Props) {
                         }
                     },
 
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     onError: (err: any) => {
                         console.error("PayPal error:", err);
                         clearPayPalApproval();
-                        setSdkError("PayPal returned an error while processing your payment. Please retry.");
+                        setSdkError(
+                            "PayPal returned an error while processing your payment. Please retry.",
+                        );
                     },
 
                     onCancel: () => {
@@ -265,17 +270,9 @@ export function PayPalForm({ form, orderCost, onApprovalChange }: Props) {
                 name="paymentPayPalInfo.payPalEmail"
                 render={({ field, fieldState }) => (
                     <Field>
-                        <FieldLabel htmlFor={field.name}>
-                            PayPal E-mail
-                        </FieldLabel>
-                        <Input
-                            {...field}
-                            id={field.name}
-                            autoComplete="email"
-                        />
-                        {fieldState.invalid && (
-                            <FieldError errors={[fieldState.error]} />
-                        )}
+                        <FieldLabel htmlFor={field.name}>PayPal E-mail</FieldLabel>
+                        <Input {...field} id={field.name} autoComplete="email" />
+                        {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                     </Field>
                 )}
             />

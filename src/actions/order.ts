@@ -149,8 +149,6 @@ async function claimGuestOrdersForUser(email: string, name: string) {
     }
 
     return { ok: true as const, linked: resultEmail.count + resultName.count };
-
-    return { ok: true as const, linked: result.count };
 }
 
 export { getOrder, getOrdersByUser, deleteOrder, claimGuestOrdersForUser };

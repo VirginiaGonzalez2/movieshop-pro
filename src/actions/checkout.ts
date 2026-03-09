@@ -8,13 +8,14 @@
 
 "use server";
 
-import { CheckoutFormValues, checkoutSchema } from "@/form-schemas/checkout";
-import { getDealSelection } from "@/actions/deal-of-the-day";
+import { CheckoutFormValues, checkoutSchema, OrderItemFormValues } from "@/form-schemas/checkout";
+import { applyDealDiscountToPrice } from "@/actions/deal-of-the-day";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Order, OrderStatus } from "@prisma/client";
+import { Order, OrderItem } from "@prisma/client";
 import { headers } from "next/headers";
 import { ZodError } from "zod";
+import { Decimal } from "@prisma/client/runtime/client";
 
 type SerializableOrder = Pick<Order, "id" | "userId" | "status" | "orderDate"> & {
     totalAmount: string;
@@ -26,6 +27,7 @@ class CheckoutBusinessError extends Error {
         this.name = "CheckoutBusinessError";
     }
 }
+type OrderItemData = Omit<OrderItem, "id" | "orderId">;
 
 async function checkout(
     values: CheckoutFormValues,
@@ -59,7 +61,13 @@ async function checkout(
     if (!guestIdentifier && safeValues.firstName && safeValues.lastName) {
         guestIdentifier = `${safeValues.firstName} ${safeValues.lastName}`;
     }
+
     const userId = session ? session.user.id : guestIdentifier;
+
+    if (!userId) {
+        return { ok: false, cause: "business", error: "No valid id found." };
+    }
+
     const authUserId = session?.user?.id ?? null;
 
     if (safeValues.orderItems.length === 0) {
@@ -68,10 +76,15 @@ async function checkout(
 
     const orderQuantityByMovieId = new Map<number, number>();
     for (const item of safeValues.orderItems) {
-        if (!Number.isInteger(item.id) || item.id <= 0 || item.quantity <= 0) {
+        const idAsNumber = Number(item.id);
+        const quantityAsNumber = Number(item.quantity ?? 1);
+        if (!Number.isInteger(idAsNumber) || idAsNumber <= 0 || quantityAsNumber <= 0) {
             return { ok: false, cause: "business", error: "Invalid cart item data." };
         }
-        orderQuantityByMovieId.set(item.id, (orderQuantityByMovieId.get(item.id) ?? 0) + item.quantity);
+        orderQuantityByMovieId.set(
+            idAsNumber,
+            (orderQuantityByMovieId.get(idAsNumber) ?? 0) + quantityAsNumber,
+        );
     }
 
     const requestedIds = [...orderQuantityByMovieId.keys()];
@@ -96,36 +109,7 @@ async function checkout(
         }
     }
 
-    const dealSelection = await getDealSelection();
-
-    const normalizedOrderItems = [] as Array<{
-        movieId: number;
-        quantity: number;
-        priceAtPurchase: number;
-    }>;
-
-    let normalizedOrderCost = 0;
-    for (const item of safeValues.orderItems) {
-        const movie = movieById.get(item.id);
-        if (!movie) {
-            continue;
-        }
-
-        const basePrice = movie.price.toNumber();
-        const discountedPrice =
-            dealSelection && dealSelection.movieId === item.id
-                ? Number((basePrice * (1 - dealSelection.discountPct / 100)).toFixed(2))
-                : basePrice;
-        const priceAtPurchase = Number(discountedPrice.toFixed(2));
-
-        normalizedOrderItems.push({
-            movieId: item.id,
-            quantity: item.quantity,
-            priceAtPurchase,
-        });
-
-        normalizedOrderCost += priceAtPurchase * item.quantity;
-    }
+    const orderPrices = await calculateOrderPrices(safeValues.orderItems);
 
     let result;
     try {
@@ -149,11 +133,11 @@ async function checkout(
             return tx.order.create({
                 data: {
                     userId: userId,
-                    totalAmount: Number(normalizedOrderCost.toFixed(2)),
-                    status: OrderStatus.PENDING,
-                    authUserId,
+                    totalAmount: Number(orderPrices.totalOrderCost.toFixed(2)),
+                    status: "PENDING",
+                    authUserId: authUserId,
                     items: {
-                        create: normalizedOrderItems,
+                        create: orderPrices.orderItems,
                     },
                 },
             });
@@ -177,4 +161,42 @@ async function checkout(
     };
 }
 
-export { checkout };
+async function calculateOrderPrices(
+    orderItems: OrderItemFormValues[],
+): Promise<{ orderItems: OrderItemData[]; totalOrderCost: number }> {
+    const requestedIds = orderItems.map((item) => Number(item.id));
+    const movies = await prisma.movie.findMany({
+        where: { id: { in: requestedIds } },
+        select: { id: true, price: true },
+    });
+
+    const movieById = new Map(movies.map((movie) => [movie.id, movie]));
+
+    const pricedOrderItems: OrderItemData[] = [];
+
+    let totalOrderCost = 0;
+    for (const item of orderItems) {
+        const idAsNumber = Number(item.id);
+        const movie = movieById.get(idAsNumber);
+        if (!movie) {
+            continue;
+        }
+
+        const basePrice = movie.price.toNumber();
+        let discountedPrice = await applyDealDiscountToPrice(idAsNumber, basePrice);
+
+        const quantity = item.quantity ?? 1;
+
+        pricedOrderItems.push({
+            movieId: idAsNumber,
+            quantity: quantity,
+            priceAtPurchase: new Decimal(discountedPrice.toFixed(2)),
+        });
+
+        totalOrderCost += discountedPrice * quantity;
+    }
+
+    return { orderItems: pricedOrderItems, totalOrderCost: totalOrderCost };
+}
+
+export { checkout, calculateOrderPrices };

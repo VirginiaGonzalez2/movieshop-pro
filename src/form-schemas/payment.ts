@@ -51,7 +51,8 @@ export type PaymentCardFormValues = z.infer<typeof paymentCardSchema>;
 const errPayPalEmail = "Please enter the e-mail linked to your PayPal account.";
 
 export const paymentPayPalSchema = z.object({
-    payPalEmail: z.email(errPayPalEmail),
+    payPalEmail: z.email(errPayPalEmail).optional(),
+    verified: z.boolean(),
 });
 
 export type PaymentPayPalFormValues = z.infer<typeof paymentPayPalSchema>;

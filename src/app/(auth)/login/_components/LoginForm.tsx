@@ -8,7 +8,7 @@
 
 "use client";
 
-import { FieldContinueWithLabel } from "@/components/ui-custom-shadcn/FieldContinueWithLabel";
+// import { FieldContinueWithLabel } from "@/components/ui-custom-shadcn/FieldContinueWithLabel";
 import { Button } from "@/components/ui/button";
 import {
     Field,
@@ -26,6 +26,7 @@ import { useOriginRouter } from "@/hooks/use-origin-router";
 import { authClient } from "@/lib/auth-client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
+import { redirect, RedirectType } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
@@ -34,6 +35,8 @@ type Props = React.ComponentProps<"form">;
 
 export function LoginForm({ className, ...rest }: Props) {
     const router = useOriginRouter(true);
+
+    const originlUrl = router.getOrigin();
 
     const form = useForm<LoginFormValues>({
         resolver: zodResolver(loginFormSchema),
@@ -55,6 +58,8 @@ export function LoginForm({ className, ...rest }: Props) {
             toast.error(error.message || "An unknown error occurred. Please try again later.");
             return;
         }
+
+        redirect(originlUrl, RedirectType.replace);
     }
 
     return (
@@ -120,7 +125,7 @@ export function LoginForm({ className, ...rest }: Props) {
                 </FieldSet>
                 <Field className="justify-between">
                     <Button type="submit">Log In</Button>
-                    <FieldContinueWithLabel />
+                    {/* <FieldContinueWithLabel /> */}
                 </Field>
                 <Field>
                     {/* Bloque de registro mejorado ya incluido arriba */}

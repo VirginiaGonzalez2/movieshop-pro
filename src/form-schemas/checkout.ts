@@ -10,17 +10,14 @@ import z from "zod";
 import { paymentCardSchema, PaymentMethod, paymentPayPalSchema, PaymentSchemaKey } from "./payment";
 import { shippingAddressSchema, shippingMethodSchema } from "./shipping";
 
+const orderItem = z.object({
+    id: z.union([z.number(), z.string()]),
+    quantity: z.number().optional(),
+});
+
 export const checkoutSchema = z.object({
-    ...z.object({
-        orderItems: z.array(
-            z.object({
-                id: z.number(),
-                quantity: z.number(),
-                cost: z.number(),
-            }),
-        ),
-        orderCost: z.number(),
-    }).shape,
+    orderItems: z.array(orderItem),
+    buyNow: z.boolean().optional(),
     ...shippingAddressSchema.shape,
     ...shippingMethodSchema.shape,
     [PaymentSchemaKey.METHOD]: z.string<PaymentMethod>(),
@@ -35,4 +32,4 @@ export type FullPaymentMethodFormValues = Pick<
     PaymentSchemaKey.METHOD | PaymentSchemaKey.CARD | PaymentSchemaKey.PAYPAL
 >;
 
-export type OrderItemsFormValues = Pick<CheckoutFormValues, "orderItems" | "orderCost">;
+export type OrderItemFormValues = z.infer<typeof orderItem>;

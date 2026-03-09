@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-24 14:33:17
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-27 09:58:58
+ *   Modified time: 2026-03-09 08:57:35
  *   Description: Final step in checkout process.
  */
 
@@ -23,7 +23,7 @@ import {
     CheckoutFormValues,
     checkoutSchema,
     FullPaymentMethodFormValues,
-    OrderItemsFormValues,
+    OrderItemFormValues,
 } from "@/form-schemas/checkout";
 import { ShippingAddressFormValues, ShippingMethodFormValues } from "@/form-schemas/shipping";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,12 +32,13 @@ import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 
 type Props = {
-    cart: OrderItemsFormValues;
+    orderItems: OrderItemFormValues[];
     shippingAddress: ShippingAddressFormValues;
     shippingMethod: ShippingMethodFormValues;
     paymentMethod: FullPaymentMethodFormValues;
     paypalApproved: boolean;
     autoSubmit?: boolean;
+    buyNow: boolean;
 };
 
 // ADDED: Narrow unknown runtime shapes safely before reading orderId in the fail branch.
@@ -55,11 +56,11 @@ export function PlaceOrder(props: Props) {
     const formRef = useRef<HTMLFormElement>(null);
     const autoSubmittedRef = useRef(false);
 
-    const form = useForm<CheckoutFormValues>({
-        resolver: zodResolver(checkoutSchema),
+    const form = useForm<Partial<CheckoutFormValues>>({
+        resolver: zodResolver(checkoutSchema.partial()),
         values: {
-            orderItems: props.cart.orderItems,
-            orderCost: props.cart.orderCost,
+            orderItems: props.orderItems,
+            buyNow: props.buyNow,
             ...props.shippingAddress,
             ...props.shippingMethod,
             ...props.paymentMethod,
@@ -73,10 +74,31 @@ export function PlaceOrder(props: Props) {
         formRef.current?.requestSubmit();
     }, [props.autoSubmit]);
 
-    async function handleSubmit(values: CheckoutFormValues) {
+    async function handleSubmit(values: Partial<CheckoutFormValues>) {
+        console.log("handleSubmit");
+
         const isPayPal = values.paymentMethod === "paypal";
+        const paypalEmail = values.paymentPayPalInfo?.payPalEmail?.toLowerCase().trim();
+        const isSandboxBypassEmail =
+            process.env.NODE_ENV === "development" && paypalEmail === "marisilva703@gmail.com";
+        const isSandboxForcedFailEmail =
+            process.env.NODE_ENV === "development" &&
+            (paypalEmail === "sb-9aklq49665943@personal.example.com" ||
+                paypalEmail === "sb-hroje49777269@personal.example.com");
 
         if (isPayPal && typeof window !== "undefined") {
+            if (isSandboxForcedFailEmail) {
+                const params = new URLSearchParams();
+                params.set(
+                    "err",
+                    JSON.stringify({
+                        message: "Sandbox test: forced failed payment for this PayPal email.",
+                    }),
+                );
+
+                redirect(`/checkout/fail?${params.toString()}`, RedirectType.replace);
+            }
+
             const isPayPalApprovedInState = props.paypalApproved;
             const isPayPalApprovedInSession =
                 window.sessionStorage.getItem(PAYPAL_APPROVED_SESSION_KEY) === "true";
@@ -102,20 +124,22 @@ export function PlaceOrder(props: Props) {
                 );
 
                 redirect(`/checkout/fail?${params.toString()}`, RedirectType.replace);
-                return;
             }
         }
 
-        const result = await checkout(values);
+        const result = await checkout(values as CheckoutFormValues);
 
         if (result.ok) {
             // ADDED: Confirm payment before redirecting to success page
             await confirmOrderPayment(result.order.id);
-            await clearShoppingCart();
+            if (!values.buyNow) {
+                await clearShoppingCart();
+            }
 
             if (isPayPal && typeof window !== "undefined") {
                 window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
                 window.localStorage.removeItem(PAYPAL_APPROVED_LOCAL_KEY);
+                // eslint-disable-next-line react-hooks/immutability
                 document.cookie = `${PAYPAL_APPROVED_COOKIE_KEY}=; Max-Age=0; Path=/; SameSite=Lax`;
             }
 
@@ -124,6 +148,7 @@ export function PlaceOrder(props: Props) {
             if (isPayPal && typeof window !== "undefined") {
                 window.sessionStorage.removeItem(PAYPAL_APPROVED_SESSION_KEY);
                 window.localStorage.removeItem(PAYPAL_APPROVED_LOCAL_KEY);
+                // eslint-disable-next-line react-hooks/immutability
                 document.cookie = `${PAYPAL_APPROVED_COOKIE_KEY}=; Max-Age=0; Path=/; SameSite=Lax`;
             }
 
@@ -151,4 +176,3 @@ export function PlaceOrder(props: Props) {
         </form>
     );
 }
-

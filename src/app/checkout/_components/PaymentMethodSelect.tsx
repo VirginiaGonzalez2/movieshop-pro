@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-19 16:57:39
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-03-06 12:40:26
+ *   Modified time: 2026-03-09 09:25:35
  *   Description: Payment method selection.
  */
 
@@ -96,6 +96,7 @@ export function PaymentMethodSelect(props: Props) {
                         </Field>
                     )}
                 />
+
                 {paymentMethod === "card" && (
                     <FieldSet>
                         <PayByCardForm form={form} />
@@ -111,6 +112,7 @@ export function PaymentMethodSelect(props: Props) {
                         />
                     </FieldSet>
                 )}
+
                 <Button className="w-fit self-center" type="submit">
                     Continue to {props.nextStep}
                 </Button>

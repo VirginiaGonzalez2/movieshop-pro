@@ -2,7 +2,7 @@
  *   Author: Sabrina Bjurman
  *   Create Time: 2026-02-19 14:17:47
  *   Modified by: Sabrina Bjurman
- *   Modified time: 2026-02-25 09:21:49
+ *   Modified time: 2026-03-09 09:00:39
  *   Description: Main checkout form.
  */
 
@@ -15,7 +15,7 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion";
 import { FieldGroup } from "@/components/ui/field";
-import { FullPaymentMethodFormValues, OrderItemsFormValues } from "@/form-schemas/checkout";
+import { FullPaymentMethodFormValues, OrderItemFormValues } from "@/form-schemas/checkout";
 import { PaymentMethodFormValues, paymentMethodSchema } from "@/form-schemas/payment";
 import {
     ShippingAddressFormValues,
@@ -32,7 +32,9 @@ import { ShippingMethodSelect } from "./ShippingMethodSelect";
 type CheckoutStep = "shippingAddress" | "shippingMethod" | "paymentMethod" | "confirmation";
 
 type Props = {
-    cart: OrderItemsFormValues;
+    orderItems: OrderItemFormValues[];
+    orderCost: number;
+    buyNow: boolean;
 };
 
 export function Checkout(props: Props) {
@@ -128,7 +130,7 @@ export function Checkout(props: Props) {
                 <PaymentMethodSelect
                     nextStep="Confirmation"
                     savedValues={paymentMethodInfo}
-                    orderCost={props.cart.orderCost}
+                    orderCost={props.orderCost}
                     onPayPalApprovedChange={setPaypalApproved}
                     onSubmit={handlePaymentMethodSubmit}
                 />
@@ -141,14 +143,13 @@ export function Checkout(props: Props) {
             >
                 {shippingAddressInfo && shippingMethodInfo && paymentMethodInfo && (
                     <PlaceOrder
-                        cart={props.cart}
+                        orderItems={props.orderItems}
                         shippingAddress={shippingAddressInfo}
                         shippingMethod={shippingMethodInfo}
                         paymentMethod={paymentMethodInfo}
                         paypalApproved={paypalApproved}
-                        autoSubmit={
-                            paymentMethodInfo.paymentMethod === "paypal" && paypalApproved
-                        }
+                        autoSubmit={paymentMethodInfo.paymentMethod === "paypal" && paypalApproved}
+                        buyNow={props.buyNow}
                     />
                 )}
             </CheckoutStepComponent>

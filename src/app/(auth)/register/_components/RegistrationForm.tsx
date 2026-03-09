@@ -35,6 +35,7 @@ import {
     CollapsibleTrigger,
 } from "../../../../components/ui/collapsible";
 import { registrationFormSchema, RegistrationFormValues } from "@/form-schemas/registration";
+import { redirect, RedirectType } from "next/navigation";
 
 type Props = React.ComponentProps<"form">;
 
@@ -52,6 +53,8 @@ export function RegistrationForm({ className, ...rest }: Props) {
             confirmPassword: "",
         },
     });
+
+    const originlUrl = router.getOrigin();
 
     async function handleSubmit(values: RegistrationFormValues) {
         const { error } = await authClient.signUp.email({
@@ -79,6 +82,8 @@ export function RegistrationForm({ className, ...rest }: Props) {
         toast.warning("Before you can sign in you must verify your email.", {
             duration: 10000,
         });
+
+        redirect(originlUrl, RedirectType.replace);
     }
 
     return (

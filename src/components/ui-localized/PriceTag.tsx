@@ -8,7 +8,7 @@ type Props = {
     className?: string;
 };
 
-export function PriceTag({ amount, currency = "SEK", locale = "sv-SE", className }: Props) {
+export function PriceTag({ amount, currency = "EUR", locale = "sv-SE", className }: Props) {
     const num = typeof amount === "number" ? amount : Number(amount);
 
     const formatted = Number.isFinite(num)
