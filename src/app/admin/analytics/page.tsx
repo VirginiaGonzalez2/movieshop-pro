@@ -5,9 +5,9 @@ export default function AnalyticsAdminPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold">Analítica & GTM</h2>
+        <h2 className="text-xl font-semibold">Analytics & GTM</h2>
         <p className="text-sm text-muted-foreground">
-          Conecta Google Analytics, Google Tag Manager y visualiza datos de analítica.
+          Professional control center for Google Analytics, Google Tag Manager, and ecommerce insights.
         </p>
       </div>
       <div className="grid gap-4">
@@ -20,9 +20,9 @@ export default function AnalyticsAdminPage() {
               <BarChart2 className="h-5 w-5" />
             </div>
             <div>
-              <div className="font-semibold">Configurar IDs de Analítica</div>
+              <div className="font-semibold">Configure Analytics IDs</div>
               <div className="text-sm text-muted-foreground">
-                Gestiona Google Analytics y GTM.
+                Manage Google Analytics and Google Tag Manager IDs.
               </div>
             </div>
           </div>
@@ -36,9 +36,9 @@ export default function AnalyticsAdminPage() {
               <BarChart2 className="h-5 w-5" />
             </div>
             <div>
-              <div className="font-semibold">Ver Analítica</div>
+              <div className="font-semibold">View Analytics Dashboard</div>
               <div className="text-sm text-muted-foreground">
-                Visualiza datos de Google Analytics.
+                Visualize ecommerce sales insights and opportunities.
               </div>
             </div>
           </div>

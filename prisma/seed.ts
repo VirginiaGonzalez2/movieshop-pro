@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client/edge";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const connectionString = process.env.DATABASE_URL;
@@ -170,7 +170,9 @@ async function main() {
     });
   }
   const allGenres = await prisma.genre.findMany();
-  const genreByName = new Map(allGenres.map(g => [g.name, g.id]));
+  const genreByName = new Map(
+    allGenres.map((g: { name: string; id: number }) => [g.name, g.id])
+  );
 
   // 4. Crear películas y relaciones
   for (const m of movies) {
@@ -226,10 +228,10 @@ async function main() {
 
     await prisma.movieGenre.upsert({
       where: {
-        movieId_genreId: { movieId: movie.id, genreId },
+        movieId_genreId: { movieId: movie.id, genreId: genreId as number },
       },
       update: {},
-      create: { movieId: movie.id, genreId },
+      create: { movieId: movie.id, genreId: genreId as number },
     });
 
     await prisma.moviePerson.upsert({

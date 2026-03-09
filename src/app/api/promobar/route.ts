@@ -31,6 +31,6 @@ export async function PUT(request: Request) {
     });
     return NextResponse.json(promoBar);
   } catch (error) {
-    return NextResponse.json({ error: error?.message || String(error) }, { status: 500 });
+    return NextResponse.json({ error: (error as Error)?.message || String(error) }, { status: 500 });
   }
 }

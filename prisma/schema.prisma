@@ -290,3 +290,10 @@ model DiscountCodeMovie {
   @@id([discountCodeId, movieId])
   @@index([movieId])
 }
+model AnalyticsConfig {
+  id        Int      @id @default(autoincrement())
+  gaId      String?
+  gtmId     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

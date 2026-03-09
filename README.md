@@ -38,7 +38,7 @@ PAYPAL_BASE_URL=https://api-m.sandbox.paypal.com
 Initialize Prisma and seed the database.
 
 ```bash
-npx prisma migrate deploy
+npx prisma migrate dev
 npx prisma generate
 npx prisma db seed
 ```
@@ -67,3 +67,65 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+# MovieShopProyect
+
+## Setup rápido para copias, plantillas y Vercel
+
+Este proyecto está listo para ser copiado, clonado o desplegado en Vercel. Para evitar errores con Prisma y la base de datos, sigue estos pasos:
+
+### 1. Instala dependencias
+```
+npm install
+```
+
+### 2. Genera el cliente Prisma
+```
+npx prisma generate
+```
+
+### 3. Aplica migraciones (crea tablas)
+```
+npx prisma migrate dev
+```
+
+### 4. (Opcional) Ejecuta el seed
+```
+npx tsx prisma/seed.ts
+```
+
+### 5. Arranca el proyecto
+```
+npm run dev
+```
+
+### 6. Para producción/Vercel
+- Vercel ejecuta automáticamente `npx prisma generate` en el build.
+- Si usas una base de datos externa, configura `DATABASE_URL` en `.env` o en Vercel.
+
+---
+
+## Notas importantes
+- Si ves errores como `findMany undefined`, asegúrate de haber ejecutado `npx prisma generate` y reiniciado el servidor.
+- El modelo `IntegrationConfig` está listo para integraciones futuras.
+- Puedes agregar un dominio fácilmente en Vercel o VPS siguiendo las instrucciones del README.
+
+---
+
+## Scripts útiles
+Agrega estos scripts en tu `package.json` para automatizar:
+
+```json
+"scripts": {
+  "prisma:generate": "npx prisma generate",
+  "prisma:migrate": "npx prisma migrate dev",
+  "prisma:seed": "npx tsx prisma/seed.ts"
+}
+```
+
+Así puedes correr:
+```
+npm run prisma:generate
+npm run prisma:migrate
+npm run prisma:seed
+```
