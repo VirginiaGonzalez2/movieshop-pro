@@ -1,14 +1,9 @@
-import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 
-const connectionString = process.env.DATABASE_URL;
+// ...existing code...
 
-if (!connectionString) {
-  throw new Error("Missing DATABASE_URL in .env file");
-}
-
-const prisma = new PrismaClient();
-
+// --- Types ---
 type SeedMovie = {
   title: string;
   year: number;
@@ -22,35 +17,15 @@ type SeedMovie = {
   trailerUrl?: string;
 };
 
+// --- Static Data ---
 const genres = [
-  {
-    name: "Action",
-    description: "Fast-paced movies with intense sequences and high-stakes conflict.",
-  },
-  {
-    name: "Animation",
-    description: "Animated stories for all ages, from family adventures to mature themes.",
-  },
-  {
-    name: "Comedy",
-    description: "Lighthearted films designed to entertain through humor and wit.",
-  },
-  {
-    name: "Drama",
-    description: "Character-driven stories focused on emotion, conflict, and realism.",
-  },
-  {
-    name: "Romance",
-    description: "Love-centered stories exploring relationships and emotional connection.",
-  },
-  {
-    name: "Sci-Fi",
-    description: "Speculative films featuring futuristic technology, science, or space themes.",
-  },
-  {
-    name: "Thriller",
-    description: "Suspenseful movies built around tension, danger, and twists.",
-  },
+  { name: "Action", description: "Fast-paced movies with intense sequences and high-stakes conflict." },
+  { name: "Animation", description: "Animated stories for all ages, from family adventures to mature themes." },
+  { name: "Comedy", description: "Lighthearted films designed to entertain through humor and wit." },
+  { name: "Drama", description: "Character-driven stories focused on emotion, conflict, and realism." },
+  { name: "Romance", description: "Love-centered stories exploring relationships and emotional connection." },
+  { name: "Sci-Fi", description: "Speculative films featuring futuristic technology, science, or space themes." },
+  { name: "Thriller", description: "Suspenseful movies built around tension, danger, and twists." },
 ];
 
 const movies: SeedMovie[] = [
@@ -78,6 +53,7 @@ const movies: SeedMovie[] = [
   { title: "Moonlight", year: 2016, genre: "Drama", director: "Barry Jenkins", actor: "Trevante Rhodes", rating: 4, price: 10.49, runtime: 111, image: "/images/moonlight.jpeg", trailerUrl: "https://www.youtube.com/watch?v=9NJj12tJzqc" },
 ];
 
+// --- Helper Functions ---
 function buildReleaseDate(year: number) {
   return new Date(`${year}-01-01`);
 }
@@ -99,6 +75,13 @@ function isGenericDescription(description: string | null | undefined, title: str
   );
 }
 
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error("Missing DATABASE_URL");
+}
+
+const prisma = new PrismaClient({ adapter: new PrismaPg() });
+
 async function getOrCreatePerson(name: string) {
   const existing = await prisma.person.findFirst({
     where: { name },
@@ -111,7 +94,7 @@ async function getOrCreatePerson(name: string) {
   });
 }
 
-
+// --- Main Seed Logic ---
 async function main() {
   console.log("🌱 Starting FULL seed...");
 
@@ -326,6 +309,7 @@ async function main() {
   console.log("🎉 FULL dataset with purchase data created successfully.");
 }
 
+// --- Run Seed ---
 main()
   .catch((e) => {
     console.error("❌ Seed error:", e);
