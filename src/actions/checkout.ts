@@ -17,7 +17,11 @@ import { headers } from "next/headers";
 import { ZodError } from "zod";
 import { Decimal } from "@prisma/client/runtime/client";
 
-type SerializableOrder = Pick<Order, "id" | "userId" | "status" | "orderDate"> & {
+type SerializableOrder = {
+    id: number;
+    userId: string;
+    status: string;
+    orderDate: Date;
     totalAmount: string;
 };
 
@@ -27,7 +31,11 @@ class CheckoutBusinessError extends Error {
         this.name = "CheckoutBusinessError";
     }
 }
-type OrderItemData = Omit<OrderItem, "id" | "orderId">;
+type OrderItemData = {
+    movieId: number;
+    quantity: number;
+    priceAtPurchase: string;
+};
 
 async function checkout(
     values: CheckoutFormValues,

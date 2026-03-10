@@ -8,7 +8,6 @@
  */
 
 import { prisma } from "@/lib/prisma";
-import { OrderStatus } from "@prisma/client";
 
 export async function confirmOrderPayment(orderId: number) {
     await prisma.order.update({
