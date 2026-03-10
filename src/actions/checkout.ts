@@ -12,7 +12,7 @@ import { CheckoutFormValues, checkoutSchema, OrderItemFormValues } from "@/form-
 import { applyDealDiscountToPrice } from "@/actions/deal-of-the-day";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { Order, OrderItem } from "@prisma/client";
+// import eliminado: no se usa ningún tipo directamente de @prisma/client
 import { headers } from "next/headers";
 import { ZodError } from "zod";
 import { Decimal } from "@prisma/client/runtime/client";
