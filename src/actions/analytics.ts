@@ -11,8 +11,8 @@ function validateGTMId(gtmId: string): boolean {
   return /^GTM-\w{6,}$/.test(gtmId);
 }
 
+export async function saveAnalyticsConfig(data: { gaId?: string; gtmId?: string }) {
   // TODO: Validación de usuario actual eliminada temporalmente para evitar error de compilación.
-
   const { gaId, gtmId } = data;
   if (gaId && !validateGAId(gaId)) {
     throw new Error("Invalid Google Analytics ID format.");
@@ -22,7 +22,7 @@ function validateGTMId(gtmId: string): boolean {
   }
 
   // Update if exists, else create
-  const existing = await prisma.analyticsConfig.findFirst();
+  const existing = await prisma.analyticsConfig.findFirst(); // Usa el nombre correcto del modelo
   if (existing) {
     return await prisma.analyticsConfig.update({
       where: { id: existing.id },
