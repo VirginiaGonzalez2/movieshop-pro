@@ -51,7 +51,6 @@ export default function MovieFilterPanel({
           Refine your results by genre, director, or actor.
         </p>
       </div>
-      {/* Accordion must be in this file if you want only one dropdown open at once */}
       {/* Clear filters button for the vertical panel. Styling only, no filter logic change. */}
       <div>
         <button
@@ -61,11 +60,12 @@ export default function MovieFilterPanel({
           Clear All Filters
         </button>
       </div>
-      {/* <Accordion type="multiple" className="max-w-lg">  */}
+      {/* Accordion for filter dropdowns */}
+      <Accordion type="multiple" className="max-w-lg">
         <GenreDropdownFilter genres={genres} selected={selectedGenres} />
         <DirectorDropdownFilter directors={directors} selected={selectedDirectors} />
         <ActorDropdownFilter actors={actors} selected={selectedActors} />
-      {/* </Accordion> */}
+      </Accordion>
       {/* Render movies here if needed */}
     </div>
   );

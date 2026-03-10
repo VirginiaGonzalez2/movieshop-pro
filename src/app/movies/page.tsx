@@ -93,11 +93,14 @@ export default async function MoviesPage({
      * 3️ Fetch Dropdown Data
      * ----------------------------------------
      */
-    const [genres, directors, actors] = await Promise.all([
+    let [genres, directors, actors] = await Promise.all([
         getGenres(),
         getDirectors(),
         getActors(),
     ]);
+    genres = genres ?? [];
+    directors = directors ?? [];
+    actors = actors ?? [];
 
     /**
      * ----------------------------------------
@@ -198,14 +201,11 @@ export default async function MoviesPage({
                         <summary className="cursor-pointer px-4 py-3 font-medium">Filters</summary>
                         <div className="p-4 border-t">
                             <MoviePanel
-                                genres={genres.map((g) => ({ id: g.id.toString(), name: g.name }))}
+                                genres={Array.isArray(genres) ? genres.map((g) => ({ id: g.id.toString(), name: g.name })) : []}
                                 selectedGenres={selectedGenres}
-                                directors={directors.map((d) => ({
-                                    id: d.id.toString(),
-                                    name: d.name,
-                                }))}
+                                directors={Array.isArray(directors) ? directors.map((d) => ({ id: d.id.toString(), name: d.name })) : []}
                                 selectedDirectors={selectedDirectors}
-                                actors={actors.map((a) => ({ id: a.id.toString(), name: a.name }))}
+                                actors={Array.isArray(actors) ? actors.map((a) => ({ id: a.id.toString(), name: a.name })) : []}
                                 selectedActors={selectedActors}
                             />
                         </div>
@@ -300,7 +300,7 @@ export default async function MoviesPage({
             imageUrl: m.imageUrl ?? null,
             directors: info.directors,
             actors: info.actors,
-            genres: m.genres.map((mg) => mg.genre.name),
+            genres: Array.isArray(m.genres) ? m.genres.map((mg) => mg.genre.name) : [],
         };
     });
 
@@ -310,6 +310,11 @@ export default async function MoviesPage({
             if (b.avgRating !== a.avgRating) return b.avgRating - a.avgRating;
             return b.ratingCount - a.ratingCount;
         });
+    }
+
+    // Evita error de .map sobre undefined en movies
+    if (!movies || !Array.isArray(movies)) {
+        return <div>No movies found</div>;
     }
 
     /**
@@ -349,11 +354,11 @@ export default async function MoviesPage({
                 <aside className="hidden md:block md:col-span-3">
                     <div className="bg-white border rounded-2xl shadow-sm p-6 sticky top-24 h-fit">
                         <MoviePanel
-                        genres={genres.map((g) => ({ id: g.id.toString(), name: g.name }))}
+                        genres={Array.isArray(genres) ? genres.map((g) => ({ id: g.id.toString(), name: g.name })) : []}
                         selectedGenres={selectedGenres}
-                        directors={directors.map((d) => ({ id: d.id.toString(), name: d.name }))}
+                        directors={Array.isArray(directors) ? directors.map((d) => ({ id: d.id.toString(), name: d.name })) : []}
                         selectedDirectors={selectedDirectors}
-                        actors={actors.map((a) => ({ id: a.id.toString(), name: a.name }))}
+                        actors={Array.isArray(actors) ? actors.map((a) => ({ id: a.id.toString(), name: a.name })) : []}
                         selectedActors={selectedActors}
                         />
                     </div>

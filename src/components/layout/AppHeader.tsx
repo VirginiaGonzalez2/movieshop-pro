@@ -50,7 +50,7 @@ export default function AppHeader() {
                 {/* DESKTOP NAVIGATION */}
                 <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
                     <Link href="/">Home</Link>
-                    <Link href="/movies">Movies</Link>
+                    <Link href="/movies-test">Movies</Link>
                     <Link href="/orders">Orders</Link>
                     <Link href="/cart">Cart</Link>
                     <Link href="/contact">Contact</Link>
@@ -79,29 +79,29 @@ export default function AppHeader() {
                 <div className="md:hidden border-t bg-background shadow-lg animate-in fade-in slide-in-from-top duration-200">
                     <div className="px-6 py-6 flex flex-col gap-5 text-base font-medium">
                         {/* Mobile Navigation Links */}
-                        <Link href="/" onClick={() => setIsOpen(false)}>
-                            Home
-                        </Link>
+                            <Link href="/" onClick={() => setIsOpen(false)}>
+                                Home
+                            </Link>
 
-                        <Link href="/movies" onClick={() => setIsOpen(false)}>
-                            Movies
-                        </Link>
+                            <Link href="/movies-test" onClick={() => setIsOpen(false)}>
+                                Movies
+                            </Link>
 
-                        <Link href="/orders" onClick={() => setIsOpen(false)}>
-                            Orders
-                        </Link>
+                            <Link href="/orders" onClick={() => setIsOpen(false)}>
+                                Orders
+                            </Link>
 
-                        <Link href="/cart" onClick={() => setIsOpen(false)}>
-                            Cart
-                        </Link>
+                            <Link href="/cart" onClick={() => setIsOpen(false)}>
+                                Cart
+                            </Link>
 
-                        <Link href="/contact" onClick={() => setIsOpen(false)}>
-                            Contact
-                        </Link>
+                            <Link href="/contact" onClick={() => setIsOpen(false)}>
+                                Contact
+                            </Link>
 
-                        <Link href="/wishlist" onClick={() => setIsOpen(false)}>
-                            Wishlist
-                        </Link>
+                            <Link href="/wishlist" onClick={() => setIsOpen(false)}>
+                                Wishlist
+                            </Link>
 
                         {/* Mobile Search */}
                         <div className="pt-2">

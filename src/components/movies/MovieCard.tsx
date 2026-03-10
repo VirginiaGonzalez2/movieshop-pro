@@ -44,39 +44,35 @@ export default function MovieCard({
             }`}
         >
             {/* Poster (clickable) */}
-            <Link href={`/movies/${movie.id}`} className="block">
-                <div className="aspect-2/3 bg-muted flex items-center justify-center overflow-hidden">
-                    {movie.imageUrl ? (
-                        <Image
-                            src={movie.imageUrl}
-                            alt={movie.title}
-                            className="h-full w-full object-cover"
-                            loading="lazy"
-                            width={444}
-                            height={666}
-                        />
-                    ) : (
-                        <div className="text-sm text-muted-foreground">No image</div>
-                    )}
-                </div>
-            </Link>
+            <div className="aspect-2/3 bg-muted flex items-center justify-center overflow-hidden">
+                {movie.imageUrl ? (
+                    <Image
+                        src={movie.imageUrl}
+                        alt={movie.title}
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                        width={444}
+                        height={666}
+                    />
+                ) : (
+                    <div className="text-sm text-muted-foreground">No image</div>
+                )}
+            </div>
 
             {/* Content */}
             <div className={compact ? "p-2 space-y-1.5" : "p-3 space-y-2"}>
-                <Link href={`/movies/${movie.id}`} className="block">
-                    <div
-                        className={`font-semibold line-clamp-1 flex items-baseline gap-2 ${
-                            compact ? "text-xs" : ""
-                        }`}
-                    >
-                        <span className="truncate">{movie.title}</span>
-                        {movie.releaseYear ? (
-                            <span className="text-xs text-muted-foreground">
-                                {movie.releaseYear}
-                            </span>
-                        ) : null}
-                    </div>
-                </Link>
+                <div
+                    className={`font-semibold line-clamp-1 flex items-baseline gap-2 ${
+                        compact ? "text-xs" : ""
+                    }`}
+                >
+                    <span className="truncate">{movie.title}</span>
+                    {movie.releaseYear ? (
+                        <span className="text-xs text-muted-foreground">
+                            {movie.releaseYear}
+                        </span>
+                    ) : null}
+                </div>
 
                 {movie.genres && movie.genres.length > 0 ? (
                     <p
