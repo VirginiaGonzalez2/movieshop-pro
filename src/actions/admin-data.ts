@@ -2,7 +2,6 @@
 
 import { requireAdminArea } from "@/lib/admin-access";
 import { prisma } from "@/lib/prisma";
-import { OrderStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 function revalidateOrderPaths(orderId?: number) {
@@ -15,25 +14,8 @@ function revalidateOrderPaths(orderId?: number) {
     }
 }
 
-export async function updateOrderStatusAction(orderId: number, formData: FormData): Promise<void> {
-    await requireAdminArea("orders");
-
-    const rawStatus = String(formData.get("status") ?? "");
-    const allowedStatuses = Object.values(OrderStatus) as string[];
-
-    if (!allowedStatuses.includes(rawStatus)) {
-        throw new Error("Invalid order status");
-    }
-
-    const status = rawStatus as OrderStatus;
-
-    await prisma.order.update({
-        where: { id: orderId },
-        data: { status },
-    });
-
-    revalidateOrderPaths(orderId);
-}
+// ...existing code...
+// Elimina código fuera de función, define correctamente las funciones
 
 export async function deleteOrderAdminAction(orderId: number): Promise<void> {
     await requireAdminArea("orders");
