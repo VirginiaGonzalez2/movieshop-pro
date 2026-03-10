@@ -2,7 +2,7 @@ import { deleteOrderAdminAction } from "@/actions/admin-data";
 import { requireAdminArea } from "@/lib/admin-access";
 import { prisma } from "@/lib/prisma";
 
-const statuses = Object.values(OrderStatus);
+const statuses = ["PENDING", "PAID", "SHIPPED", "CANCELLED", "REFUNDED"];
 
 export default async function AdminOrdersPage() {
     await requireAdminArea("orders");
