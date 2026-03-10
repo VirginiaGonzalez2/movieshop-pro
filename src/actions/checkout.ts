@@ -105,7 +105,7 @@ async function checkout(
         return { ok: false, cause: "business", error: "One or more movies no longer exist." };
     }
 
-    const movieById = new Map(movies.map((movie: any) => [movie.id, movie]));
+    const movieById = new Map<number, any>(movies.map((movie: any) => [movie.id, movie]));
     for (const [movieId, quantity] of orderQuantityByMovieId) {
         const movie = movieById.get(movieId);
         if (!movie || movie.stock < quantity) {
@@ -178,7 +178,7 @@ async function calculateOrderPrices(
         select: { id: true, price: true },
     });
 
-    const movieById = new Map(movies.map((movie: any) => [movie.id, movie]));
+    const movieById = new Map<number, any>(movies.map((movie: any) => [movie.id, movie]));
 
     const pricedOrderItems: OrderItemData[] = [];
 
