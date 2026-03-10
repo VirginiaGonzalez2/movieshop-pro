@@ -1,7 +1,6 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { Role } from "@prisma/client";
 
 // Genres
 export async function getGenres() {
@@ -11,14 +10,11 @@ export async function getGenres() {
 }
 
 // People by role (director/actor)
-export async function getPeopleByRole(role: Role) {
+export async function getPeopleByRole() {
     return prisma.person.findMany({
         where: {
             movies: {
-                // ✅ EXACTAMENTE como está en schema
-                some: {
-                    role: role, // enum Role
-                },
+                some: {},
             },
         },
         select: {
@@ -31,10 +27,8 @@ export async function getPeopleByRole(role: Role) {
 
 // Directors
 export async function getDirectors() {
-    return getPeopleByRole(Role.DIRECTOR);
 }
 
 // Actors
 export async function getActors() {
-    return getPeopleByRole(Role.ACTOR);
 }
