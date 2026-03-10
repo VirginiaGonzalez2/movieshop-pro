@@ -1,4 +1,4 @@
-import { deleteOrderAdminAction, updateOrderStatusAction } from "@/actions/admin-data";
+import { deleteOrderAdminAction } from "@/actions/admin-data";
 import { requireAdminArea } from "@/lib/admin-access";
 import { prisma } from "@/lib/prisma";
 import { OrderStatus } from "@prisma/client";
