@@ -123,10 +123,12 @@ function buildShortEnglishDescription({
 export default async function MovieDetailsPage({
     params,
 }: {
-    params: { id: string };
+    params: Promise<{ id: string }> | { id: string };
 }) {
     try {
-        const movieId = Number(params.id);
+        // Unwrap params if it's a Promise (Next.js app router dynamic route)
+        const resolvedParams = await Promise.resolve(params);
+        const movieId = Number(resolvedParams.id);
 
         if (Number.isNaN(movieId) || !Number.isInteger(movieId) || movieId <= 0) {
             return notFound();
