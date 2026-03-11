@@ -27,8 +27,36 @@ export async function getPeopleByRole() {
 
 // Directors
 export async function getDirectors() {
+    return prisma.person.findMany({
+        where: {
+            movies: {
+                some: {
+                    role: "DIRECTOR"
+                }
+            }
+        },
+        select: {
+            id: true,
+            name: true,
+        },
+        orderBy: { name: "asc" },
+    });
 }
 
 // Actors
 export async function getActors() {
+    return prisma.person.findMany({
+        where: {
+            movies: {
+                some: {
+                    role: "ACTOR"
+                }
+            }
+        },
+        select: {
+            id: true,
+            name: true,
+        },
+        orderBy: { name: "asc" },
+    });
 }

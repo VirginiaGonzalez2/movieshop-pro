@@ -38,121 +38,126 @@ export default function MovieCard({
     const buyNow = useBuyNow(movie.id);
 
     return (
-        <div
-            className={`block border rounded-lg overflow-hidden transition-all duration-200 transform hover:shadow-lg ${
-                compact ? "hover:scale-100" : "hover:scale-[1.02]"
-            }`}
-        >
-            {/* Poster (clickable) */}
-            <div className="aspect-2/3 bg-muted flex items-center justify-center overflow-hidden">
-                {movie.imageUrl ? (
-                    <Image
-                        src={movie.imageUrl}
-                        alt={movie.title}
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                        width={444}
-                        height={666}
-                    />
-                ) : (
-                    <div className="text-sm text-muted-foreground">No image</div>
-                )}
-            </div>
-
-            {/* Content */}
-            <div className={compact ? "p-2 space-y-1.5" : "p-3 space-y-2"}>
-                <div
-                    className={`font-semibold line-clamp-1 flex items-baseline gap-2 ${
-                        compact ? "text-xs" : ""
-                    }`}
-                >
-                    <span className="truncate">{movie.title}</span>
-                    {movie.releaseYear ? (
-                        <span className="text-xs text-muted-foreground">
-                            {movie.releaseYear}
-                        </span>
-                    ) : null}
+        <Link href={`/movies/${movie.id}`} className="block group" prefetch={false}>
+            <div
+                className={`border rounded-lg overflow-hidden transition-all duration-200 transform hover:shadow-lg ${
+                    compact ? "hover:scale-100" : "hover:scale-[1.02]"
+                }`}
+            >
+                {/* Poster (clickable) */}
+                <div className="aspect-2/3 bg-muted flex items-center justify-center overflow-hidden">
+                    {movie.imageUrl ? (
+                        <Image
+                            src={movie.imageUrl}
+                            alt={movie.title}
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                            width={444}
+                            height={666}
+                        />
+                    ) : (
+                        <div className="text-sm text-muted-foreground">No image</div>
+                    )}
                 </div>
 
-                {movie.genres && movie.genres.length > 0 ? (
-                    <p
-                        className={`text-muted-foreground line-clamp-1 ${
-                            compact ? "text-[10px]" : "text-xs"
+                {/* Content */}
+                <div className={compact ? "p-2 space-y-1.5" : "p-3 space-y-2"}>
+                    <div
+                        className={`font-semibold line-clamp-1 flex items-baseline gap-2 ${
+                            compact ? "text-xs" : ""
                         }`}
                     >
-                        {movie.genres.join(" • ")}
-                    </p>
-                ) : null}
+                        <span className="truncate">{movie.title}</span>
+                        {movie.releaseYear ? (
+                            <span className="text-xs text-muted-foreground">
+                                {movie.releaseYear}
+                            </span>
+                        ) : null}
+                    </div>
 
-                {movie.purchasedCount !== undefined && movie.purchasedCount > 0 ? (
-                    <p
-                        className={
-                            compact
-                                ? "text-[10px] text-muted-foreground"
-                                : "text-xs text-muted-foreground"
-                        }
-                    >
-                        {movie.purchasedCount} sold
-                    </p>
-                ) : null}
+                    {movie.genres && movie.genres.length > 0 ? (
+                        <p
+                            className={`text-muted-foreground line-clamp-1 ${
+                                compact ? "text-[10px]" : "text-xs"
+                            }`}
+                        >
+                            {movie.genres.join(" • ")}
+                        </p>
+                    ) : null}
 
-                <div className="flex items-start justify-between">
-                    <div className={compact ? "text-sm font-semibold" : "text-lg font-semibold"}>
-                        <PriceTag amount={movie.price} />
+                    {movie.purchasedCount !== undefined && movie.purchasedCount > 0 ? (
+                        <p
+                            className={
+                                compact
+                                    ? "text-[10px] text-muted-foreground"
+                                    : "text-xs text-muted-foreground"
+                            }
+                        >
+                            {movie.purchasedCount} sold
+                        </p>
+                    ) : null}
+
+                    <div className="flex items-start justify-between">
+                        <div className={compact ? "text-sm font-semibold" : "text-lg font-semibold"}>
+                            <PriceTag amount={movie.price} />
+                        </div>
+
+                        <div
+                            className={`text-muted-foreground text-right ${
+                                compact ? "text-[10px]" : "text-xs"
+                            }`}
+                        >
+                            <div>{movie.runtime} min</div>
+                            <div>
+                                {movie.stock > 0 ? (
+                                    <span className="text-green-600">In stock ({movie.stock})</span>
+                                ) : (
+                                    <span className="text-red-500">Out of stock</span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2">
+                        <RatingStars value={Math.round(movie.avgRating)} size={compact ? 12 : 16} />
+                        <span
+                            className={
+                                compact
+                                    ? "text-[10px] text-muted-foreground"
+                                    : "text-xs text-muted-foreground"
+                            }
+                        >
+                            {movie.ratingCount > 0
+                                ? `${movie.avgRating.toFixed(1)} (${movie.ratingCount})`
+                                : "No ratings"}
+                        </span>
                     </div>
 
                     <div
-                        className={`text-muted-foreground text-right ${
-                            compact ? "text-[10px]" : "text-xs"
+                        className={`flex flex-col sm:flex-row gap-1 mt-2 items-stretch ${
+                            compact ? "scale-90 origin-left" : ""
                         }`}
                     >
-                        <div>{movie.runtime} min</div>
-                        <div>
-                            {movie.stock > 0 ? (
-                                <span className="text-green-600">In stock ({movie.stock})</span>
-                            ) : (
-                                <span className="text-red-500">Out of stock</span>
-                            )}
+                        <div className="w-full sm:w-auto">
+                            <AddToCartButton movieId={movie.id} disabled={movie.stock <= 0} />
+                        </div>
+
+                        <div className="w-full sm:w-auto">
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    buyNow();
+                                }}
+                                disabled={movie.stock <= 0}
+                                className="h-7 px-2 rounded-md bg-blue-600 text-white text-xs shadow-sm transition-all duration-150 hover:shadow-sm active:scale-[0.98] disabled:opacity-60 w-full sm:w-auto"
+                            >
+                                Buy Now
+                            </button>
                         </div>
                     </div>
                 </div>
-
-                <div className="flex items-center justify-between gap-2">
-                    <RatingStars value={Math.round(movie.avgRating)} size={compact ? 12 : 16} />
-                    <span
-                        className={
-                            compact
-                                ? "text-[10px] text-muted-foreground"
-                                : "text-xs text-muted-foreground"
-                        }
-                    >
-                        {movie.ratingCount > 0
-                            ? `${movie.avgRating.toFixed(1)} (${movie.ratingCount})`
-                            : "No ratings"}
-                    </span>
-                </div>
-
-                <div
-                    className={`flex flex-col sm:flex-row gap-1 mt-2 items-stretch ${
-                        compact ? "scale-90 origin-left" : ""
-                    }`}
-                >
-                    <div className="w-full sm:w-auto">
-                        <AddToCartButton movieId={movie.id} disabled={movie.stock <= 0} />
-                    </div>
-
-                    <div className="w-full sm:w-auto">
-                        <button
-                            type="button"
-                            onClick={buyNow}
-                            disabled={movie.stock <= 0}
-                            className="h-7 px-2 rounded-md bg-blue-600 text-white text-xs shadow-sm transition-all duration-150 hover:shadow-sm active:scale-[0.98] disabled:opacity-60 w-full sm:w-auto"
-                        >
-                            Buy Now
-                        </button>
-                    </div>
-                </div>
             </div>
-        </div>
+        </Link>
     );
 }

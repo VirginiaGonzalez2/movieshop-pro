@@ -50,7 +50,7 @@ export default function AppHeader() {
                 {/* DESKTOP NAVIGATION */}
                 <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
                     <Link href="/">Home</Link>
-                    <Link href="/movies-test">Movies</Link>
+                    <Link href="/movies">Movies</Link>
                     <Link href="/orders">Orders</Link>
                     <Link href="/cart">Cart</Link>
                     <Link href="/contact">Contact</Link>
@@ -83,7 +83,7 @@ export default function AppHeader() {
                                 Home
                             </Link>
 
-                            <Link href="/movies-test" onClick={() => setIsOpen(false)}>
+                            <Link href="/movies" onClick={() => setIsOpen(false)}>
                                 Movies
                             </Link>
 
