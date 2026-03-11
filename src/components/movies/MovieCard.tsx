@@ -74,63 +74,67 @@ export default function MovieCard({
                     </p>
                 ) : null}
 
-                <div className="flex items-start justify-between">
-                    <div className={compact ? "text-sm font-semibold" : "text-lg font-semibold"}>
-                        <PriceTag amount={movie.price} />
+                    <div className="flex items-start justify-between">
+                        <div className={compact ? "text-sm font-semibold" : "text-lg font-semibold"}>
+                            <PriceTag amount={movie.price} />
+                        </div>
+
+                        <div
+                            className={`text-muted-foreground text-right ${
+                                compact ? "text-[10px]" : "text-xs"
+                            }`}
+                        >
+                            <div>{movie.runtime} min</div>
+                            <div>
+                                {movie.stock > 0 ? (
+                                    <span className="text-green-600">In stock ({movie.stock})</span>
+                                ) : (
+                                    <span className="text-red-500">Out of stock</span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-2">
+                        <RatingStars value={Math.round(movie.avgRating)} size={compact ? 12 : 16} />
+                        <span
+                            className={
+                                compact
+                                    ? "text-[10px] text-muted-foreground"
+                                    : "text-xs text-muted-foreground"
+                            }
+                        >
+                            {movie.ratingCount > 0
+                                ? `${movie.avgRating.toFixed(1)} (${movie.ratingCount})`
+                                : "No ratings"}
+                        </span>
                     </div>
 
                     <div
-                        className={`text-muted-foreground text-right ${
-                            compact ? "text-[10px]" : "text-xs"
+                        className={`flex flex-col sm:flex-row gap-1 mt-2 items-stretch ${
+                            compact ? "scale-90 origin-left" : ""
                         }`}
                     >
-                        <div>{movie.runtime} min</div>
-                        <div>
-                            {movie.stock > 0 ? (
-                                <span className="text-green-600">In stock ({movie.stock})</span>
-                            ) : (
-                                <span className="text-red-500">Out of stock</span>
-                            )}
+                        <div className="w-full sm:w-auto">
+                            <AddToCartButton movieId={movie.id} disabled={movie.stock <= 0} />
+                        </div>
+
+                        <div className="w-full sm:w-auto">
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    buyNow();
+                                }}
+                                disabled={movie.stock <= 0}
+                                className="h-7 px-2 rounded-md bg-blue-600 text-white text-xs shadow-sm transition-all duration-150 hover:shadow-sm active:scale-[0.98] disabled:opacity-60 w-full sm:w-auto"
+                            >
+                                Buy Now
+                            </button>
                         </div>
                     </div>
                 </div>
-
-                <div className="flex items-center justify-between gap-2">
-                    <RatingStars value={Math.round(movie.avgRating)} size={compact ? 12 : 16} />
-                    <span
-                        className={
-                            compact
-                                ? "text-[10px] text-muted-foreground"
-                                : "text-xs text-muted-foreground"
-                        }
-                    >
-                        {movie.ratingCount > 0
-                            ? `${movie.avgRating.toFixed(1)} (${movie.ratingCount})`
-                            : "No ratings"}
-                    </span>
-                </div>
-
-                <div
-                    className={`flex flex-col sm:flex-row gap-1 mt-2 items-stretch ${
-                        compact ? "scale-90 origin-left" : ""
-                    }`}
-                >
-                    <div className="w-full sm:w-auto">
-                        <AddToCartButton movieId={movie.id} disabled={movie.stock <= 0} />
-                    </div>
-
-                    <div className="w-full sm:w-auto">
-                        <button
-                            type="button"
-                            onClick={buyNow}
-                            disabled={movie.stock <= 0}
-                            className="h-7 px-2 rounded-md bg-blue-600 text-white text-xs shadow-sm transition-all duration-150 hover:shadow-sm active:scale-[0.98] disabled:opacity-60 w-full sm:w-auto"
-                        >
-                            Buy Now
-                        </button>
-                    </div>
-                </div>
             </div>
-        </div>
+        </Link>
     );
 }
