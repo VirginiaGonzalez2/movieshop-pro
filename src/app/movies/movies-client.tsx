@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link";
 import { Suspense, useMemo, useState } from "react";
 import MoviesSearchBar from "./search-bar";
 import MoviesSortBar from "./MoviesSortBar";
@@ -75,20 +75,21 @@ export default function MoviesClient({
                 <div>
                     <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {filtered.map((movie) => (
-                            <MovieCard
-                                key={movie.id}
-                                movie={{
-                                    id: movie.id,
-                                    title: movie.title,
-                                    price: movie.price,
-                                    stock: movie.stock,
-                                    runtime: movie.runtime,
-                                    avgRating: movie.avgRating,
-                                    ratingCount: movie.ratingCount,
-                                    imageUrl: movie.imageUrl,
-                                    genres: movie.genres,
-                                }}
-                            />
+                            <Link href={`/movies/${movie.id}`} className="block group" prefetch={false} key={movie.id}>
+                                <MovieCard
+                                    movie={{
+                                        id: movie.id,
+                                        title: movie.title,
+                                        price: movie.price,
+                                        stock: movie.stock,
+                                        runtime: movie.runtime,
+                                        avgRating: movie.avgRating,
+                                        ratingCount: movie.ratingCount,
+                                        imageUrl: movie.imageUrl,
+                                        genres: movie.genres,
+                                    }}
+                                />
+                            </Link>
                         ))}
                     </div>
 

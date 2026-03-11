@@ -61,29 +61,7 @@ export default function MovieCard({
 
             {/* Content */}
             <div className={compact ? "p-2 space-y-1.5" : "p-3 space-y-2"}>
-                <div
-                    className={`font-semibold line-clamp-1 flex items-baseline gap-2 ${
-                        compact ? "text-xs" : ""
-                    }`}
-                >
-                    <span className="truncate">{movie.title}</span>
-                    {movie.releaseYear ? (
-                        <span className="text-xs text-muted-foreground">
-                            {movie.releaseYear}
-                        </span>
-                    ) : null}
-                </div>
-
-                {movie.genres && movie.genres.length > 0 ? (
-                    <p
-                        className={`text-muted-foreground line-clamp-1 ${
-                            compact ? "text-[10px]" : "text-xs"
-                        }`}
-                    >
-                        {movie.genres.join(" • ")}
-                    </p>
-                ) : null}
-
+                {/* ...existing code... */}
                 {movie.purchasedCount !== undefined && movie.purchasedCount > 0 ? (
                     <p
                         className={
