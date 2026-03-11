@@ -80,7 +80,7 @@ if (!connectionString) {
   throw new Error("Missing DATABASE_URL");
 }
 
-const prisma = new PrismaClient({ adapter: new PrismaPg() });
+const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
 
 async function getOrCreatePerson(name: string) {
   const existing = await prisma.person.findFirst({

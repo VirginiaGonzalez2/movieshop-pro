@@ -38,64 +38,41 @@ export default function MovieCard({
     const buyNow = useBuyNow(movie.id);
 
     return (
-        <Link href={`/movies/${movie.id}`} className="block group" prefetch={false}>
-            <div
-                className={`border rounded-lg overflow-hidden transition-all duration-200 transform hover:shadow-lg ${
-                    compact ? "hover:scale-100" : "hover:scale-[1.02]"
-                }`}
-            >
-                {/* Poster (clickable) */}
-                <div className="aspect-2/3 bg-muted flex items-center justify-center overflow-hidden">
-                    {movie.imageUrl ? (
-                        <Image
-                            src={movie.imageUrl}
-                            alt={movie.title}
-                            className="h-full w-full object-cover"
-                            loading="lazy"
-                            width={444}
-                            height={666}
-                        />
-                    ) : (
-                        <div className="text-sm text-muted-foreground">No image</div>
-                    )}
-                </div>
+        <div
+            className={`block border rounded-lg overflow-hidden transition-all duration-200 transform hover:shadow-lg ${
+                compact ? "hover:scale-100" : "hover:scale-[1.02]"
+            }`}
+        >
+            {/* Poster (clickable) */}
+            <div className="aspect-2/3 bg-muted flex items-center justify-center overflow-hidden">
+                {movie.imageUrl ? (
+                    <Image
+                        src={movie.imageUrl}
+                        alt={movie.title}
+                        className="h-full w-full object-cover"
+                        loading="lazy"
+                        width={444}
+                        height={666}
+                    />
+                ) : (
+                    <div className="text-sm text-muted-foreground">No image</div>
+                )}
+            </div>
 
-                {/* Content */}
-                <div className={compact ? "p-2 space-y-1.5" : "p-3 space-y-2"}>
-                    <div
-                        className={`font-semibold line-clamp-1 flex items-baseline gap-2 ${
-                            compact ? "text-xs" : ""
-                        }`}
+            {/* Content */}
+            <div className={compact ? "p-2 space-y-1.5" : "p-3 space-y-2"}>
+                {/* ...existing code... */}
+                {movie.purchasedCount !== undefined && movie.purchasedCount > 0 ? (
+                    <p
+                        className={
+                            compact
+                                ? "text-[10px] text-muted-foreground"
+                                : "text-xs text-muted-foreground"
+                        }
                     >
-                        <span className="truncate">{movie.title}</span>
-                        {movie.releaseYear ? (
-                            <span className="text-xs text-muted-foreground">
-                                {movie.releaseYear}
-                            </span>
-                        ) : null}
-                    </div>
-
-                    {movie.genres && movie.genres.length > 0 ? (
-                        <p
-                            className={`text-muted-foreground line-clamp-1 ${
-                                compact ? "text-[10px]" : "text-xs"
-                            }`}
-                        >
-                            {movie.genres.join(" • ")}
-                        </p>
-                    ) : null}
-
-                    {movie.purchasedCount !== undefined && movie.purchasedCount > 0 ? (
-                        <p
-                            className={
-                                compact
-                                    ? "text-[10px] text-muted-foreground"
-                                    : "text-xs text-muted-foreground"
-                            }
-                        >
-                            {movie.purchasedCount} sold
-                        </p>
-                    ) : null}
+                        {movie.purchasedCount} sold
+                    </p>
+                ) : null}
 
                     <div className="flex items-start justify-between">
                         <div className={compact ? "text-sm font-semibold" : "text-lg font-semibold"}>
