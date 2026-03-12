@@ -82,6 +82,7 @@ export default async function MovieDetailsNewPage({ params }: { params: { id: st
                 ← Back to Movies
             </Link>
             <div className="flex flex-col md:flex-row gap-8">
+                {/* LEFT COLUMN: Poster + Wishlist */}
                 <div className="md:w-1/3">
                     <div className="relative">
                         {movie.imageUrl ? (
@@ -89,48 +90,42 @@ export default async function MovieDetailsNewPage({ params }: { params: { id: st
                         ) : (
                             <div className="text-sm text-muted-foreground">No image</div>
                         )}
-                        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur shadow-md rounded-full p-3 hover:scale-110 transition">
+                        <div className="absolute top-3 right-3 bg-white shadow rounded-full p-3">
                             <WishlistToggle movieId={movie.id} />
                         </div>
                     </div>
                 </div>
-                <div className="md:w-2/3 space-y-4">
+                {/* RIGHT COLUMN: Info + Actions */}
+                <div className="flex flex-col gap-4 max-w-md mx-auto md:mx-0 md:w-2/3">
                     <h1 className="text-2xl font-bold">{movie.title}</h1>
-                    <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-                        <span>{movie.runtime} min</span>
-                        <span>{movie.stock > 0 ? `In stock (${movie.stock})` : "Out of stock"}</span>
-                        <span>{genreNames.join(", ")}</span>
-                        <span>{movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : "—"}</span>
+                    {/* Rating stars directly under title */}
+                    <MovieRatingSection movieId={movie.id} avgRating={avgRating} ratingCount={ratingCount} />
+                    {/* Description below rating */}
+                    <div className="text-sm text-muted-foreground">
+                        {movie.description || "No description available."}
                     </div>
-                    <div className="mt-2 text-sm">
+                    {/* Metadata block */}
+                    <p className="text-sm text-gray-600">
+                        {genreNames.join(", ")} • {movie.releaseDate ? new Date(movie.releaseDate).getFullYear() : "—"} • {movie.runtime} min
+                    </p>
+                    <p className="mt-2">
                         <strong>Director:</strong> {directors.join(", ") || "—"}
-                    </div>
-                    <div className="mt-2 text-sm">
+                    </p>
+                    <p>
                         <strong>Cast:</strong> {actors.join(", ") || "—"}
-                    </div>
+                    </p>
+                    {/* Price */}
                     <div className="mt-2 text-lg font-semibold">
                         <PriceTag amount={movie.price.toString()} />
                     </div>
-
-                    {/* Refined purchase section - professional ecommerce layout */}
-                    <div className="mt-6 flex flex-col gap-3 max-w-sm">
-                        <button
-                            className="h-11 rounded-lg bg-primary text-white font-medium hover:opacity-90 transition"
-                        >
+                    {/* Centered purchase buttons */}
+                    <div className="flex flex-col items-center gap-3 mt-6">
+                        <button className="w-56 h-10 rounded-lg bg-primary text-white font-medium hover:opacity-90 transition">
                             Add to Cart
                         </button>
-
-                        <button
-                            className="h-11 rounded-lg border border-gray-300 hover:bg-gray-100 transition font-medium"
-                        >
+                        <button className="w-56 h-10 rounded-lg border border-gray-300 hover:bg-gray-100 transition">
                             Buy Now
                         </button>
-                    </div>
-                    <div className="mt-4 text-sm text-muted-foreground">
-                        {movie.description || "No description available."}
-                    </div>
-                    <div className="mt-4">
-                        <MovieRatingSection movieId={movie.id} avgRating={avgRating} ratingCount={ratingCount} />
                     </div>
                 </div>
             </div>
