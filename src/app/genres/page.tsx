@@ -1,3 +1,5 @@
+// Revalidate genre data every 60 seconds
+export const revalidate = 60
 import { prisma } from "@/lib/prisma";
 import GenresClient from "./genres-client";
 

@@ -1,28 +1,22 @@
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "@prisma/client"
+import { PrismaPg } from "@prisma/adapter-pg"
 
-const connectionString = process.env.DATABASE_URL;
+// Create Prisma adapter for Neon using DATABASE_URL
+const adapter = new PrismaPg({
+    connectionString: process.env.DATABASE_URL!,
+})
 
-if (!connectionString) {
-    throw new Error("DATABASE_URL is not defined");
+// Prevent multiple Prisma instances during development and serverless execution
+const globalForPrisma = globalThis as unknown as {
+    prisma: PrismaClient | undefined
 }
 
-const adapter = new PrismaPg({ connectionString });
-
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
-
-const prisma =
-    globalForPrisma.prisma ||
+// Create Prisma client only once
+export const prisma =
+    globalForPrisma.prisma ??
     new PrismaClient({
         adapter,
-        log:
-            process.env.NODE_ENV === "development"
-                ? ["query", "info", "warn", "error"]
-                : ["warn", "error"],
-    });
+    })
 
-if (process.env.NODE_ENV === "development") {
-    globalForPrisma.prisma = prisma;
-}
-
-export { prisma };
+// Store Prisma instance globally in development
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma

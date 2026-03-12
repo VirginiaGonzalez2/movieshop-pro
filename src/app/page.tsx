@@ -1,3 +1,5 @@
+// Revalidate cached homepage data every 60 seconds
+export const revalidate = 60
 // SEO metadata for HomePage (Next.js App Router)
 export const metadata = {
     title: "A+ MovieShop",

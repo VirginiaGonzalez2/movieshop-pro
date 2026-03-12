@@ -1,3 +1,5 @@
+// Revalidate movie list data every 60 seconds
+export const revalidate = 60
 // SEO metadata for Movies page
 export const metadata = {
     title: "Movies Catalog - A+ MovieShop",
