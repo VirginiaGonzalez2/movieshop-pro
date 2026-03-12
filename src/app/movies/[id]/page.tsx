@@ -83,13 +83,15 @@ export default async function MovieDetailsNewPage({ params }: { params: { id: st
             </Link>
             <div className="flex flex-col md:flex-row gap-8">
                 <div className="md:w-1/3">
-                    {movie.imageUrl ? (
-                        <Image src={movie.imageUrl} alt={movie.title} width={444} height={666} className="rounded-lg object-cover" />
-                    ) : (
-                        <div className="text-sm text-muted-foreground">No image</div>
-                    )}
-                    <div className="mt-4">
-                        <WishlistToggle movieId={movie.id} />
+                    <div className="relative">
+                        {movie.imageUrl ? (
+                            <Image src={movie.imageUrl} alt={movie.title} width={444} height={666} className="rounded-lg object-cover" />
+                        ) : (
+                            <div className="text-sm text-muted-foreground">No image</div>
+                        )}
+                        <div className="absolute top-3 right-3 bg-white shadow-md rounded-full p-2 hover:scale-110 transition">
+                            <WishlistToggle movieId={movie.id} />
+                        </div>
                     </div>
                 </div>
                 <div className="md:w-2/3 space-y-4">
@@ -110,16 +112,16 @@ export default async function MovieDetailsNewPage({ params }: { params: { id: st
                         <PriceTag amount={movie.price.toString()} />
                     </div>
 
-                    {/* Professional purchase section */}
-                    <div className="flex gap-4 mt-6">
+                    {/* Professional purchase section - vertical buttons */}
+                    <div className="flex flex-col gap-3 mt-6 w-full max-w-xs">
                         <Link href={`/cart?add=${movie.id}`}>
-                            <button className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition">
+                            <button className="w-full py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-900 transition">
                                 Add to Cart
                             </button>
                         </Link>
 
                         <Link href={`/checkout?movie=${movie.id}`}>
-                            <button className="px-6 py-3 border border-black rounded-lg hover:bg-gray-100 transition">
+                            <button className="w-full py-3 border border-black rounded-lg hover:bg-gray-100 transition">
                                 Buy Now
                             </button>
                         </Link>
