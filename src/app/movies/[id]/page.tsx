@@ -89,7 +89,7 @@ export default async function MovieDetailsNewPage({ params }: { params: { id: st
                         ) : (
                             <div className="text-sm text-muted-foreground">No image</div>
                         )}
-                        <div className="absolute top-3 right-3 bg-white shadow-md rounded-full p-2 hover:scale-110 transition">
+                        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur shadow-md rounded-full p-3 hover:scale-110 transition">
                             <WishlistToggle movieId={movie.id} />
                         </div>
                     </div>
@@ -112,19 +112,19 @@ export default async function MovieDetailsNewPage({ params }: { params: { id: st
                         <PriceTag amount={movie.price.toString()} />
                     </div>
 
-                    {/* Professional purchase section - vertical buttons */}
-                    <div className="flex flex-col gap-3 mt-6 w-full max-w-xs">
-                        <Link href={`/cart?add=${movie.id}`}>
-                            <button className="w-full py-3 bg-black text-white rounded-lg font-medium hover:bg-gray-900 transition">
-                                Add to Cart
-                            </button>
-                        </Link>
+                    {/* Refined purchase section - professional ecommerce layout */}
+                    <div className="mt-6 flex flex-col gap-3 max-w-sm">
+                        <button
+                            className="h-11 rounded-lg bg-primary text-white font-medium hover:opacity-90 transition"
+                        >
+                            Add to Cart
+                        </button>
 
-                        <Link href={`/checkout?movie=${movie.id}`}>
-                            <button className="w-full py-3 border border-black rounded-lg hover:bg-gray-100 transition">
-                                Buy Now
-                            </button>
-                        </Link>
+                        <button
+                            className="h-11 rounded-lg border border-gray-300 hover:bg-gray-100 transition font-medium"
+                        >
+                            Buy Now
+                        </button>
                     </div>
                     <div className="mt-4 text-sm text-muted-foreground">
                         {movie.description || "No description available."}
