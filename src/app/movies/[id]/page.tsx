@@ -109,6 +109,21 @@ export default async function MovieDetailsNewPage({ params }: { params: { id: st
                     <div className="mt-2 text-lg font-semibold">
                         <PriceTag amount={movie.price.toString()} />
                     </div>
+
+                    {/* Professional purchase section */}
+                    <div className="flex gap-4 mt-6">
+                        <Link href={`/cart?add=${movie.id}`}>
+                            <button className="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition">
+                                Add to Cart
+                            </button>
+                        </Link>
+
+                        <Link href={`/checkout?movie=${movie.id}`}>
+                            <button className="px-6 py-3 border border-black rounded-lg hover:bg-gray-100 transition">
+                                Buy Now
+                            </button>
+                        </Link>
+                    </div>
                     <div className="mt-4 text-sm text-muted-foreground">
                         {movie.description || "No description available."}
                     </div>
