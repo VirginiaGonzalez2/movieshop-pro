@@ -26,15 +26,13 @@ export const auth = betterAuth({
         provider: "postgresql",
     }),
 
-    trustedOrigins: !development
-        ? //[
-          // Production
-          undefined
-        : //]
-          [
-              // Development
-              "http://localhost:3000",
-          ],
+        trustedOrigins: !development
+                ? process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",") || []
+                : ["http://localhost:3000"],
+    cookies: {
+        secure: true,
+        sameSite: "lax"
+    },
 
     emailAndPassword: {
         enabled: true,
