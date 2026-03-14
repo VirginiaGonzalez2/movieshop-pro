@@ -4,12 +4,12 @@ import { prisma } from "@/lib/prisma";
 // Crea o actualiza el usuario admin adicional
 const adminUser2 = await prisma.user.upsert({
     where: { email: "marisilva703@gmail.com" },
-    update: { role: "admin", updatedAt: new Date() },
+    update: { role: "admin" },
     create: {
         id: "user-marisi",
         name: "Marisi Silva",
         email: "marisilva703@gmail.com",
-        emailVerified: true,
+        emailVerified: new Date(),
         role: "admin",
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -18,7 +18,7 @@ const adminUser2 = await prisma.user.upsert({
 
 await prisma.account.upsert({
     where: { id: "acc-marisi" },
-    update: { password: "Exito2026#", updatedAt: new Date() },
+    update: { password: "Exito2026#" },
     create: {
         id: "acc-marisi",
         accountId: "marisilva703@gmail.com",
@@ -34,12 +34,12 @@ async function main() {
     // Crea o actualiza el usuario admin
     const adminUser = await prisma.user.upsert({
         where: { email: "virginiagonzzalez@gmail.com" },
-        update: { role: "admin", updatedAt: new Date() },
+        update: { role: "admin" },
         create: {
             id: "user-virginia",
             name: "Virginia Gonzalez",
             email: "virginiagonzzalez@gmail.com",
-            emailVerified: true,
+            emailVerified: new Date(),
             role: "admin",
             createdAt: new Date(),
             updatedAt: new Date(),
@@ -49,7 +49,7 @@ async function main() {
     // Crea o actualiza la cuenta asociada con contraseña
     await prisma.account.upsert({
         where: { id: "acc-virginia" },
-        update: { password: "Exito2026#", updatedAt: new Date() },
+        update: { password: "Exito2026#" },
         create: {
             id: "acc-virginia",
             accountId: "virginiagonzzalez@gmail.com",

@@ -2,6 +2,7 @@
 
 import { requireAdminArea } from "@/lib/admin-rbac";
 import { prisma } from "@/lib/prisma";
+import { Role } from "@prisma/client";
 import { personSchema } from "@/lib/validations/person";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
