@@ -59,22 +59,18 @@ model session {
 }
 
 model user {
-  id            String         @id
-  name          String
-  email         String         @unique
-  emailVerified Boolean        @default(false)
-  image         String?
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime
-  banExpires    DateTime?
-  banReason     String?
-  banned        Boolean        @default(false)
-  role          String         @default("user")
-  ratings       MovieRating[]
-  orders        Order[]
-  wishlist      WishlistItem[]
-  account       account[]
-  session       session[]
+  id             String   @id @default(cuid())
+  name           String?
+  email          String   @unique
+  emailVerified  DateTime?
+  password       String?
+  image          String?
+  role           String   @default("USER")
+  account        account[]
+  session        session[]
+  ratings        MovieRating[]
+  orders         Order[]
+  wishlist       WishlistItem[]
 }
 
 model verification {

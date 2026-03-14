@@ -47,19 +47,21 @@ export function LoginForm({ className, ...rest }: Props) {
     });
 
     async function handleSubmit(values: LoginFormValues) {
-        console.log(values);
-
-        const { error } = await authClient.signIn.email({
-            email: values.email,
-            password: values.password,
-        });
-
-        if (error) {
-            toast.error(error.message || "An unknown error occurred. Please try again later.");
-            return;
+        try {
+            const { error } = await authClient.signIn.email({
+                email: values.email,
+                password: values.password,
+            });
+            if (error) {
+                console.error("LOGIN ERROR:", error);
+                toast.error(error.message || "An unknown error occurred. Please try again later.");
+                return;
+            }
+            redirect(originlUrl, RedirectType.replace);
+        } catch (error) {
+            console.error("LOGIN ERROR:", error);
+            toast.error("Login failed. Please try again.");
         }
-
-        redirect(originlUrl, RedirectType.replace);
     }
 
     return (

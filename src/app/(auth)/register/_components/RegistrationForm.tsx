@@ -57,33 +57,31 @@ export function RegistrationForm({ className, ...rest }: Props) {
     const originlUrl = router.getOrigin();
 
     async function handleSubmit(values: RegistrationFormValues) {
-        const { error } = await authClient.signUp.email({
-            name: values.name,
-            email: values.email,
-            password: values.password,
-        });
-
-        if (error) {
-            toast.error(error.message || "An unknown error occurred. Please try again later.");
-            return;
-        }
-
         try {
+            const { error } = await authClient.signUp.email({
+                name: values.name,
+                email: values.email,
+                password: values.password,
+            });
+            if (error) {
+                console.error("REGISTER ERROR:", error);
+                toast.error(error.message || "An unknown error occurred. Please try again later.");
+                return;
+            }
             const result = await claimGuestOrdersForUser(values.email, values.name);
             if (result.linked > 0 && values.name !== values.email) {
                 toast.info("Guest orders linked to your account.");
             } else if (result.linked === 0 && values.name && values.name !== values.email) {
                 toast.warning("No guest orders found for your email. If you used a different name, your orders may be linked by name as fallback.");
             }
-        } catch {
-            // Keep signup successful even if order linking fails.
+            toast.warning("Before you can sign in you must verify your email.", {
+                duration: 10000,
+            });
+            redirect(originlUrl, RedirectType.replace);
+        } catch (error) {
+            console.error("REGISTER ERROR:", error);
+            toast.error("Registration failed. Please try again.");
         }
-
-        toast.warning("Before you can sign in you must verify your email.", {
-            duration: 10000,
-        });
-
-        redirect(originlUrl, RedirectType.replace);
     }
 
     return (

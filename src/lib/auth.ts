@@ -26,9 +26,10 @@ export const auth = betterAuth({
         provider: "postgresql",
     }),
 
-        trustedOrigins: !development
-                ? process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",") || []
-                : ["http://localhost:3000"],
+    trustedOrigins:
+        process.env.NODE_ENV === "production"
+            ? process.env.BETTER_AUTH_TRUSTED_ORIGINS?.split(",") || []
+            : ["http://localhost:3000"],
     cookies: {
         secure: true,
         sameSite: "lax"
@@ -36,11 +37,6 @@ export const auth = betterAuth({
 
     emailAndPassword: {
         enabled: true,
-        // TODO: Change this to test e-mail verification.
-        requireEmailVerification: false, //!development,
-        sendResetPassword: async (data: { url: string }) => {
-            console.log("Password Reset:", data.url);
-        },
     },
 
     emailVerification: {
