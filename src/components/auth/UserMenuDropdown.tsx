@@ -7,8 +7,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useOriginRouter } from "@/hooks/use-origin-router";
-import { authClient } from "@/lib/auth-client";
-import { isAdminRole } from "@/lib/admin-roles";
+// Lógica client-side: solo fetch endpoints y localStorage/cookies
 import { User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,15 +27,31 @@ export default function UserMenuDropdown() {
 
     const router = useOriginRouter(isAuthRoute);
 
-    const session = authClient.useSession();
+    const [user, setUser] = useState<any>(null);
+    const [loginStatus, setLoginStatus] = useState<LoginStatus>("pending");
     const [isAdmin, setIsAdmin] = useState(false);
 
-    const loginStatus: LoginStatus =
-        session.isPending || session.isRefetching
-            ? "pending"
-            : session.data
-              ? "loggedin"
-              : "notloggedin";
+    useEffect(() => {
+        // Leer token de cookie/localStorage
+        const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+        if (token) {
+            // Decodificar JWT solo client-side
+            try {
+                const payload = JSON.parse(atob(token.split(".")[1]));
+                setUser(payload);
+                setLoginStatus("loggedin");
+                setIsAdmin(payload.role === "admin");
+            } catch {
+                setUser(null);
+                setLoginStatus("notloggedin");
+                setIsAdmin(false);
+            }
+        } else {
+            setUser(null);
+            setLoginStatus("notloggedin");
+            setIsAdmin(false);
+        }
+    }, []);
 
     function blockWhilePending(event: MouseEvent<HTMLAnchorElement>) {
         if (loginStatus === "pending") {
@@ -88,7 +103,7 @@ export default function UserMenuDropdown() {
         return () => {
             mounted = false;
         };
-    }, [loginStatus, session.data?.user.role]);
+    }, [loginStatus, user?.role]);
 
     // TODO: Use session data to display name and email profile pic etc.
 

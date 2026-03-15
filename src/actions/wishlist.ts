@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+// import { getSession } from "@/lib/auth-session";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 
@@ -18,6 +18,10 @@ export async function getMyWishlistState(movieId: number): Promise<boolean> {
 
     const userId = session?.user?.id;
     if (!userId) return false;
+        // TODO: Nueva lógica de sesión basada en JWT/cookie
+        // const session = getSession();
+        // const userId = session?.id;
+        // if (!userId) return false;
 
     const row = await prisma.wishlistItem.findUnique({
         where: { movieId_userId: { movieId, userId } },
@@ -44,6 +48,10 @@ export async function toggleWishlist(movieId: number): Promise<boolean> {
     if (!userId) {
         throw new Error("Unauthorized");
     }
+        // TODO: Nueva lógica de sesión basada en JWT/cookie
+        // const session = getSession();
+        // const userId = session?.id;
+        // if (!userId) throw new Error("Not logged in");
 
     const existing = await prisma.wishlistItem.findUnique({
         where: { movieId_userId: { movieId, userId } },
@@ -77,6 +85,10 @@ export async function getWishlistCount(): Promise<number> {
 
     const userId = session?.user?.id;
     if (!userId) return 0;
+        // TODO: Nueva lógica de sesión basada en JWT/cookie
+        // const session = getSession();
+        // const userId = session?.id;
+        // if (!userId) return 0;
 
     const count = await prisma.wishlistItem.count({
         where: { userId },
@@ -105,6 +117,10 @@ export async function getWishlistInfo(): Promise<WishlistItemInfo[] | null> {
 
     const userId = session?.user?.id;
     if (!userId) return null;
+        // TODO: Nueva lógica de sesión basada en JWT/cookie
+        // const session = getSession();
+        // const userId = session?.id;
+        // if (!userId) return null;
 
     const wishlisted = await prisma.wishlistItem.findMany({
         where: { userId },

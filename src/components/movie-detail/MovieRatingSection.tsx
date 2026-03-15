@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { authClient } from "@/lib/auth-client";
+// import { authClient } from "@/lib/auth-client";
 import { useOriginRouter } from "@/hooks/use-origin-router";
 import { getMyMovieRating, setMovieRating } from "@/actions/movie-rating";
 
@@ -13,7 +13,16 @@ type Props = {
 };
 
 export default function MovieRatingSection({ movieId, avgRating, ratingCount }: Props) {
-    const session = authClient.useSession();
+    // Nueva lógica: verifica token en localStorage
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    let session = null;
+    if (token) {
+        try {
+            session = JSON.parse(atob(token.split(".")[1]));
+        } catch {
+            session = null;
+        }
+    }
     const originRouter = useOriginRouter();
     const router = useRouter();
     const [isPending, startTransition] = useTransition();

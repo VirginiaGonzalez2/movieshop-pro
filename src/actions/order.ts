@@ -1,28 +1,19 @@
 "use server";
 
-import { auth } from "@/lib/auth";
+// import { getSession } from "@/lib/auth-session";
 import { prisma } from "@/lib/prisma";
 import { ActionError, ActionSuccess, HTTPStatusCode } from "@/utils/action-util";
 import { Order } from "@prisma/client";
 import { ReadonlyHeaders } from "next/dist/server/web/spec-extension/adapters/headers";
 import { headers as nextHeaders } from "next/headers";
 
-// Permission helper
-async function hasPermission(
-    userId: string,
-    action: "create" | "get" | "get-own" | "delete",
-    headers?: ReadonlyHeaders,
-): Promise<boolean> {
-    return (
-        await auth.api.userHasPermission({
-            headers: headers ?? (await nextHeaders()),
-            body: {
-                userId: userId,
-                permissions: { orders: [action] },
-            },
-        })
-    ).success;
-}
+// TODO: Nueva lógica de permisos basada en JWT/session
+// async function hasPermission(userId: string, action: "create" | "get" | "get-own" | "delete") {
+//   const session = getSession();
+//   if (!session) return false;
+//   // Ejemplo: solo el usuario o admin puede crear/editar/eliminar
+//   return session.id === userId || session.role === 'admin';
+// }
 
 // Actions
 

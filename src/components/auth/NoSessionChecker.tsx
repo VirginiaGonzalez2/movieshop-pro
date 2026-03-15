@@ -9,33 +9,32 @@
 
 "use client";
 
-import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
-import { ReactNode, useEffect } from "react";
+import React from "react";
 
 type Props = {
     children: ReactNode;
     originUrl: string;
 };
 
-export function NoSessionChecker({ children, originUrl }: Props) {
+const NoSessionChecker = ({ children, originUrl }: Props) => {
     const router = useRouter();
-    const session = authClient.useSession();
+    const [hasSession, setHasSession] = React.useState(false);
 
-    useEffect(() => {
-        if (!session.isPending && !session.isRefetching && session.data) {
+    React.useEffect(() => {
+        const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+        if (token) {
+            setHasSession(true);
             router.replace(originUrl);
+        } else {
+            setHasSession(false);
         }
-    }, [session.isPending, session.isRefetching, session.data, router, originUrl]);
+    }, [router, originUrl]);
 
-    if (session.isPending || session.isRefetching) {
-        // Loading
-        return <></>;
+    if (hasSession) {
+        return null;
     }
-
-    if (session.data) {
-        return <></>;
-    }
-
     return <>{children}</>;
-}
+};
+
+export { NoSessionChecker };

@@ -5,14 +5,23 @@ import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
 import { toast } from "sonner";
 
-import { authClient } from "@/lib/auth-client";
+// import { authClient } from "@/lib/auth-client";
 import { useOriginRouter } from "@/hooks/use-origin-router";
 import { getMyWishlistState, toggleWishlist } from "@/actions/wishlist";
 
 type Props = { movieId: number };
 
 export default function WishlistToggle({ movieId }: Props) {
-    const session = authClient.useSession();
+    // Nueva lógica: verifica token en localStorage
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    let session = null;
+    if (token) {
+        try {
+            session = JSON.parse(atob(token.split(".")[1]));
+        } catch {
+            session = null;
+        }
+    }
     const originRouter = useOriginRouter();
     const router = useRouter();
     const [isPending, startTransition] = useTransition();

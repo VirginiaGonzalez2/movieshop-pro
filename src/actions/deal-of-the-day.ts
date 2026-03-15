@@ -10,7 +10,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { cookies, headers } from "next/headers";
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/auth-session";
 
 const DEAL_COOKIE = "dotd_uid_v1";
 

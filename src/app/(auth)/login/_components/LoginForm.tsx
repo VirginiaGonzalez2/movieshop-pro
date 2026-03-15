@@ -48,15 +48,16 @@ export function LoginForm({ className, ...rest }: Props) {
 
     async function handleSubmit(values: LoginFormValues) {
         try {
-            const { error } = await authClient.signIn.email({
+            console.log("[LOGIN] Payload:", values);
+            const { error, session } = await authClient.signIn.email({
                 email: values.email,
                 password: values.password,
             });
             if (error) {
-                console.error("LOGIN ERROR:", error);
-                toast.error(error.message || "An unknown error occurred. Please try again later.");
+                // Error oculto: no mostrar mensaje ni log
                 return;
             }
+            console.log("[LOGIN] Session:", session);
             redirect(originlUrl, RedirectType.replace);
         } catch (error) {
             console.error("LOGIN ERROR:", error);

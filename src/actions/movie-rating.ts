@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { auth } from "@/lib/auth";
+// import { getSession } from "@/lib/auth-session";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 
@@ -34,9 +34,10 @@ export async function getMovieRatingSummary(movieId: number): Promise<{
 export async function getMyMovieRating(movieId: number): Promise<number> {
     if (!Number.isInteger(movieId) || movieId <= 0) return 0;
 
-    const session = await auth.api.getSession({
-        headers: await headers(),
-    });
+    // TODO: Nueva lógica de sesión basada en JWT/cookie
+    // const session = getSession();
+    // if (!session) return 0;
+    // const userId = session.id;
 
     const userId = session?.user?.id;
     if (!userId) return 0;

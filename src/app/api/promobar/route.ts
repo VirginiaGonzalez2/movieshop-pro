@@ -1,19 +1,21 @@
-import "dotenv/config";
-import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from "@prisma/adapter-pg";
 import { NextResponse } from 'next/server';
-
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  throw new Error("Missing DATABASE_URL in .env file");
-}
-const adapter = new PrismaPg({ connectionString });
-const prisma = new PrismaClient({ adapter });
+import { prisma } from '@/lib/prisma';
 
 // GET: Get current PromoBar config
 export async function GET() {
-  const promoBar = await prisma.promoBar.findFirst({});
-  return NextResponse.json(promoBar);
+  try {
+    const promoBar = await prisma.promoBar.findFirst({});
+    return NextResponse.json(promoBar);
+  } catch (error) {
+    console.error("PROMOBAR API ERROR:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Internal server error",
+      },
+      { status: 500 }
+    );
+  }
 }
 
 // PUT: Update PromoBar config
